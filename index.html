@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apex Math</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f7f5f0;
+      --cream: #f0ede6;
+      --accent: #c8ff00;
+      --gray: #888880;
+      --mid: #2a2a28;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      background: var(--white);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+
+    .logo span {
+      color: var(--black);
+      background: var(--accent);
+      padding: 0 4px;
+    }
+
+    nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--black); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gray);
+    }
+
+    .hero-sub {
+      margin-top: 2.5rem;
+      font-size: 1.05rem;
+      color: var(--gray);
+      max-width: 480px;
+      line-height: 1.7;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    .hero-actions {
+      margin-top: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .waitlist-form {
+      display: flex;
+      gap: 0;
+      border: 1.5px solid var(--black);
+    }
+
+    .waitlist-form input {
+      padding: 0.85rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 260px;
+      color: var(--black);
+    }
+
+    .waitlist-form input::placeholder { color: var(--gray); }
+
+    .waitlist-form button {
+      padding: 0.85rem 1.4rem;
+      background: var(--black);
+      color: var(--accent);
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .waitlist-form button:hover { background: var(--mid); }
+
+    .success-msg {
+      display: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--black);
+      background: var(--accent);
+      padding: 0.85rem 1.2rem;
+    }
+
+    .hero-stat {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      color: var(--gray);
+    }
+
+    /* BIG NUMBER */
+    .number-strip {
+      background: var(--black);
+      color: var(--white);
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .stat-item { padding: 1rem 0; }
+
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+    }
+
+    .stat-desc {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: rgba(247,245,240,0.45);
+      line-height: 1.6;
+      max-width: 200px;
+    }
+
+    /* HOW IT WORKS */
+    .how {
+      padding: 8rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 3rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+
+    .step-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3.5rem;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .step h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.7;
+    }
+
+    /* MANIFESTO */
+    .manifesto {
+      background: var(--black);
+      color: var(--white);
+      padding: 8rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manifesto::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.04;
+      filter: blur(80px);
+    }
+
+    .manifesto-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .manifesto h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+    }
+
+    .manifesto h2 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .manifesto p {
+      font-size: 1rem;
+      color: rgba(247,245,240,0.5);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    /* WAITLIST BOTTOM */
+    .bottom-cta {
+      padding: 8rem 3rem;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .bottom-cta h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+
+    .bottom-cta p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .waitlist-form-2 {
+      display: flex;
+      gap: 0;
+      border: 1.5px solid var(--black);
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    .waitlist-form-2 input {
+      padding: 0.9rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      border: none;
+      background: transparent;
+      outline: none;
+      flex: 1;
+      color: var(--black);
+    }
+
+    .waitlist-form-2 input::placeholder { color: var(--gray); }
+
+    .waitlist-form-2 button {
+      padding: 0.9rem 1.4rem;
+      background: var(--black);
+      color: var(--accent);
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .waitlist-form-2 button:hover { background: var(--mid); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(0,0,0,0.07);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer .logo {
+      font-size: 1rem;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--gray);
+      text-transform: uppercase;
+    }
+
+    /* TICKER */
+    .ticker {
+      background: var(--accent);
+      padding: 0.6rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: ticker 20s linear infinite;
+      gap: 0;
+    }
+
+    .ticker-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+      padding: 0 3rem;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: rgba(0,0,0,0.07);
+      margin: 0 3rem;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.8rem; }
+      .waitlist-form input { width: 180px; }
+      .number-strip { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+      .steps { grid-template-columns: 1fr; }
+      .how { padding: 5rem 1.5rem; }
+      .manifesto { padding: 5rem 1.5rem; }
+      .bottom-cta { padding: 5rem 1.5rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Apex<span>Math</span></div>
+    <a href="#waitlist">Join Waitlist →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-label">Free · For every student · Launching 2025</p>
+    <h1>Your math<br/>level shouldn't<br/>be <em>decided</em><br/>for you.</h1>
+    <p class="hero-sub">A personalized path from wherever you are right now — to the highest level of math — built around your pace, your goals, your timeline.</p>
+    <div class="hero-actions">
+      <div class="waitlist-form" id="form1">
+        <input type="email" placeholder="your@email.com" id="email1"/>
+        <button onclick="joinWaitlist('email1', 'form1', 'success1')">Get Early Access</button>
+      </div>
+      <div class="success-msg" id="success1">You're on the list ✓</div>
+      <span class="hero-stat">0 spots claimed so far</span>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">Algebra → Calc BC → Linear Algebra → Real Analysis</span>
+      <span class="ticker-item">No prerequisites required</span>
+      <span class="ticker-item">Your pace. Your map. Your future.</span>
+      <span class="ticker-item">Built for every student</span>
+      <span class="ticker-item">Algebra → Calc BC → Linear Algebra → Real Analysis</span>
+      <span class="ticker-item">No prerequisites required</span>
+      <span class="ticker-item">Your pace. Your map. Your future.</span>
+      <span class="ticker-item">Built for every student</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="number-strip">
+    <div class="stat-item">
+      <div class="stat-num">4 yrs</div>
+      <p class="stat-desc">The math track is set before most students even know they care about it.</p>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1 path</div>
+      <p class="stat-desc">Most schools offer one fixed sequence. Miss a step and you're locked out.</p>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0 reasons</div>
+      <p class="stat-desc">Why starting late should stop you from reaching the highest level.</p>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <p class="section-label">How it works</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Tell us where you are</h3>
+        <p>A quick diagnostic — no judgment, no placement test anxiety. We just need to know your starting point to build the right map.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Get your personal map</h3>
+        <p>A clear, step-by-step path from your current level to your goal. You always know exactly what's next and why it matters.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Move at your speed</h3>
+        <p>Not the class pace. Not the school's timeline. Yours. Go faster when you're locked in. Go slower when you need to. The map adjusts.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto">
+    <div class="manifesto-inner">
+      <h2>Math ability isn't<br/><em>innate.</em><br/>Access is the problem.</h2>
+      <p>The students who reach calculus, linear algebra, and beyond aren't smarter. They had the right track, the right school, the right timing.</p>
+      <p>That shouldn't determine your ceiling. We're building the tool that gives every student — regardless of where they started — a real shot at the highest level.</p>
+      <p>Free. Always.</p>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta" id="waitlist">
+    <h2>Be first when<br/>we launch.</h2>
+    <p>We're building in public and launching soon. Join the waitlist and help shape what Apex Math becomes.</p>
+    <div class="waitlist-form-2" id="form2">
+      <input type="email" placeholder="your@email.com" id="email2"/>
+      <button onclick="joinWaitlist('email2', 'form2', 'success2')">Join Waitlist</button>
+    </div>
+    <div class="success-msg" id="success2" style="max-width:460px;margin:0 auto;text-align:left;">You're on the list — we'll be in touch ✓</div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">Apex<span>Math</span></div>
+    <p>© 2025 ApexMath · Free forever · Built for students</p>
+  </footer>
+
+  <script>
+    async function joinWaitlist(inputId, formId, successId) {
+      const emailEl = document.getElementById(inputId);
+      const email = emailEl.value;
+
+      if (!email || !email.includes('@')) {
+        emailEl.style.outline = '2px solid red';
+        return;
+      }
+
+      emailEl.style.outline = 'none';
+
+      try {
+        const res = await fetch('/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById(formId).style.display = 'none';
+          document.getElementById(successId).style.display = 'block';
+
+          const stat = document.querySelector('.hero-stat');
+          if (stat) stat.textContent = `${data.count} spot${data.count !== 1 ? 's' : ''} claimed so far`;
+        } else if (res.status === 409) {
+          emailEl.placeholder = "You're already on the list!";
+          emailEl.value = '';
+        } else {
+          alert('Something went wrong. Try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Could not connect to server.');
+      }
+    }
+
+    // Load current count on page load
+    fetch('/waitlist/count')
+      .then(r => r.json())
+      .then(data => {
+        const stat = document.querySelector('.hero-stat');
+        if (stat) stat.textContent = `${data.count} spot${data.count !== 1 ? 's' : ''} claimed so far`;
+      });
+  </script>
+
+</body>
+</html>
