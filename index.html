@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apex Math</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black:#0a0a0a; --white:#f7f5f0; --accent:#c8ff00; --gray:#888880; --red:#ff4444; }
+    body {
+      background: var(--black); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh; display: flex; flex-direction: column;
+      padding: 2.5rem 3rem;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(200,255,0,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(200,255,0,0.03) 1px,transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+    nav { display:flex; justify-content:space-between; align-items:center; position:relative; z-index:1; margin-bottom:2rem; }
+    .logo { font-family:'DM Serif Display',serif; font-size:1.1rem; letter-spacing:-0.02em; }
+    .logo span { background:var(--accent); color:var(--black); padding:1px 5px; }
+    .badge { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gray); border:1px solid rgba(255,255,255,0.1); padding:0.35rem 0.75rem; }
+
+    .screen { display:none; flex:1; flex-direction:column; justify-content:center; position:relative; z-index:1; }
+    .screen.active { display:flex; }
+
+    /* LANDING */
+    .eyebrow { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1.5rem; opacity:0; animation:fadeUp 0.7s ease 0.3s forwards; }
+    h1 { font-family:'DM Serif Display',serif; font-size:clamp(2.8rem,7vw,5.5rem); line-height:1.05; letter-spacing:-0.03em; margin-bottom:1.5rem; opacity:0; animation:fadeUp 0.7s ease 0.45s forwards; }
+    h1 em { font-style:italic; color:var(--gray); }
+    .sub { font-size:1rem; color:var(--gray); line-height:1.7; max-width:440px; margin-bottom:2.5rem; opacity:0; animation:fadeUp 0.7s ease 0.6s forwards; }
+    .form-wrap { opacity:0; animation:fadeUp 0.7s ease 0.75s forwards; }
+    .wform { display:inline-flex; border:1.5px solid rgba(255,255,255,0.15); transition:border-color 0.2s; }
+    .wform:focus-within { border-color:var(--accent); }
+    .wform input { padding:0.9rem 1.2rem; background:transparent; border:none; outline:none; font-family:'DM Sans',sans-serif; font-size:0.9rem; color:var(--white); width:260px; }
+    .wform input::placeholder { color:rgba(255,255,255,0.25); }
+    .wform button { padding:0.9rem 1.4rem; background:var(--accent); color:var(--black); border:none; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:opacity 0.2s; white-space:nowrap; font-weight:500; }
+    .wform button:hover { opacity:0.85; }
+    .count-label { margin-top:1rem; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.08em; color:rgba(255,255,255,0.2); text-transform:uppercase; }
+
+    /* DIAGNOSTIC */
+    #diagnostic { max-width:640px; }
+    .progress-wrap { margin-bottom:3rem; }
+    .progress-top { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
+    .prog-label { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); }
+    .prog-level { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); }
+    .pbar { width:100%; height:2px; background:rgba(255,255,255,0.08); }
+    .pfill { height:100%; background:var(--accent); transition:width 0.5s ease; width:0%; }
+    .q-text { font-family:'DM Serif Display',serif; font-size:clamp(1.3rem,3vw,1.9rem); line-height:1.3; letter-spacing:-0.02em; margin-bottom:2rem; min-height:70px; }
+    .opts { display:flex; flex-direction:column; gap:0.65rem; }
+    .opt { padding:0.85rem 1.1rem; border:1.5px solid rgba(255,255,255,0.1); background:transparent; color:var(--white); font-family:'DM Sans',sans-serif; font-size:0.9rem; text-align:left; cursor:pointer; transition:border-color 0.15s,background 0.15s; display:flex; align-items:center; gap:0.9rem; }
+    .opt:hover:not(.disabled) { border-color:var(--accent); background:rgba(200,255,0,0.04); }
+    .opt.correct { border-color:var(--accent)!important; background:rgba(200,255,0,0.08)!important; }
+    .opt.wrong { border-color:var(--red)!important; background:rgba(255,68,68,0.08)!important; }
+    .opt.disabled { pointer-events:none; }
+    .opt-letter { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--gray); min-width:14px; }
+    .loading { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--gray); letter-spacing:0.1em; margin-top:1rem; display:none; }
+    .loading.on { display:block; }
+
+    /* RESULT */
+    #result { max-width:640px; }
+    .r-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:0.75rem; }
+    .r-level { font-family:'DM Serif Display',serif; font-size:clamp(2rem,5vw,3.2rem); line-height:1.1; letter-spacing:-0.03em; margin-bottom:1rem; }
+    .r-score { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.08em; color:var(--gray); margin-bottom:1.5rem; }
+    .r-desc { font-size:0.95rem; color:var(--gray); line-height:1.7; max-width:480px; margin-bottom:2rem; }
+    .roadmap { display:flex; flex-direction:column; margin-bottom:2rem; }
+    .rm-step { display:flex; align-items:flex-start; gap:1rem; padding:0.85rem 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .rm-step:last-child { border-bottom:none; }
+    .rm-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.15); margin-top:6px; flex-shrink:0; }
+    .rm-dot.now { background:var(--accent); }
+    .rm-info { flex:1; }
+    .rm-name { font-size:0.9rem; margin-bottom:0.2rem; }
+    .rm-desc { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.04em; color:var(--gray); }
+    .rm-time { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--gray); white-space:nowrap; }
+    .notify-btn { padding:0.9rem 2rem; background:var(--accent); color:var(--black); border:none; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-weight:500; transition:opacity 0.2s; }
+    .notify-btn:hover { opacity:0.85; }
+
+    /* FOOTER */
+    footer { position:relative; z-index:1; display:flex; justify-content:space-between; align-items:flex-end; margin-top:2rem; }
+    .three { display:flex; gap:2.5rem; }
+    .thing { display:flex; flex-direction:column; gap:0.3rem; }
+    .t-num { font-family:'DM Serif Display',serif; font-size:1.8rem; color:var(--accent); line-height:1; }
+    .t-lbl { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); max-width:100px; line-height:1.5; }
+    .copy { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.08em; color:rgba(255,255,255,0.15); text-transform:uppercase; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .fade { animation:fadeUp 0.4s ease forwards; }
+
+    @media(max-width:600px){
+      body{padding:1.5rem;}
+      .wform input{width:170px;}
+      .three{gap:1.5rem;}
+      .copy{display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Apex<span>Math</span></div>
+  <div class="badge" id="badge">Coming Soon</div>
+</nav>
+
+<!-- LANDING -->
+<div class="screen active" id="s-landing">
+  <p class="eyebrow">Free · For every student</p>
+  <h1>Your math level<br/>shouldn't be<br/><em>decided for you.</em></h1>
+  <p class="sub">A personalized path from wherever you are — to the highest level of math. No prerequisites. No gatekeeping. Just you and the work.</p>
+  <div class="form-wrap">
+    <div class="wform" id="wform">
+      <input type="email" placeholder="your@email.com" id="email-input"/>
+      <button onclick="joinWaitlist()">Join Waitlist</button>
+    </div>
+    <div class="count-label" id="count-label"></div>
+  </div>
+</div>
+
+<!-- DIAGNOSTIC -->
+<div class="screen" id="s-diagnostic">
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span class="prog-label" id="prog-label">Question 1 of 10</span>
+      <span class="prog-level" id="prog-level">Algebra</span>
+    </div>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+  </div>
+  <div class="q-text" id="q-text"></div>
+  <div class="opts" id="opts"></div>
+  <div class="loading" id="loading">Loading next question...</div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="r-label">Your Math Level</div>
+  <div class="r-level" id="r-level"></div>
+  <div class="r-score" id="r-score"></div>
+  <div class="r-desc" id="r-desc"></div>
+  <div class="roadmap" id="roadmap"></div>
+  <button class="notify-btn" onclick="notifyMe()">Notify me when lessons are ready →</button>
+</div>
+
+<footer>
+  <div class="three">
+    <div class="thing"><div class="t-num">0</div><div class="t-lbl">Prerequisites required</div></div>
+    <div class="thing"><div class="t-num">∞</div><div class="t-lbl">Your ceiling</div></div>
+    <div class="thing"><div class="t-num">Free</div><div class="t-lbl">Always. No exceptions.</div></div>
+  </div>
+  <div class="copy">© 2025 Apex Math</div>
+</footer>
+
+<script>
+  const ROADMAPS = {
+    0: { name: "Arithmetic Foundations", desc: "You're building the base. Master arithmetic and you unlock everything above.", path: [
+      { name: "Number Systems & Operations", desc: "Integers, fractions, decimals, percentages", time: "2 weeks", now: true },
+      { name: "Early Algebra", desc: "Variables, equations, expressions", time: "3 weeks", now: false },
+      { name: "Geometry Basics", desc: "Shapes, area, volume, angles", time: "3 weeks", now: false },
+      { name: "Advanced Algebra", desc: "Polynomials, functions, systems", time: "4 weeks", now: false },
+      { name: "Pre-Calculus", desc: "Trig, logs, sequences", time: "5 weeks", now: false },
+    ]},
+    1: { name: "Early Algebra", desc: "You're ready to move fast. Algebra is the gateway — and you're at the gate.", path: [
+      { name: "Linear Equations & Inequalities", desc: "Solve, graph, and interpret", time: "2 weeks", now: true },
+      { name: "Polynomials & Factoring", desc: "Quadratics, factoring, roots", time: "3 weeks", now: false },
+      { name: "Geometry", desc: "Proofs, similarity, trig intro", time: "3 weeks", now: false },
+      { name: "Advanced Algebra", desc: "Functions, logs, complex numbers", time: "4 weeks", now: false },
+      { name: "Pre-Calculus", desc: "Trig deep dive, limits intro", time: "4 weeks", now: false },
+    ]},
+    2: { name: "Advanced Algebra", desc: "Solid foundation. You're in the territory where most students fall behind — but you won't.", path: [
+      { name: "Complex Numbers & Sequences", desc: "Master what most skip", time: "2 weeks", now: true },
+      { name: "Exponential & Log Functions", desc: "Growth, decay, inverses", time: "2 weeks", now: false },
+      { name: "Trigonometry", desc: "Unit circle, identities, graphs", time: "3 weeks", now: false },
+      { name: "Pre-Calculus", desc: "Vectors, polar, conics", time: "4 weeks", now: false },
+      { name: "Calculus I", desc: "Limits, derivatives, integrals", time: "6 weeks", now: false },
+    ]},
+    3: { name: "Geometry", desc: "You're working across topics well. Let's sharpen your geometry and push forward.", path: [
+      { name: "Proof-Based Geometry", desc: "Logical reasoning, congruence", time: "2 weeks", now: true },
+      { name: "Advanced Algebra", desc: "Functions, systems, sequences", time: "3 weeks", now: false },
+      { name: "Trigonometry", desc: "SOH-CAH-TOA to full identities", time: "3 weeks", now: false },
+      { name: "Pre-Calculus", desc: "Limits, series, parametrics", time: "4 weeks", now: false },
+      { name: "Calculus I", desc: "The full first course", time: "6 weeks", now: false },
+    ]},
+    4: { name: "Pre-Calculus", desc: "You're almost at calculus. One strong push and you're there.", path: [
+      { name: "Trig Identities & Advanced Functions", desc: "Fill the last gaps", time: "2 weeks", now: true },
+      { name: "Limits & Continuity", desc: "The bridge to calculus", time: "2 weeks", now: false },
+      { name: "Calculus I — Derivatives", desc: "Rates of change, rules, applications", time: "4 weeks", now: false },
+      { name: "Calculus I — Integration", desc: "Antiderivatives, FTC", time: "4 weeks", now: false },
+      { name: "Calculus II", desc: "Series, techniques, applications", time: "5 weeks", now: false },
+    ]},
+    5: { name: "Calculus I", desc: "You're in the top tier. Let's go deeper.", path: [
+      { name: "Advanced Derivative Techniques", desc: "Implicit, related rates, optimization", time: "2 weeks", now: true },
+      { name: "Integration Techniques", desc: "IBP, trig sub, partial fractions", time: "3 weeks", now: false },
+      { name: "Calculus II", desc: "Series, convergence, multivariable intro", time: "5 weeks", now: false },
+      { name: "Linear Algebra", desc: "Vectors, matrices, transformations", time: "5 weeks", now: false },
+      { name: "Real Analysis", desc: "Rigorous proofs, the real foundation", time: "6 weeks", now: false },
+    ]},
+    6: { name: "Calculus II+", desc: "Elite level. You're operating where very few high schoolers reach.", path: [
+      { name: "Multivariable Calculus", desc: "Partial derivatives, gradients", time: "4 weeks", now: true },
+      { name: "Linear Algebra", desc: "Deep dive into matrices and spaces", time: "4 weeks", now: false },
+      { name: "Differential Equations", desc: "ODEs, systems, modeling", time: "4 weeks", now: false },
+      { name: "Real Analysis", desc: "ε-δ proofs, measure theory intro", time: "6 weeks", now: false },
+      { name: "Abstract Algebra", desc: "Groups, rings, fields", time: "6 weeks", now: false },
+    ]},
+  };
+
+  let userEmail = '';
+  let sessionId = Math.random().toString(36).slice(2);
+  let qCount = 0;
+  let correct = 0;
+  let wrong = 0;
+  let currentLevel = 1;
+  const MAX_Q = 10;
+
+  // ── WAITLIST ──────────────────────────────────────────────
+  async function joinWaitlist() {
+    const email = document.getElementById('email-input').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('email-input').style.outline = '1px solid var(--red)';
+      return;
+    }
+    userEmail = email;
+    try {
+      await fetch('/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    } catch(e) {}
+    showScreen('s-diagnostic');
+    document.getElementById('badge').textContent = 'Diagnostic';
+    loadQuestion();
+  }
+
+  // ── SCREEN ────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ── LOAD QUESTION ─────────────────────────────────────────
+  async function loadQuestion() {
+    document.getElementById('loading').classList.add('on');
+    document.getElementById('opts').innerHTML = '';
+    document.getElementById('q-text').textContent = '';
+
+    try {
+      const res = await fetch('/question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, currentLevel, correct, wrong })
+      });
+      const data = await res.json();
+      document.getElementById('loading').classList.remove('on');
+
+      if (data.done || qCount >= MAX_Q) { showResult(); return; }
+
+      currentLevel = data.level;
+      renderQuestion(data.question, data.levelName);
+    } catch(e) {
+      document.getElementById('loading').classList.remove('on');
+      document.getElementById('q-text').textContent = 'Error loading question. Please refresh.';
+    }
+  }
+
+  // ── RENDER QUESTION ───────────────────────────────────────
+  function renderQuestion(q, levelName) {
+    qCount++;
+    const labels = ['A','B','C','D'];
+    document.getElementById('prog-label').textContent = `Question ${qCount} of ${MAX_Q}`;
+    document.getElementById('prog-level').textContent = levelName;
+    document.getElementById('pfill').style.width = `${(qCount / MAX_Q) * 100}%`;
+
+    const qt = document.getElementById('q-text');
+    qt.textContent = q.q;
+    qt.classList.remove('fade');
+    void qt.offsetWidth;
+    qt.classList.add('fade');
+
+    const opts = document.getElementById('opts');
+    opts.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.innerHTML = `<span class="opt-letter">${labels[i]}</span>${opt}`;
+      btn.onclick = () => handleAnswer(i, q.ans, opts);
+      opts.appendChild(btn);
+    });
+  }
+
+  // ── HANDLE ANSWER ─────────────────────────────────────────
+  function handleAnswer(chosen, correct_ans, optsEl) {
+    const isCorrect = chosen === correct_ans;
+    if (isCorrect) correct++; else wrong++;
+
+    optsEl.querySelectorAll('.opt').forEach((b, i) => {
+      b.classList.add('disabled');
+      if (i === correct_ans) b.classList.add('correct');
+      if (i === chosen && !isCorrect) b.classList.add('wrong');
+    });
+
+    setTimeout(() => {
+      if (qCount >= MAX_Q) showResult();
+      else loadQuestion();
+    }, 800);
+  }
+
+  // ── SHOW RESULT ───────────────────────────────────────────
+  async function showResult() {
+    showScreen('s-result');
+    document.getElementById('badge').textContent = 'Your Map';
+
+    const rm = ROADMAPS[currentLevel];
+    document.getElementById('r-level').textContent = rm.name;
+    document.getElementById('r-score').textContent = `${correct} / ${MAX_Q} correct`;
+    document.getElementById('r-desc').textContent = rm.desc;
+
+    const roadmapEl = document.getElementById('roadmap');
+    roadmapEl.innerHTML = '';
+    rm.path.forEach(step => {
+      roadmapEl.innerHTML += `
+        <div class="rm-step">
+          <div class="rm-dot${step.now ? ' now' : ''}"></div>
+          <div class="rm-info">
+            <div class="rm-name">${step.name}</div>
+            <div class="rm-desc">${step.desc}</div>
+          </div>
+          <div class="rm-time">${step.time}</div>
+        </div>`;
+    });
+
+    // Save result
+    try {
+      await fetch('/result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, level: currentLevel, levelName: rm.name, score: correct, total: MAX_Q })
+      });
+    } catch(e) {}
+  }
+
+  function notifyMe() {
+    alert("We'll notify you at " + (userEmail || 'your email') + " when lessons go live!");
+  }
+
+  // ── INIT ──────────────────────────────────────────────────
+  fetch('/waitlist/count').then(r => r.json()).then(d => {
+    if (d.count > 0) document.getElementById('count-label').textContent = `${d.count} student${d.count !== 1 ? 's' : ''} already in`;
+  }).catch(() => {});
+</script>
+</body>
+</html>
