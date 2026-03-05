@@ -66,6 +66,11 @@
     .wform button { padding:0.9rem 1.5rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;white-space:nowrap;font-weight:500; }
     .wform button:hover { opacity:0.85; }
     .count-label { margin-top:1rem;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;color:var(--text3);text-transform:uppercase; }
+    .landing-btns { display:flex;gap:0.75rem;flex-wrap:wrap; }
+    .landing-cta { padding:0.95rem 2rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;font-weight:500; }
+    .landing-cta:hover { opacity:0.85; }
+    .landing-cta-ghost { padding:0.95rem 2rem;background:none;color:var(--text2);border:1.5px solid var(--border);font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s; }
+    .landing-cta-ghost:hover { border-color:var(--accent);color:var(--accent); }
     .landing-foot { margin-top:5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;gap:3rem;opacity:0;animation:fadeUp 0.7s ease 0.8s forwards; }
     .lf-num { font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--accent);line-height:1;margin-bottom:0.3rem; }
     .lf-label { font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
@@ -215,7 +220,7 @@
 <nav>
   <a class="logo" onclick="handleLogoClick()">Apex<em>Math</em></a>
   <div class="nav-right">
-    <div class="nav-status" id="nav-status">Coming Soon</div>
+
     <div class="nav-auth" id="nav-auth">
       <button class="nav-auth-btn" onclick="openModal('login')">Log In</button>
       <button class="nav-auth-btn primary" onclick="openModal('register')">Sign Up</button>
@@ -252,8 +257,8 @@
     </div>
     <div class="auth-error" id="auth-error"></div>
     <button class="auth-submit" id="auth-submit" onclick="submitAuth()">Create Account</button>
-    <div class="auth-divider"><span>or</span></div>
-    <button class="auth-skip" onclick="closeModal()">Continue without account</button>
+
+
     <div class="auth-toggle" id="auth-toggle">
       Already have an account? <button onclick="switchMode()">Log in</button>
     </div>
@@ -264,13 +269,12 @@
 <div class="screen active" id="s-landing">
   <p class="eyebrow">Free · For every student</p>
   <h1>Your math level<br/>shouldn't be<br/><em>decided for you.</em></h1>
-  <p class="sub">A personalized path from wherever you are — to the highest level of math. No prerequisites. No gatekeeping. Just you and the work.</p>
+  <p class="sub">Take a 10-question diagnostic, find out exactly where you are, and get a personalized path to the highest level of math. No prerequisites. No gatekeeping.</p>
   <div class="form-wrap">
-    <div class="wform">
-      <input type="email" placeholder="your@email.com" id="email-input"/>
-      <button onclick="joinBeta()">Join the Beta</button>
+    <div class="landing-btns">
+      <button class="landing-cta" onclick="openModal('register')">Get Started — It's Free</button>
+      <button class="landing-cta-ghost" onclick="openModal('login')">Log In</button>
     </div>
-    <div class="count-label" id="count-label"></div>
   </div>
   <div class="landing-foot">
     <div class="lf-item"><div class="lf-num">0</div><div class="lf-label">Prerequisites</div></div>
@@ -426,7 +430,7 @@ function signOut() {
   localStorage.removeItem(STORAGE_KEY);
   updateNavAuth();
   showScreen('s-landing');
-  document.getElementById('nav-status').textContent = 'Coming Soon';
+  
 }
 
 // ── AUTH MODAL ────────────────────────────────────────────────
@@ -490,12 +494,23 @@ async function submitAuth() {
     updateNavAuth();
     closeModal();
 
-    // Save result linked to account if they just finished diagnostic
-    const saved = getSavedResult();
-    if (saved) {
-      saved.email = email;
-      saveResult(saved);
-      try { await fetch('/result', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, level:saved.level, levelName:STAGES[saved.level].name, score:saved.score, total:saved.total}) }); } catch(e) {}
+    if (authMode === 'register') {
+      // New account → straight to diagnostic
+      qCount=0; correct=0; wrong=0; currentLevel=1; userLevel=1;
+      sessionId = Math.random().toString(36).slice(2);
+      showScreen('s-diagnostic');
+      
+      loadQuestion();
+    } else {
+      // Login → restore saved results if they exist
+      const saved = getSavedResult();
+      if (currentUser.level !== undefined) {
+        const rd = { level:currentUser.level, score:currentUser.score||0, total:currentUser.total||10, email:currentUser.email };
+        saveResult(rd);
+        renderResult(rd, false);
+      } else if (saved) {
+        renderResult(saved, false);
+      }
     }
   } catch(e) {
     errEl.textContent = 'Network error. Please try again.'; errEl.classList.add('show');
@@ -526,7 +541,7 @@ if (savedTheme !== null) {
 function handleLogoClick() {
   const saved = getSavedResult();
   if (saved) { showResultFromSaved(saved, true); }
-  else { showScreen('s-landing'); document.getElementById('nav-status').textContent = 'Coming Soon'; }
+  else { showScreen('s-landing');  }
 }
 
 // ── STORAGE ───────────────────────────────────────────────────
@@ -540,7 +555,7 @@ async function joinBeta() {
   userEmail = email;
   try { await fetch('/waitlist', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email}) }); } catch(e) {}
   showScreen('s-diagnostic');
-  document.getElementById('nav-status').textContent = 'Diagnostic';
+  
   loadQuestion();
 }
 
@@ -553,7 +568,7 @@ function showScreen(id) {
 function startFresh() {
   qCount=0; correct=0; wrong=0; currentLevel=1; userLevel=1;
   showScreen('s-diagnostic');
-  document.getElementById('nav-status').textContent = 'Diagnostic';
+  
   loadQuestion();
 }
 
@@ -610,10 +625,6 @@ async function showResult() {
   saveResult(resultData);
   renderResult(resultData, false);
   try { await fetch('/result', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:userEmail, level:userLevel, levelName:STAGES[userLevel].name, score:correct, total:MAX_Q}) }); } catch(e) {}
-  // Prompt to create account if not logged in
-  if (!currentUser) {
-    setTimeout(() => openModal('register'), 1200);
-  }
 }
 
 function showResultFromSaved(data, showRetake) {
@@ -623,7 +634,7 @@ function showResultFromSaved(data, showRetake) {
 
 function renderResult(data, showRetakeBanner) {
   showScreen('s-result');
-  document.getElementById('nav-status').textContent = 'Your Map';
+  
   const stage = STAGES[data.level];
   document.getElementById('r-level').textContent = stage.name;
   document.getElementById('r-score').textContent = `${data.score} / ${data.total} correct · Diagnostic complete`;
