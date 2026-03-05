@@ -194,3 +194,95 @@ app.post('/result', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Apex Math running on port ${PORT}`));
+
+// ── DAILY QUIZ ────────────────────────────────────────────────────────────────
+
+// Get 5 daily questions for user's current level
+app.get('/daily/questions', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT level FROM users WHERE id=$1', [req.user.id]);
+    const level = result.rows[0]?.level ?? 1;
+    const pool_q = questions[level];
+    // Pick 5 random questions
+    const shuffled = [...pool_q].sort(() => Math.random() - 0.5).slice(0, 5);
+    res.json({ questions: shuffled, level, levelName: LEVEL_NAMES[level] });
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Submit daily quiz completion
+app.post('/daily/complete', authMiddleware, async (req, res) => {
+  const { score } = req.body; // score out of 5
+  const passed = score >= 3;
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    // Record completion (ignore if already done today)
+    await pool.query(
+      `INSERT INTO daily_completions (user_id, completed_date, score, passed)
+       VALUES ($1, $2, $3, $4) ON CONFLICT (user_id, completed_date) DO UPDATE SET score=$3, passed=$4`,
+      [req.user.id, today, score, passed]
+    );
+
+    if (!passed) {
+      return res.json({ success: true, passed: false, streak: null });
+    }
+
+    // Calculate streak
+    const rows = await pool.query(
+      `SELECT completed_date FROM daily_completions
+       WHERE user_id=$1 AND passed=true ORDER BY completed_date DESC`,
+      [req.user.id]
+    );
+    const dates = rows.rows.map(r => r.completed_date.toISOString().split('T')[0]);
+    let streak = 0;
+    let check = new Date(today);
+    for (let i = 0; i < dates.length; i++) {
+      const d = check.toISOString().split('T')[0];
+      if (dates.includes(d)) { streak++; check.setDate(check.getDate() - 1); }
+      else break;
+    }
+
+    // Update user streak + last_active
+    await pool.query(
+      'UPDATE users SET streak=$1, last_active=CURRENT_DATE WHERE id=$2',
+      [streak, req.user.id]
+    );
+
+    res.json({ success: true, passed: true, streak });
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get user dashboard data
+app.get('/dashboard', authMiddleware, async (req, res) => {
+  try {
+    const user = await pool.query(
+      'SELECT id, email, level, level_name, streak, last_active FROM users WHERE id=$1',
+      [req.user.id]
+    );
+    const u = user.rows[0];
+
+    // Check if already completed today
+    const today = new Date().toISOString().split('T')[0];
+    const done = await pool.query(
+      'SELECT passed, score FROM daily_completions WHERE user_id=$1 AND completed_date=$2',
+      [u.id, today]
+    );
+    const completedToday = done.rows.length > 0;
+    const passedToday = done.rows[0]?.passed ?? false;
+
+    // Check if streak is broken (last_active was not yesterday or today)
+    let streak = u.streak;
+    if (u.last_active) {
+      const last = new Date(u.last_active).toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      if (last !== today && last !== yesterday) streak = 0;
+    }
+
+    res.json({ user: u, streak, completedToday, passedToday });
+  } catch(e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
