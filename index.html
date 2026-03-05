@@ -199,104 +199,132 @@
     .fade { animation:fadeUp 0.35s ease forwards; }
 
     /* ── DASHBOARD ── */
-    #s-dashboard { position:relative;z-index:1; }
-    .dash-hero { min-height:calc(100vh - 62px);display:flex;flex-direction:column;justify-content:center;padding:4rem 3rem 2.5rem;border-bottom:1px solid var(--border); }
-    .dash-hero-inner { display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;max-width:960px;margin:0 auto;width:100%; }
-    .dash-greet { font-family:"DM Serif Display",serif;font-size:clamp(2rem,5vw,3.6rem);letter-spacing:-0.03em;color:var(--text);line-height:1.05;margin-bottom:0.4rem; }
-    .dash-level-pill { font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.75rem; }
-    .dash-streak-row { display:flex;align-items:baseline;gap:0.5rem;margin-bottom:1.25rem; }
-    .dash-streak-fire { font-size:1.6rem;line-height:1; }
-    .dash-streak-num { font-family:"DM Serif Display",serif;font-size:3.2rem;color:var(--text);line-height:1;letter-spacing:-0.04em; }
-    .dash-streak-label { font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
-    .dash-week-wrap { display:flex;flex-direction:column;gap:0.4rem; }
-    .dash-week-label { font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
-    .dash-week-dots { display:flex;gap:6px; }
-    .week-dot { width:28px;height:28px;border-radius:2px;border:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:0.5rem;letter-spacing:0.05em;color:var(--text3);flex-direction:column;gap:1px; }
-    .week-dot.done { background:var(--accent);border-color:var(--accent);color:#fff; }
-    .week-dot.today { border-color:var(--accent);color:var(--accent); }
-    .week-dot-day { font-size:0.42rem;opacity:0.7; }
-    .dash-hero-right { display:flex;flex-direction:column; }
-    .dash-quiz-card { background:var(--surface);border:1.5px solid var(--accent-mid);padding:2rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:0.9rem; }
-    .dqc-top { display:flex;justify-content:space-between;align-items:center; }
-    .dqc-label { font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent); }
-    .dqc-level-tag { font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);padding:0.2rem 0.5rem;border:1px solid var(--border); }
-    .dqc-desc { font-size:0.88rem;color:var(--text2);line-height:1.7; }
-    .dc-btn { padding:0.8rem 1.4rem;background:var(--accent);color:#fff;border:none;font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:flex-start;font-weight:500; }
-    .dc-btn:hover:not(:disabled) { opacity:0.85; }
-    .dc-btn:disabled { opacity:0.4;cursor:default; }
-    .dc-btn-ghost { padding:0.8rem 1.4rem;background:none;color:var(--text2);border:1px solid var(--border);font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start; }
-    .dc-btn-ghost:hover { border-color:var(--accent);color:var(--accent); }
-    .dash-scroll-hint { margin-top:2.5rem;font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;transition:color 0.2s;padding:0;align-self:flex-start; }
-    .dash-scroll-hint:hover { color:var(--accent); }
+    #s-dashboard { position:relative;z-index:1;min-height:100vh; }
 
-    /* ── TABS ── */
-    .dtab-nav { display:flex;border-bottom:1px solid var(--border);background:var(--bg);overflow-x:auto;scrollbar-width:none; }
-    .dtab-nav::-webkit-scrollbar { display:none; }
-    .dtab-btn { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:1rem 1.5rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;transition:all 0.2s;white-space:nowrap;margin-bottom:-1px; }
-    .dtab-btn:hover { color:var(--text); }
-    .dtab-btn.active { color:var(--accent);border-bottom-color:var(--accent); }
+    /* sticky toolbar */
+    .dash-toolbar { position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;padding:0 2rem;backdrop-filter:blur(8px); }
+    .dtb-btn { display:flex;align-items:center;gap:0.45rem;padding:0.9rem 1.1rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.18s;white-space:nowrap;margin-bottom:-1px; }
+    .dtb-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0; }
+    .dtb-btn:hover { color:var(--text); }
+    .dtb-btn.active { color:var(--accent);border-bottom-color:var(--accent); }
+    .dtb-spacer { flex:1; }
+    .dtb-gear { padding:0.7rem;border-radius:4px; }
+
+    /* panels */
     .dtab-panel { display:none; }
     .dtab-panel.active { display:block; }
-    .dtab-content { max-width:760px;margin:0 auto;padding:3rem 3rem 5rem; }
-    .dtab-title { font-family:"DM Serif Display",serif;font-size:1.6rem;letter-spacing:-0.02em;color:var(--text);margin-bottom:0.4rem; }
-    .dtab-title-row { display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem; }
-    .dtab-sub { font-size:0.86rem;color:var(--text2);line-height:1.7;margin-bottom:2rem; }
+
+    /* ── HERO ── */
+    .dash-hero { padding:3.5rem 3rem 2rem;border-bottom:1px solid var(--border); }
+    .dash-hero-inner { display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;max-width:980px;margin:0 auto; }
+    .dash-greet { font-family:"DM Serif Display",serif;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-0.03em;color:var(--text);line-height:1.05;margin-bottom:0.35rem; }
+    .dash-level-pill { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:2rem; }
+
+    /* stat grid */
+    .dash-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:2rem; }
+    .dash-stat { background:var(--surface);border:1px solid var(--border);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.25rem; }
+    .ds-label { font-family:"DM Mono",monospace;font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
+    .ds-val { font-family:"DM Serif Display",serif;font-size:1.8rem;color:var(--text);line-height:1;letter-spacing:-0.03em; }
+    .ds-val.accent { color:var(--accent); }
+    .ds-sub { font-family:"DM Mono",monospace;font-size:0.52rem;letter-spacing:0.06em;color:var(--text3); }
+
+    /* week heatmap */
+    .dash-week-label { font-family:"DM Mono",monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.4rem; }
+    .dash-week-dots { display:flex;gap:5px; }
+    .week-dot { width:32px;height:36px;border:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:"DM Mono",monospace;font-size:0.6rem;color:var(--text3);transition:all 0.2s; }
+    .week-dot.done { background:var(--accent);border-color:var(--accent);color:#fff; }
+    .week-dot.today { border-color:var(--accent);color:var(--accent); }
+    .week-dot-day { font-size:0.42rem;opacity:0.65;letter-spacing:0.05em; }
+
+    /* quiz card */
+    .dash-hero-right { display:flex;flex-direction:column;gap:0.75rem; }
+    .dash-quiz-card { background:var(--surface);border:1.5px solid var(--accent-mid);padding:1.75rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:0.85rem; }
+    .dqc-top { display:flex;justify-content:space-between;align-items:center; }
+    .dqc-label { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent); }
+    .dqc-level-tag { font-family:"DM Mono",monospace;font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);padding:0.18rem 0.5rem;border:1px solid var(--border); }
+    .dqc-desc { font-size:0.86rem;color:var(--text2);line-height:1.65; }
+    .dc-btn { padding:0.75rem 1.3rem;background:var(--accent);color:#fff;border:none;font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:flex-start;font-weight:500; }
+    .dc-btn:hover:not(:disabled) { opacity:0.82; }
+    .dc-btn:disabled { opacity:0.38;cursor:default; }
+    .dc-btn-ghost { padding:0.75rem 1.3rem;background:none;color:var(--text2);border:1px solid var(--border);font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start; }
+    .dc-btn-ghost:hover { border-color:var(--accent);color:var(--accent); }
+
+    /* info cards row below quiz */
+    .dash-info-cards { display:grid;grid-template-columns:1fr 1fr;gap:0.75rem; }
+    .dash-info-card { background:var(--bg2);border:1px solid var(--border);padding:0.9rem 1rem; }
+    .dic-label { font-family:"DM Mono",monospace;font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:0.3rem; }
+    .dic-val { font-size:0.84rem;color:var(--text);line-height:1.4; }
+    .dic-val strong { color:var(--accent); }
+
+    /* ── MY PATH TAB ── */
+    #tab-resources { padding:0; }
+    .path-header { max-width:980px;margin:0 auto;padding:2rem 3rem 0; }
+    .path-progress-bar-wrap { margin-top:1rem;margin-bottom:0; }
+    .path-progress-label { display:flex;justify-content:space-between;font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.4rem; }
+    .path-progress-bar { height:3px;background:var(--bg2);border-radius:2px;overflow:hidden; }
+    .path-progress-fill { height:100%;background:var(--accent);border-radius:2px;transition:width 0.6s ease; }
+    .dtab-content { max-width:760px;margin:0 auto;padding:2.5rem 3rem 5rem; }
+    .dtab-title { font-family:"DM Serif Display",serif;font-size:1.5rem;letter-spacing:-0.02em;color:var(--text);margin-bottom:0.35rem; }
+    .dtab-title-row { display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem; }
+    .dtab-sub { font-size:0.84rem;color:var(--text2);line-height:1.7;margin-bottom:1.75rem; }
 
     /* ── WEAK SPOTS ── */
     .ws-list { display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem; }
     .ws-item { display:flex;flex-direction:column;gap:0.3rem; }
     .ws-item-top { display:flex;justify-content:space-between;align-items:center; }
-    .ws-topic { font-size:0.85rem;color:var(--text); }
-    .ws-pct { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.08em;color:var(--text3); }
+    .ws-topic { font-size:0.84rem;color:var(--text); }
+    .ws-pct { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.06em;color:var(--text3); }
     .ws-bar-bg { height:4px;background:var(--bg2);border-radius:2px;overflow:hidden; }
     .ws-bar-fill { height:100%;border-radius:2px;transition:width 0.6s ease; }
-    .ws-empty { text-align:center;padding:3rem 1rem;color:var(--text3);font-size:0.88rem;line-height:1.7; }
+    .ws-empty { text-align:center;padding:3rem 1rem;color:var(--text3);font-size:0.86rem;line-height:1.7; }
     .ws-empty-icon { font-size:2rem;margin-bottom:0.75rem; }
-    .ws-legend { display:flex;gap:1.5rem;margin-top:1rem; }
-    .ws-legend-item { display:flex;align-items:center;gap:0.4rem;font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
+    .ws-legend { display:flex;gap:1.5rem;margin-top:0.75rem; }
+    .ws-legend-item { display:flex;align-items:center;gap:0.4rem;font-family:"DM Mono",monospace;font-size:0.54rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
     .ws-bar-swatch { width:12px;height:4px;border-radius:2px;flex-shrink:0; }
 
     /* ── STUDY TIMER ── */
-    .timer-display { text-align:center;padding:3rem 0 2rem; }
-    .timer-digits { font-family:"DM Serif Display",serif;font-size:clamp(3rem,8vw,5.5rem);letter-spacing:-0.04em;color:var(--text);line-height:1; }
-    .timer-status { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-top:0.75rem; }
-    .timer-controls { display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2rem; }
-    .timer-total-row { display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:2rem; }
-    .timer-total-label { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
-    .timer-total-val { font-family:"DM Serif Display",serif;font-size:1.4rem;color:var(--accent);letter-spacing:-0.02em; }
-    .timer-log-section { display:flex;flex-direction:column;gap:0; }
-    .timer-log-title { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.75rem; }
-    .timer-log-list { display:flex;flex-direction:column;gap:0; }
-    .timer-log-row { display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid var(--border); }
+    .timer-display { text-align:center;padding:2.5rem 0 1.75rem; }
+    .timer-digits { font-family:"DM Serif Display",serif;font-size:clamp(3rem,8vw,5rem);letter-spacing:-0.04em;color:var(--text);line-height:1; }
+    .timer-status { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-top:0.6rem; }
+    .timer-controls { display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.75rem; }
+    .timer-total-row { display:flex;justify-content:space-between;align-items:center;padding:0.9rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:1.75rem; }
+    .timer-total-label { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
+    .timer-total-val { font-family:"DM Serif Display",serif;font-size:1.3rem;color:var(--accent);letter-spacing:-0.02em; }
+    .timer-log-section { display:flex;flex-direction:column; }
+    .timer-log-title { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem; }
+    .timer-log-list { display:flex;flex-direction:column; }
+    .timer-log-row { display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border); }
     .timer-log-date { font-size:0.82rem;color:var(--text2); }
-    .timer-log-dur { font-family:"DM Mono",monospace;font-size:0.68rem;letter-spacing:0.08em;color:var(--accent); }
-    .timer-log-empty { font-size:0.85rem;color:var(--text3);padding:1.5rem 0; }
+    .timer-log-dur { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--accent); }
+    .timer-log-empty { font-size:0.84rem;color:var(--text3);padding:1.25rem 0; }
 
     /* ── NOTES ── */
-    .notes-level-select { padding:0.4rem 0.7rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none; }
-    .notes-area { width:100%;min-height:360px;padding:1.25rem;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:"DM Sans",sans-serif;font-size:0.9rem;line-height:1.75;outline:none;resize:vertical;transition:border-color 0.2s;margin-bottom:0.75rem; }
+    .notes-level-select { padding:0.35rem 0.65rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.06em;text-transform:uppercase;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none; }
+    .notes-area { width:100%;min-height:360px;padding:1.1rem;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:"DM Sans",sans-serif;font-size:0.9rem;line-height:1.75;outline:none;resize:vertical;transition:border-color 0.2s;margin-bottom:0.75rem; }
     .notes-area:focus { border-color:var(--accent); }
     .notes-footer { display:flex;justify-content:space-between;align-items:center; }
-    .notes-saved { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);opacity:0;transition:opacity 0.3s; }
+    .notes-saved { font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);opacity:0;transition:opacity 0.3s; }
     .notes-saved.show { opacity:1; }
-    .notes-count { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
+    .notes-count { font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
 
     /* ── SETTINGS ── */
-    .settings-group { margin-bottom:2.5rem; }
-    .settings-group-label { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border); }
-    .settings-row { display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--border);gap:1rem; }
-    .settings-theme-row { border-bottom:none;gap:0.5rem;flex-wrap:wrap;padding-top:0.75rem; }
+    .settings-group { margin-bottom:2.25rem; }
+    .settings-group-label { font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);margin-bottom:0.4rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border); }
+    .settings-row { display:flex;justify-content:space-between;align-items:center;padding:0.9rem 0;border-bottom:1px solid var(--border);gap:1rem; }
+    .settings-theme-row { border-bottom:none;gap:0.5rem;flex-wrap:wrap;padding-top:0.6rem; }
     .settings-row-info { flex:1; }
-    .settings-row-name { font-size:0.9rem;color:var(--text);margin-bottom:0.2rem; }
-    .settings-row-val { font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.05em;color:var(--text3); }
-    .settings-btn { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.4rem 0.85rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0; }
+    .settings-row-name { font-size:0.88rem;color:var(--text);margin-bottom:0.18rem; }
+    .settings-row-val { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.04em;color:var(--text3); }
+    .settings-btn { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.38rem 0.8rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0; }
     .settings-btn:hover { border-color:var(--accent);color:var(--accent); }
-    .settings-btn-danger:hover { border-color:var(--red);color:var(--red); }
-    .settings-sub-panel { max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.2s;padding:0; }
-    .settings-sub-panel.open { max-height:400px;padding:1.25rem 0 0.5rem; }
-    .theme-pill { display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.9rem;background:none;border:1px solid var(--border);color:var(--text2);font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s; }
+    .settings-btn-danger:hover { border-color:var(--red,#c0392b);color:var(--red,#c0392b); }
+    .settings-sub-panel { max-height:0;overflow:hidden;transition:max-height 0.35s ease;padding:0; }
+    .settings-sub-panel.open { max-height:420px;padding:1.1rem 0 0.5rem; }
+    .theme-pill { display:flex;align-items:center;gap:0.45rem;padding:0.42rem 0.85rem;background:none;border:1px solid var(--border);color:var(--text2);font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s; }
     .theme-pill:hover { border-color:var(--text3); }
     .theme-pill.active { border-color:var(--accent);color:var(--accent);background:var(--accent-light); }
+    .theme-swatch { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+
     #s-daily { position:relative;z-index:1; }
     .daily-wrap { max-width:660px;margin:0 auto;padding:4rem 3rem; }
     .daily-header { margin-bottom:3rem; }
@@ -331,8 +359,14 @@
       .landing-foot{gap:2rem;flex-wrap:wrap;}
       .proj-divider{display:none;}
       .modal{margin:1rem;padding:2rem;}
-      .dash-hero{padding:3rem 1.5rem 1.5rem;min-height:auto;}
-      .dash-hero-inner{grid-template-columns:1fr;gap:2.5rem;}
+      .dash-hero{padding:2rem 1.25rem 1.5rem;}
+      .dash-hero-inner{grid-template-columns:1fr;gap:2rem;}
+      .dash-stats{grid-template-columns:repeat(3,1fr);}
+      .dash-toolbar{padding:0 0.5rem;overflow-x:auto;}
+      .dtb-btn{padding:0.8rem 0.7rem;font-size:0.52rem;gap:0.3rem;}
+      .dash-info-cards{grid-template-columns:1fr 1fr;}
+      .dtab-content{padding:2rem 1.25rem 4rem;}
+      .path-header{padding:1.5rem 1.25rem 0;}
       .daily-wrap{padding:2.5rem 1.5rem;}
       .done-wrap{padding:4rem 1.5rem;}
     }
@@ -488,105 +522,219 @@
 <!-- ── DASHBOARD ── -->
 <div class="screen" id="s-dashboard">
 
-  <!-- HERO -->
-  <div class="dash-hero">
-    <div class="dash-hero-inner">
-      <div class="dash-hero-left">
-        <div class="dash-greet" id="dash-greet">Good morning.</div>
-        <div class="dash-level-pill" id="dash-level-name"></div>
-        <div class="dash-streak-row">
-          <span class="dash-streak-fire">🔥</span>
-          <span class="dash-streak-num" id="dash-streak">0</span>
-          <span class="dash-streak-label">day streak</span>
-        </div>
-        <div class="dash-week-wrap">
-          <div class="dash-week-label">This week</div>
-          <div class="dash-week-dots" id="dash-week-dots"></div>
-        </div>
-      </div>
-      <div class="dash-hero-right">
-        <div class="dash-quiz-card">
-          <div class="dqc-top">
-            <div class="dqc-label" id="dash-quiz-label">Today's Quiz</div>
-            <div class="dqc-level-tag" id="dqc-level-tag"></div>
-          </div>
-          <div class="dqc-desc" id="dash-quiz-desc">5 questions at your level. Get 3 or more right to keep your streak alive.</div>
-          <button class="dc-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
-        </div>
-      </div>
-    </div>
-    <button class="dash-scroll-hint" onclick="document.getElementById('dash-tabs-section').scrollIntoView({behavior:'smooth'})">
-      Tools & Resources ↓
+  <!-- STICKY TOOLBAR -->
+  <div class="dash-toolbar">
+    <button class="dtb-btn active" data-tab="home" onclick="switchDTab('home',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="dtb-btn" data-tab="path" onclick="switchDTab('path',this)">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      My Path
+    </button>
+    <button class="dtb-btn" data-tab="weakspots" onclick="switchDTab('weakspots',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Weak Spots
+    </button>
+    <button class="dtb-btn" data-tab="timer" onclick="switchDTab('timer',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Study Timer
+    </button>
+    <button class="dtb-btn" data-tab="notes" onclick="switchDTab('notes',this)">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Notes
+    </button>
+    <div class="dtb-spacer"></div>
+    <button class="dtb-btn dtb-gear" data-tab="settings" onclick="switchDTab('settings',this)" title="Settings">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
 
-  <!-- TABS -->
-  <div id="dash-tabs-section">
-    <div class="dtab-nav">
-      <button class="dtab-btn active" data-tab="resources" onclick="switchTab('resources',this)">My Path</button>
-      <button class="dtab-btn" data-tab="weakspots" onclick="switchTab('weakspots',this)">Weak Spots</button>
-      <button class="dtab-btn" data-tab="timer" onclick="switchTab('timer',this)">Study Timer</button>
-      <button class="dtab-btn" data-tab="notes" onclick="switchTab('notes',this)">Notes</button>
-      <button class="dtab-btn" data-tab="settings" onclick="switchTab('settings',this)">Settings</button>
-    </div>
+  <!-- HOME TAB -->
+  <div class="dtab-panel active" id="tab-home">
+    <div class="dash-hero">
+      <div class="dash-hero-inner">
 
-    <!-- MY PATH -->
-    <div class="dtab-panel active" id="tab-resources">
-      <div class="journey-section" style="padding-top:2rem">
-        <p class="section-label">Your Full Path — Resources & Timeline</p>
-        <div class="journey-track" id="dash-journey-track"></div>
+        <div class="dash-hero-left">
+          <div class="dash-greet" id="dash-greet">Good morning.</div>
+          <div class="dash-level-pill" id="dash-level-name"></div>
+          <div class="dash-stats">
+            <div class="dash-stat">
+              <div class="ds-label">Streak</div>
+              <div class="ds-val accent" id="dash-streak">0</div>
+              <div class="ds-sub">🔥 days</div>
+            </div>
+            <div class="dash-stat">
+              <div class="ds-label">Quizzes</div>
+              <div class="ds-val" id="dash-total-quizzes">0</div>
+              <div class="ds-sub">completed</div>
+            </div>
+            <div class="dash-stat">
+              <div class="ds-label">Level</div>
+              <div class="ds-val" id="dash-level-num">1</div>
+              <div class="ds-sub">of 7</div>
+            </div>
+          </div>
+          <div class="dash-week-label">This week</div>
+          <div class="dash-week-dots" id="dash-week-dots"></div>
+        </div>
+
+        <div class="dash-hero-right">
+          <div class="dash-quiz-card">
+            <div class="dqc-top">
+              <div class="dqc-label" id="dash-quiz-label">Today's Quiz</div>
+              <div class="dqc-level-tag" id="dqc-level-tag"></div>
+            </div>
+            <div class="dqc-desc" id="dash-quiz-desc">5 questions at your level. Get 3 or more right to keep your streak alive.</div>
+            <button class="dc-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
+          </div>
+          <div class="dash-info-cards">
+            <div class="dash-info-card">
+              <div class="dic-label">Current Level</div>
+              <div class="dic-val" id="dic-level-name">—</div>
+            </div>
+            <div class="dash-info-card">
+              <div class="dic-label">Next Level</div>
+              <div class="dic-val" id="dic-next-level">—</div>
+            </div>
+            <div class="dash-info-card">
+              <div class="dic-label">Study Time (week)</div>
+              <div class="dic-val" id="dic-study-time">0h 0m</div>
+            </div>
+            <div class="dash-info-card">
+              <div class="dic-label">Best Streak</div>
+              <div class="dic-val" id="dic-best-streak">—</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <!-- WEAK SPOTS -->
-    <div class="dtab-panel" id="tab-weakspots">
-      <div class="dtab-content">
-        <div class="dtab-title">Weak Spots</div>
-        <div class="dtab-sub">Topics you've missed most across your daily quizzes. The more you do, the more accurate this gets.</div>
-        <div id="weakspots-list" class="ws-list"></div>
-        <div id="weakspots-empty" class="ws-empty">
-          <div class="ws-empty-icon">◌</div>
-          <div>Complete a few daily quizzes and your weak spots will appear here.</div>
+  <!-- MY PATH TAB -->
+  <div class="dtab-panel" id="tab-path">
+    <div class="path-header">
+      <div class="dtab-title">My Path</div>
+      <div class="dtab-sub" style="margin-bottom:0.75rem">Your complete roadmap from where you are to the highest level. Resources for every stage.</div>
+      <div class="path-progress-bar-wrap">
+        <div class="path-progress-label">
+          <span id="path-prog-label">Level 1 of 7</span>
+          <span id="path-prog-pct">0% complete</span>
         </div>
-        <div class="ws-legend">
-          <div class="ws-legend-item"><span class="ws-bar-swatch" style="background:var(--red)"></span>Needs work</div>
-          <div class="ws-legend-item"><span class="ws-bar-swatch" style="background:var(--accent)"></span>Getting there</div>
-        </div>
+        <div class="path-progress-bar"><div class="path-progress-fill" id="path-progress-fill"></div></div>
       </div>
     </div>
+    <div class="journey-section" style="padding-top:1.5rem">
+      <div class="journey-track" id="dash-journey-track"></div>
+    </div>
+  </div>
 
-    <!-- STUDY TIMER -->
-    <div class="dtab-panel" id="tab-timer">
-      <div class="dtab-content">
-        <div class="dtab-title">Study Timer</div>
-        <div class="dtab-sub">Track exactly how much time you put in. Time studied is the one number that never lies.</div>
-        <div class="timer-display">
-          <div class="timer-digits" id="timer-digits">00:00:00</div>
-          <div class="timer-status" id="timer-status">Ready</div>
-        </div>
-        <div class="timer-controls">
-          <button class="dc-btn" id="timer-start-btn" onclick="timerStart()">Start Session</button>
-          <button class="dc-btn-ghost" id="timer-stop-btn" onclick="timerStop()" style="display:none">Stop & Log</button>
-          <button class="dc-btn-ghost" id="timer-reset-btn" onclick="timerReset()" style="display:none">Discard</button>
-        </div>
-        <div class="timer-total-row">
-          <span class="timer-total-label">Total time this week</span>
-          <span class="timer-total-val" id="timer-total">0h 0m</span>
-        </div>
-        <div class="timer-log-section">
-          <div class="timer-log-title">Session Log</div>
-          <div id="timer-log-list" class="timer-log-list"></div>
-          <div id="timer-log-empty" class="timer-log-empty">No sessions logged yet. Start your first one above.</div>
-        </div>
+  <!-- WEAK SPOTS TAB -->
+  <div class="dtab-panel" id="tab-weakspots">
+    <div class="dtab-content">
+      <div class="dtab-title">Weak Spots</div>
+      <div class="dtab-sub">Topics you've missed most across your daily quizzes. The more you do, the more accurate this gets.</div>
+      <div id="weakspots-list" class="ws-list"></div>
+      <div id="weakspots-empty" class="ws-empty">
+        <div class="ws-empty-icon">◌</div>
+        <div>Complete a few daily quizzes and your weak spots will appear here.</div>
+      </div>
+      <div class="ws-legend">
+        <div class="ws-legend-item"><span class="ws-bar-swatch" style="background:var(--red,#c0392b)"></span>Needs work</div>
+        <div class="ws-legend-item"><span class="ws-bar-swatch" style="background:var(--accent)"></span>Getting there</div>
       </div>
     </div>
+  </div>
 
-    <!-- NOTES -->
-    <div class="dtab-panel" id="tab-notes">
-      <div class="dtab-content">
-        <div class="dtab-title-row">
-          <div class="dtab-title">Notes</div>
-          <select class="notes-level-select" id="notes-level-select" onchange="switchNotesLevel()">
+  <!-- STUDY TIMER TAB -->
+  <div class="dtab-panel" id="tab-timer">
+    <div class="dtab-content">
+      <div class="dtab-title">Study Timer</div>
+      <div class="dtab-sub">Track exactly how much time you put in. Time studied is the one number that never lies.</div>
+      <div class="timer-display">
+        <div class="timer-digits" id="timer-digits">00:00:00</div>
+        <div class="timer-status" id="timer-status">Ready</div>
+      </div>
+      <div class="timer-controls">
+        <button class="dc-btn" id="timer-start-btn" onclick="timerStart()">Start Session</button>
+        <button class="dc-btn-ghost" id="timer-stop-btn" onclick="timerStop()" style="display:none">Stop &amp; Log</button>
+        <button class="dc-btn-ghost" id="timer-reset-btn" onclick="timerReset()" style="display:none">Discard</button>
+      </div>
+      <div class="timer-total-row">
+        <span class="timer-total-label">Total time this week</span>
+        <span class="timer-total-val" id="timer-total">0h 0m</span>
+      </div>
+      <div class="timer-log-section">
+        <div class="timer-log-title">Session Log</div>
+        <div id="timer-log-list" class="timer-log-list"></div>
+        <div id="timer-log-empty" class="timer-log-empty">No sessions logged yet. Start your first one above.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div class="dtab-panel" id="tab-notes">
+    <div class="dtab-content">
+      <div class="dtab-title-row">
+        <div class="dtab-title">Notes</div>
+        <select class="notes-level-select" id="notes-level-select" onchange="switchNotesLevel()">
+          <option value="0">Arithmetic & Pre-Algebra</option>
+          <option value="1">Early Algebra</option>
+          <option value="2">Advanced Algebra</option>
+          <option value="3">Geometry</option>
+          <option value="4">Pre-Calculus</option>
+          <option value="5">Calculus I</option>
+          <option value="6">Calculus II & Beyond</option>
+        </select>
+      </div>
+      <div class="dtab-sub">One scratchpad per level. Write formulas, methods, anything that clicks. Saves automatically.</div>
+      <textarea class="notes-area" id="notes-area" placeholder="Start typing your notes here..." oninput="autoSaveNote()"></textarea>
+      <div class="notes-footer">
+        <span class="notes-saved" id="notes-saved"></span>
+        <span class="notes-count" id="notes-count">0 chars</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="dtab-panel" id="tab-settings">
+    <div class="dtab-content">
+      <div class="dtab-title">Settings</div>
+      <div class="settings-group">
+        <div class="settings-group-label">Account</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Email</div>
+            <div class="settings-row-val" id="settings-email-val"></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Change Password</div>
+            <div class="settings-row-val">Update your login password</div>
+          </div>
+          <button class="settings-btn" onclick="toggleSettingsPanel('pw-panel')">Change →</button>
+        </div>
+        <div class="settings-sub-panel" id="pw-panel">
+          <div class="auth-field"><label>Current Password</label><input type="password" id="pw-current" placeholder="Current password"/></div>
+          <div class="auth-field"><label>New Password</label><input type="password" id="pw-new" placeholder="At least 6 characters"/></div>
+          <div class="auth-error" id="pw-error"></div>
+          <button class="dc-btn" style="margin-top:0.5rem" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">Progress</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Current Level</div>
+            <div class="settings-row-val" id="settings-level-val"></div>
+          </div>
+          <button class="settings-btn" onclick="toggleSettingsPanel('level-panel')">Adjust →</button>
+        </div>
+        <div class="settings-sub-panel" id="level-panel">
+          <div class="dtab-sub" style="margin-bottom:0.9rem">If the diagnostic placed you at the wrong level, correct it here.</div>
+          <select class="notes-level-select" id="settings-level-select" style="width:100%;margin-bottom:0.75rem">
             <option value="0">Arithmetic & Pre-Algebra</option>
             <option value="1">Early Algebra</option>
             <option value="2">Advanced Algebra</option>
@@ -595,109 +743,48 @@
             <option value="5">Calculus I</option>
             <option value="6">Calculus II & Beyond</option>
           </select>
+          <div class="auth-error" id="level-error"></div>
+          <button class="dc-btn" onclick="updateLevel()">Save Level</button>
         </div>
-        <div class="dtab-sub">One scratchpad per level. Write formulas, methods, anything that clicks. It saves automatically.</div>
-        <textarea class="notes-area" id="notes-area" placeholder="Start typing your notes here..." oninput="autoSaveNote()"></textarea>
-        <div class="notes-footer">
-          <span class="notes-saved" id="notes-saved"></span>
-          <span class="notes-count" id="notes-count">0 chars</span>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Retake Diagnostic</div>
+            <div class="settings-row-val">Get a fresh placement assessment</div>
+          </div>
+          <button class="settings-btn" onclick="confirmRetake()">Retake →</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">Appearance</div>
+        <div class="settings-row settings-theme-row">
+          <button class="theme-pill" data-t="" onclick="setThemePill('',this)"><span class="theme-swatch" style="background:#2d5a27"></span>Forest</button>
+          <button class="theme-pill" data-t="slate" onclick="setThemePill('slate',this)"><span class="theme-swatch" style="background:#1a56db"></span>Slate</button>
+          <button class="theme-pill" data-t="sand" onclick="setThemePill('sand',this)"><span class="theme-swatch" style="background:#b45309"></span>Sand</button>
+          <button class="theme-pill" data-t="ink" onclick="setThemePill('ink',this)"><span class="theme-swatch" style="background:#a8c5a0"></span>Ink</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">Danger Zone</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Reset Streak</div>
+            <div class="settings-row-val">Clears your current streak to zero</div>
+          </div>
+          <button class="settings-btn settings-btn-danger" onclick="confirmResetStreak()">Reset</button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-name">Sign Out</div>
+            <div class="settings-row-val">You'll need to log back in on next visit</div>
+          </div>
+          <button class="settings-btn settings-btn-danger" onclick="signOut()">Sign Out</button>
         </div>
       </div>
     </div>
-
-    <!-- SETTINGS -->
-    <div class="dtab-panel" id="tab-settings">
-      <div class="dtab-content">
-        <div class="dtab-title">Settings</div>
-
-        <div class="settings-group">
-          <div class="settings-group-label">Account</div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Email</div>
-              <div class="settings-row-val" id="settings-email-val"></div>
-            </div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Change Password</div>
-              <div class="settings-row-val">Update your login password</div>
-            </div>
-            <button class="settings-btn" onclick="toggleSettingsPanel('pw-panel')">Change →</button>
-          </div>
-          <div class="settings-sub-panel" id="pw-panel">
-            <div class="auth-field"><label>Current Password</label><input type="password" id="pw-current" placeholder="Current password"/></div>
-            <div class="auth-field"><label>New Password</label><input type="password" id="pw-new" placeholder="At least 6 characters"/></div>
-            <div class="auth-error" id="pw-error"></div>
-            <button class="dc-btn" style="margin-top:0.5rem" onclick="changePassword()">Update Password</button>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-label">Progress</div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Current Level</div>
-              <div class="settings-row-val" id="settings-level-val"></div>
-            </div>
-            <button class="settings-btn" onclick="toggleSettingsPanel('level-panel')">Adjust →</button>
-          </div>
-          <div class="settings-sub-panel" id="level-panel">
-            <div class="dtab-sub" style="margin-bottom:1rem">If the diagnostic placed you at the wrong level, correct it here.</div>
-            <select class="notes-level-select" id="settings-level-select" style="width:100%;margin-bottom:0.75rem">
-              <option value="0">Arithmetic & Pre-Algebra</option>
-              <option value="1">Early Algebra</option>
-              <option value="2">Advanced Algebra</option>
-              <option value="3">Geometry</option>
-              <option value="4">Pre-Calculus</option>
-              <option value="5">Calculus I</option>
-              <option value="6">Calculus II & Beyond</option>
-            </select>
-            <div class="auth-error" id="level-error"></div>
-            <button class="dc-btn" onclick="updateLevel()">Save Level</button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Retake Diagnostic</div>
-              <div class="settings-row-val">Get a fresh placement assessment</div>
-            </div>
-            <button class="settings-btn" onclick="confirmRetake()">Retake →</button>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-label">Appearance</div>
-          <div class="settings-row settings-theme-row">
-            <button class="theme-pill" data-t="" onclick="setThemePill('',this)"><span class="theme-swatch" style="background:#2d5a27"></span>Forest</button>
-            <button class="theme-pill" data-t="slate" onclick="setThemePill('slate',this)"><span class="theme-swatch" style="background:#1a56db"></span>Slate</button>
-            <button class="theme-pill" data-t="sand" onclick="setThemePill('sand',this)"><span class="theme-swatch" style="background:#b45309"></span>Sand</button>
-            <button class="theme-pill" data-t="ink" onclick="setThemePill('ink',this)"><span class="theme-swatch" style="background:#a8c5a0"></span>Ink</button>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-label">Danger Zone</div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Reset Streak</div>
-              <div class="settings-row-val">Clears your current streak to zero</div>
-            </div>
-            <button class="settings-btn settings-btn-danger" onclick="confirmResetStreak()">Reset</button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-name">Sign Out</div>
-              <div class="settings-row-val">You'll need to log back in on next visit</div>
-            </div>
-            <button class="settings-btn settings-btn-danger" onclick="signOut()">Sign Out</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
   </div>
+
 </div>
+
 
 <!-- ── DAILY QUIZ ── -->
 <div class="screen" id="s-daily">
@@ -1096,11 +1183,28 @@ async function showDashboard() {
     document.getElementById('dash-level-name').textContent = user.level_name;
     document.getElementById('dash-streak').textContent = streak;
     document.getElementById('dqc-level-tag').textContent = user.level_name;
+    document.getElementById('dash-level-num').textContent = user.level + 1;
     document.getElementById('settings-email-val').textContent = user.email;
     document.getElementById('settings-level-val').textContent = user.level_name;
     document.getElementById('settings-level-select').value = user.level;
 
-    // Week dots — last 7 days
+    // Info cards
+    document.getElementById('dic-level-name').textContent = user.level_name;
+    document.getElementById('dic-next-level').textContent = STAGES[user.level + 1]?.name || 'Top Level ✓';
+
+    // Total quizzes
+    const totalQ = data.totalQuizzes || 0;
+    document.getElementById('dash-total-quizzes').textContent = totalQ;
+
+    // Best streak
+    document.getElementById('dic-best-streak').textContent = (data.bestStreak || streak) + ' days';
+
+    // Study time
+    renderTimerTotal();
+    const timerEl = document.getElementById('timer-total');
+    if (timerEl) document.getElementById('dic-study-time').textContent = timerEl.textContent;
+
+    // Week dots
     renderWeekDots(data.weekDays || []);
 
     if (completedToday) {
@@ -1108,32 +1212,32 @@ async function showDashboard() {
       document.getElementById('dash-quiz-desc').textContent = passedToday
         ? 'Streak kept. Come back tomorrow.'
         : 'You got less than 3 correct. Give it another shot.';
-      document.getElementById('dash-quiz-btn').textContent = passedToday ? "Done for Today" : "Retry Quiz →";
-      if (passedToday) document.getElementById('dash-quiz-btn').disabled = true;
+      document.getElementById('dash-quiz-btn').textContent = passedToday ? 'Done for Today' : 'Retry Quiz →';
+      document.getElementById('dash-quiz-btn').disabled = passedToday;
     } else {
       document.getElementById('dash-quiz-btn').disabled = false;
       document.getElementById('dash-quiz-btn').textContent = "Start Today's Quiz →";
     }
 
-    // Journey track
+    // Journey track + progress bar
     userLevel = user.level;
     renderDashJourney(user.level);
 
-    // Weak spots from localStorage
-    renderWeakSpots();
-
-    // Timer total
-    renderTimerTotal();
-
-    // Notes — load current level
+    // Notes
     document.getElementById('notes-level-select').value = user.level;
     loadNote(user.level);
 
-    // Sync theme pills
+    // Theme pills
     const t = localStorage.getItem('apexmath_theme') || '';
     document.querySelectorAll('.theme-pill').forEach(b => {
       b.classList.toggle('active', b.dataset.t === t);
     });
+
+    // Make sure home tab is active on load
+    document.querySelectorAll('.dtab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dtb-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-home').classList.add('active');
+    document.querySelector('.dtb-btn[data-tab="home"]').classList.add('active');
 
   } catch(e) { console.error(e); }
 }
@@ -1157,6 +1261,15 @@ function renderWeekDots(passedDays) {
 }
 
 function renderDashJourney(level) {
+  // Update progress bar
+  const pct = Math.round((level / (STAGES.length - 1)) * 100);
+  const fill = document.getElementById('path-progress-fill');
+  const label = document.getElementById('path-prog-label');
+  const pctEl = document.getElementById('path-prog-pct');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = 'Level ' + (level + 1) + ' of ' + STAGES.length;
+  if (pctEl) pctEl.textContent = pct + '% complete';
+
   const track = document.getElementById('dash-journey-track');
   if (!track) return;
   track.innerHTML = '';
@@ -1192,8 +1305,8 @@ function renderDashJourney(level) {
 }
 
 // ── TABS ──────────────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.dtab-btn').forEach(b => b.classList.remove('active'));
+function switchDTab(name, btn) {
+  document.querySelectorAll('.dtb-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.dtab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
