@@ -886,6 +886,18 @@ function calcSchedule() {
   document.getElementById('sw-calc').textContent = fmt(addWeeks(start, hoursToCalc / hrsPerWeek));
   document.getElementById('sw-mit').textContent = fmt(addWeeks(start, hoursToAdv / hrsPerWeek));
 }
+  function skipOne() {
+  if (qCount >= MAX_Q - 1) { showResult(); return; }
+  qCount++;
+  loadQuestion();
+}
+
+function skipAll() {
+  userLevel = currentLevel;
+  const resultData = { level: userLevel, score: correct, total: MAX_Q, email: userEmail };
+  saveResult(resultData);
+  renderResult(resultData, false);
+}
 function addWeeks(date, weeks) { const d = new Date(date); d.setDate(d.getDate() + Math.round(weeks*7)); return d; }
 function fmt(date) { return date.toLocaleDateString('en-US', {month:'short', year:'numeric'}); }
 
