@@ -1081,9 +1081,6 @@ function calcSchedule() {
 function addWeeks(date,weeks){const d=new Date(date);d.setDate(d.getDate()+Math.round(weeks*7));return d;}
 function fmt(date){return date.toLocaleDateString('en-US',{month:'short',year:'numeric'});}
 
-// ── INIT ──────────────────────────────────────────────────────
-checkAuth();
-
 // ── DASHBOARD ─────────────────────────────────────────────────
 async function showDashboard() {
   showScreen('s-dashboard');
@@ -1111,11 +1108,11 @@ async function showDashboard() {
       document.getElementById('dash-quiz-desc').textContent = passedToday
         ? 'Streak kept. Come back tomorrow.'
         : 'You got less than 3 correct. Give it another shot.';
-      document.getElementById('dash-quiz-btn').textContent = passedToday ? 'Done for Today' : 'Retry Quiz →';
+      document.getElementById('dash-quiz-btn').textContent = passedToday ? "Done for Today" : "Retry Quiz →";
       if (passedToday) document.getElementById('dash-quiz-btn').disabled = true;
     } else {
       document.getElementById('dash-quiz-btn').disabled = false;
-      document.getElementById('dash-quiz-btn').textContent = 'Start Today's Quiz →';
+      document.getElementById('dash-quiz-btn').textContent = "Start Today's Quiz →";
     }
 
     // Journey track
@@ -1536,6 +1533,22 @@ async function finishDailyQuiz() {
     document.getElementById('done-streak').style.color = 'var(--text3)';
   }
 }
+// ── INIT — must be last, after all functions defined ──────────
+(function() {
+  // Restore theme
+  const saved = localStorage.getItem('apexmath_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  // Sync theme pills in settings
+  document.querySelectorAll('.theme-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.t === (saved || ''));
+  });
+  // Also sync nav theme opts
+  document.querySelectorAll('.theme-opt').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes("'" + (saved||'') + "'") );
+  });
+  // Boot auth
+  checkAuth();
+})();
 </script>
 </body>
 </html>
