@@ -281,8 +281,49 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
       if (last !== today && last !== yesterday) streak = 0;
     }
 
-    res.json({ user: u, streak, completedToday, passedToday });
+    // Last 7 days passed completions for week dots
+    const weekRows = await pool.query(
+      `SELECT completed_date FROM daily_completions WHERE user_id=$1 AND passed=true AND completed_date >= CURRENT_DATE - INTERVAL '6 days'`,
+      [u.id]
+    );
+    const weekDays = weekRows.rows.map(r => r.completed_date.toISOString().split('T')[0]);
+
+    res.json({ user: u, streak, completedToday, passedToday, weekDays });
   } catch(e) {
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// ── SETTINGS ENDPOINTS ────────────────────────────────────────────────────────
+
+// Change password
+app.post('/auth/change-password', authMiddleware, async (req, res) => {
+  const { current, newPassword } = req.body;
+  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password too short' });
+  try {
+    const result = await pool.query('SELECT password_hash FROM users WHERE id=$1', [req.user.id]);
+    const valid = await bcrypt.compare(current, result.rows[0].password_hash);
+    if (!valid) return res.status(400).json({ error: 'Current password is incorrect' });
+    const hash = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE users SET password_hash=$1 WHERE id=$2', [hash, req.user.id]);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// Update level manually
+app.post('/auth/update-level', authMiddleware, async (req, res) => {
+  const { level, levelName } = req.body;
+  if (level === undefined || level < 0 || level > 6) return res.status(400).json({ error: 'Invalid level' });
+  try {
+    await pool.query('UPDATE users SET level=$1, level_name=$2 WHERE id=$3', [level, levelName, req.user.id]);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// Reset streak
+app.post('/auth/reset-streak', authMiddleware, async (req, res) => {
+  try {
+    await pool.query('UPDATE users SET streak=0 WHERE id=$1', [req.user.id]);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'Server error' }); }
 });
