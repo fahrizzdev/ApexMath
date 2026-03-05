@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apex Math</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── THEMES ─────────────────────────────────────────── */
+    :root {
+      --bg: #f5f2ed;
+      --bg2: #eeebe4;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1916;
+      --text2: #6b6860;
+      --text3: #a8a49d;
+      --accent: #2d5a27;
+      --accent-light: rgba(45,90,39,0.08);
+      --accent-mid: rgba(45,90,39,0.15);
+      --red: #c0392b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    }
+    [data-theme="slate"] {
+      --bg: #f0f2f5; --bg2: #e8ebef; --surface: #ffffff;
+      --border: rgba(0,0,0,0.08); --text: #1a1c20; --text2: #636870; --text3: #9fa4ad;
+      --accent: #1a56db; --accent-light: rgba(26,86,219,0.07); --accent-mid: rgba(26,86,219,0.14);
+    }
+    [data-theme="sand"] {
+      --bg: #faf6f0; --bg2: #f2ece2; --surface: #ffffff;
+      --border: rgba(0,0,0,0.07); --text: #2a2218; --text2: #7a6e62; --text3: #b0a99f;
+      --accent: #b45309; --accent-light: rgba(180,83,9,0.07); --accent-mid: rgba(180,83,9,0.14);
+    }
+    [data-theme="ink"] {
+      --bg: #1c1c1e; --bg2: #252528; --surface: #2c2c2f;
+      --border: rgba(255,255,255,0.08); --text: #f0ede8; --text2: #9b978f; --text3: #5a5750;
+      --accent: #a8c5a0; --accent-light: rgba(168,197,160,0.08); --accent-mid: rgba(168,197,160,0.16);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh; transition: background 0.4s, color 0.3s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ────────────────────────────────────────────── */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.4rem 3rem; border-bottom: 1px solid var(--border);
+      background: var(--bg); position: sticky; top: 0; z-index: 100;
+      transition: background 0.4s, border-color 0.3s;
+    }
+    .logo {
+      font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+      letter-spacing: -0.02em; color: var(--text); cursor: pointer;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .logo:hover { opacity: 0.7; }
+    .logo em { font-style: normal; color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-status {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text3); padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border); transition: all 0.3s;
+    }
+
+    /* THEME SWITCHER */
+    .theme-wrap { position: relative; }
+    .theme-btn {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+      background: none; border: 1px solid var(--border); padding: 0.3rem 0.7rem;
+      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .theme-btn:hover { color: var(--text); border-color: var(--text3); }
+    .theme-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: var(--shadow); min-width: 140px;
+      display: none; flex-direction: column; overflow: hidden;
+      z-index: 200;
+    }
+    .theme-dropdown.open { display: flex; }
+    .theme-opt {
+      padding: 0.65rem 1rem; font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text2); cursor: pointer; display: flex; align-items: center;
+      gap: 0.6rem; border: none; background: none; text-align: left;
+      transition: background 0.15s; width: 100%;
+    }
+    .theme-opt:hover { background: var(--bg2); color: var(--text); }
+    .theme-opt.active { color: var(--accent); }
+    .theme-swatch {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* ── SCREENS ─────────────────────────────────────────── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── LANDING ─────────────────────────────────────────── */
+    #s-landing {
+      max-width: 860px; padding: 7rem 3rem 5rem;
+      position: relative; z-index: 1;
+    }
+    .eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 1.75rem; opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 6.5vw, 5rem);
+      line-height: 1.06; letter-spacing: -0.03em; color: var(--text);
+      margin-bottom: 1.75rem; opacity: 0;
+      animation: fadeUp 0.7s ease 0.35s forwards;
+    }
+    h1 em { font-style: italic; color: var(--text2); }
+    .sub {
+      font-size: 1.05rem; color: var(--text2); line-height: 1.75;
+      max-width: 460px; margin-bottom: 3rem; opacity: 0;
+      animation: fadeUp 0.7s ease 0.5s forwards;
+    }
+    .form-wrap { opacity: 0; animation: fadeUp 0.7s ease 0.65s forwards; }
+    .wform {
+      display: inline-flex; border: 1.5px solid var(--border);
+      transition: border-color 0.2s; background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .wform:focus-within { border-color: var(--accent); }
+    .wform input {
+      padding: 0.9rem 1.2rem; background: transparent; border: none;
+      outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      color: var(--text); width: 270px;
+    }
+    .wform input::placeholder { color: var(--text3); }
+    .wform button {
+      padding: 0.9rem 1.5rem; background: var(--accent); color: #fff;
+      border: none; font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+      transition: opacity 0.2s; white-space: nowrap; font-weight: 500;
+    }
+    .wform button:hover { opacity: 0.85; }
+    .count-label {
+      margin-top: 1rem; font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.08em;
+      color: var(--text3); text-transform: uppercase;
+    }
+    .landing-foot {
+      margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border);
+      display: flex; gap: 3rem; opacity: 0;
+      animation: fadeUp 0.7s ease 0.8s forwards;
+    }
+    .lf-item {}
+    .lf-num {
+      font-family: 'DM Serif Display', serif; font-size: 1.6rem;
+      color: var(--accent); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .lf-label {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+    }
+
+    /* ── DIAGNOSTIC ──────────────────────────────────────── */
+    #s-diagnostic {
+      max-width: 660px; margin: 0 auto;
+      padding: 4rem 3rem; position: relative; z-index: 1;
+    }
+    .progress-wrap { margin-bottom: 3.5rem; }
+    .progress-top { display: flex; justify-content: space-between; margin-bottom: 0.6rem; }
+    .prog-label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+    }
+    .prog-level {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .pbar { width: 100%; height: 1.5px; background: var(--border); }
+    .pfill { height: 100%; background: var(--accent); transition: width 0.5s ease; width: 0%; }
+    .q-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.3rem, 2.8vw, 1.85rem);
+      line-height: 1.35; letter-spacing: -0.02em;
+      color: var(--text); margin-bottom: 2.25rem; min-height: 70px;
+    }
+    .opts { display: flex; flex-direction: column; gap: 0.6rem; }
+    .opt {
+      padding: 0.9rem 1.1rem; border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      text-align: left; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      display: flex; align-items: center; gap: 0.9rem;
+      box-shadow: var(--shadow);
+    }
+    .opt:hover:not(.disabled) {
+      border-color: var(--accent); background: var(--accent-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .opt.correct { border-color: var(--accent)!important; background: var(--accent-light)!important; }
+    .opt.wrong { border-color: var(--red)!important; background: rgba(192,57,43,0.06)!important; }
+    .opt.disabled { pointer-events: none; opacity: 0.7; }
+    .opt-letter {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; color: var(--text3); min-width: 14px;
+    }
+    .loading {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      color: var(--text3); letter-spacing: 0.08em;
+      margin-top: 1.25rem; display: none;
+    }
+    .loading.on { display: block; }
+
+    /* ── RESULT ──────────────────────────────────────────── */
+    #s-result { position: relative; z-index: 1; }
+
+    .result-hero {
+      padding: 3rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 2.5rem; flex-wrap: wrap;
+      background: var(--surface);
+    }
+    .result-hero-left { flex: 1; min-width: 280px; }
+    .r-label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.6rem;
+    }
+    .r-level {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      line-height: 1.1; letter-spacing: -0.03em;
+      color: var(--text); margin-bottom: 0.4rem;
+    }
+    .r-score {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.06em; color: var(--text3); margin-bottom: 1rem;
+    }
+    .r-desc { font-size: 0.9rem; color: var(--text2); line-height: 1.75; max-width: 420px; }
+
+    /* SCHEDULE WIDGET */
+    .schedule-widget {
+      background: var(--bg); border: 1px solid var(--border);
+      padding: 1.4rem; width: 270px; flex-shrink: 0;
+    }
+    .sw-title {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text2);
+      margin-bottom: 0; display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer; user-select: none;
+    }
+    .sw-arrow { transition: transform 0.25s; display: inline-block; color: var(--text3); }
+    .sw-arrow.open { transform: rotate(180deg); }
+    .sw-body { overflow: hidden; transition: max-height 0.35s ease; max-height: 600px; padding-top: 1.25rem; }
+    .sw-body.collapsed { max-height: 0; padding-top: 0; }
+    .sw-field { margin-bottom: 1rem; }
+    .sw-field label {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text3); display: block; margin-bottom: 0.4rem;
+    }
+    .sw-field input, .sw-field select {
+      width: 100%; padding: 0.5rem 0.7rem;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; outline: none; -webkit-appearance: none; appearance: none;
+      transition: border-color 0.2s;
+    }
+    .sw-field input:focus, .sw-field select:focus { border-color: var(--accent); }
+    .days-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+    .day-btn {
+      padding: 0.3rem 0; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text3);
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+      text-align: center; transition: all 0.15s;
+    }
+    .day-btn.sel { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+    .sw-result { margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--border); display: none; }
+    .sw-result.on { display: block; }
+    .sw-result-item { display: flex; justify-content: space-between; margin-bottom: 0.45rem; }
+    .sw-result-item span:first-child {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3);
+    }
+    .sw-result-item span:last-child {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--text);
+    }
+
+    /* PROJECTION */
+    .projection-box {
+      margin: 2rem 3rem; padding: 1.75rem 2rem;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; gap: 2.5rem; flex-wrap: wrap; align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .proj-item { text-align: center; }
+    .proj-num {
+      font-family: 'DM Serif Display', serif; font-size: 2rem;
+      color: var(--accent); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .proj-label {
+      font-family: 'DM Mono', monospace; font-size: 0.56rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+    }
+    .proj-divider { width: 1px; height: 36px; background: var(--border); }
+    .proj-text { font-size: 0.88rem; color: var(--text2); line-height: 1.7; flex: 1; min-width: 200px; }
+    .proj-text strong { color: var(--text); font-weight: 500; }
+
+    /* JOURNEY */
+    .journey-section { padding: 2.5rem 3rem 4rem; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 2.5rem;
+    }
+    .journey-track { display: flex; flex-direction: column; position: relative; }
+    .journey-track::before {
+      content: ''; position: absolute; left: 11px; top: 24px; bottom: 24px;
+      width: 1px; background: var(--border);
+    }
+    .journey-stage {
+      display: grid; grid-template-columns: 24px 1fr; gap: 1.5rem;
+      padding: 2rem 0; border-bottom: 1px solid var(--border);
+      position: relative; opacity: 0; transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .journey-stage.visible { opacity: 1; transform: translateY(0); }
+    .journey-stage:last-child { border-bottom: none; }
+
+    /* CURRENT STAGE HIGHLIGHT */
+    .journey-stage.is-current {
+      background: var(--surface); margin: 0 -1.5rem;
+      padding: 2rem 1.5rem; border: 1px solid var(--border);
+      box-shadow: var(--shadow); border-radius: 2px;
+    }
+    .journey-stage.is-next {
+      opacity: 0.9;
+    }
+
+    .stage-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1.5px solid var(--border); background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 4px; position: relative; z-index: 1;
+      transition: all 0.3s;
+    }
+    .stage-dot.current {
+      border-color: var(--accent); background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-mid);
+    }
+    .stage-dot.done { border-color: var(--accent-mid); background: var(--accent-light); }
+    .stage-dot svg { width: 10px; height: 10px; }
+    .stage-content { flex: 1; }
+    .stage-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem; }
+    .stage-name {
+      font-family: 'DM Serif Display', serif; font-size: 1.2rem;
+      letter-spacing: -0.02em; color: var(--text);
+    }
+    .stage-name.cl { color: var(--accent); }
+    .stage-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .tag {
+      font-family: 'DM Mono', monospace; font-size: 0.56rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.22rem 0.55rem; border: 1px solid var(--border); color: var(--text3);
+    }
+    .tag.ct { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .tag.nt { border-color: var(--border); color: var(--text3); background: var(--bg2); }
+    .tag.tt { color: var(--text3); border-color: transparent; }
+
+    /* NEXT UP CALLOUT */
+    .next-callout {
+      margin-bottom: 1rem; padding: 0.75rem 1rem;
+      background: var(--accent-light); border-left: 2px solid var(--accent);
+      font-size: 0.85rem; color: var(--text2); line-height: 1.5;
+    }
+    .next-callout strong { color: var(--accent); font-weight: 500; }
+
+    .stage-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.75; margin-bottom: 1.5rem; max-width: 580px; }
+    .resources { display: flex; flex-direction: column; gap: 0.45rem; }
+    .resource-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.9rem; background: var(--bg);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .resource-row:hover { border-color: var(--accent); background: var(--accent-light); }
+    .res-type {
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.18rem 0.45rem; flex-shrink: 0;
+    }
+    .res-type.free { background: var(--accent-light); color: var(--accent); }
+    .res-type.book { background: var(--bg2); color: var(--text3); }
+    .res-type.video { background: rgba(192,57,43,0.07); color: #c0392b; }
+    .res-name { font-size: 0.84rem; flex: 1; color: var(--text); line-height: 1.4; }
+    .res-link {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; color: var(--text3); text-decoration: none;
+      white-space: nowrap; border-bottom: 1px solid var(--border);
+      padding-bottom: 1px; transition: color 0.15s, border-color 0.15s;
+    }
+    .res-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* RETAKE BANNER */
+    .retake-banner {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      padding: 1rem 3rem; border-bottom: 1px solid var(--border);
+      justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .retake-banner.show { display: flex; }
+    .retake-text { font-size: 0.85rem; color: var(--text2); }
+    .retake-text strong { color: var(--text); font-weight: 500; }
+    .retake-btn {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.5rem 1rem; background: none;
+      border: 1px solid var(--border); color: var(--text2);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .retake-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .fade { animation: fadeUp 0.35s ease forwards; }
+
+    @media(max-width:700px){
+      nav { padding: 1.2rem 1.5rem; }
+      #s-landing { padding: 4rem 1.5rem 3rem; }
+      #s-diagnostic { padding: 2.5rem 1.5rem; }
+      .result-hero { padding: 2rem 1.5rem; flex-direction: column; }
+      .schedule-widget { width: 100%; }
+      .journey-section { padding: 2rem 1.5rem 3rem; }
+      .projection-box { margin: 1.5rem; padding: 1.25rem 1.5rem; }
+      .journey-stage.is-current { margin: 0 -0.75rem; padding: 1.5rem 0.75rem; }
+      .retake-banner { padding: 1rem 1.5rem; }
+      .landing-foot { gap: 2rem; flex-wrap: wrap; }
+      .wform input { width: 200px; }
+      .proj-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" onclick="handleLogoClick()">Apex<em>Math</em></a>
+  <div class="nav-right">
+    <div class="nav-status" id="nav-status">Coming Soon</div>
+    <div class="theme-wrap">
+      <button class="theme-btn" onclick="toggleThemeMenu()">
+        <span>Theme</span><span>▾</span>
+      </button>
+      <div class="theme-dropdown" id="theme-dropdown">
+        <button class="theme-opt active" data-t="" onclick="setTheme('',this)">
+          <span class="theme-swatch" style="background:#2d5a27"></span>Forest
+        </button>
+        <button class="theme-opt" data-t="slate" onclick="setTheme('slate',this)">
+          <span class="theme-swatch" style="background:#1a56db"></span>Slate
+        </button>
+        <button class="theme-opt" data-t="sand" onclick="setTheme('sand',this)">
+          <span class="theme-swatch" style="background:#b45309"></span>Sand
+        </button>
+        <button class="theme-opt" data-t="ink" onclick="setTheme('ink',this)">
+          <span class="theme-swatch" style="background:#a8c5a0"></span>Ink
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── LANDING ── -->
+<div class="screen active" id="s-landing">
+  <p class="eyebrow">Free · For every student</p>
+  <h1>Your math level<br/>shouldn't be<br/><em>decided for you.</em></h1>
+  <p class="sub">A personalized path from wherever you are — to the highest level of math. No prerequisites. No gatekeeping. Just you and the work.</p>
+  <div class="form-wrap">
+    <div class="wform">
+      <input type="email" placeholder="your@email.com" id="email-input"/>
+      <button onclick="joinWaitlist()">Join Waitlist</button>
+    </div>
+    <div class="count-label" id="count-label"></div>
+  </div>
+  <div class="landing-foot">
+    <div class="lf-item"><div class="lf-num">0</div><div class="lf-label">Prerequisites</div></div>
+    <div class="lf-item"><div class="lf-num">7</div><div class="lf-label">Levels</div></div>
+    <div class="lf-item"><div class="lf-num">Free</div><div class="lf-label">Always</div></div>
+  </div>
+</div>
+
+<!-- ── DIAGNOSTIC ── -->
+<div class="screen" id="s-diagnostic">
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span class="prog-label" id="prog-label">Question 1 of 10</span>
+      <span class="prog-level" id="prog-level">Algebra</span>
+    </div>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+  </div>
+  <div class="q-text" id="q-text"></div>
+  <div class="opts" id="opts"></div>
+  <div class="loading" id="loading">Loading next question…</div>
+</div>
+
+<!-- ── RESULT ── -->
+<div class="screen" id="s-result">
+  <div class="retake-banner" id="retake-banner">
+    <span class="retake-text">Viewing saved results for <strong id="retake-email"></strong></span>
+    <button class="retake-btn" onclick="startFresh()">Retake Diagnostic →</button>
+  </div>
+  <div class="result-hero">
+    <div class="result-hero-left">
+      <div class="r-label">Your Diagnostic Result</div>
+      <div class="r-level" id="r-level"></div>
+      <div class="r-score" id="r-score"></div>
+      <div class="r-desc" id="r-desc"></div>
+    </div>
+    <div class="schedule-widget">
+      <div class="sw-title" onclick="toggleSchedule()">
+        <span>Plan Your Schedule</span>
+        <span class="sw-arrow" id="sw-arrow">▾</span>
+      </div>
+      <div class="sw-body" id="sw-body">
+        <div class="sw-field">
+          <label>Start Date</label>
+          <input type="date" id="sw-start" oninput="calcSchedule()"/>
+        </div>
+        <div class="sw-field">
+          <label>Study Days</label>
+          <div class="days-grid">
+            <button class="day-btn" data-d="0" onclick="toggleDay(this)">Su</button>
+            <button class="day-btn sel" data-d="1" onclick="toggleDay(this)">Mo</button>
+            <button class="day-btn sel" data-d="2" onclick="toggleDay(this)">Tu</button>
+            <button class="day-btn sel" data-d="3" onclick="toggleDay(this)">We</button>
+            <button class="day-btn sel" data-d="4" onclick="toggleDay(this)">Th</button>
+            <button class="day-btn" data-d="5" onclick="toggleDay(this)">Fr</button>
+            <button class="day-btn" data-d="6" onclick="toggleDay(this)">Sa</button>
+          </div>
+        </div>
+        <div class="sw-field">
+          <label>Hours per Session</label>
+          <select id="sw-hours" onchange="calcSchedule()">
+            <option value="0.5">30 minutes</option>
+            <option value="1" selected>1 hour</option>
+            <option value="1.5">1.5 hours</option>
+            <option value="2">2 hours</option>
+            <option value="3">3 hours</option>
+          </select>
+        </div>
+        <div class="sw-result" id="sw-result">
+          <div class="sw-result-item"><span>Hours / Week</span><span id="sw-hrs-week">—</span></div>
+          <div class="sw-result-item"><span>Next Level</span><span id="sw-next">—</span></div>
+          <div class="sw-result-item"><span>Calculus Ready</span><span id="sw-calc">—</span></div>
+          <div class="sw-result-item"><span>Advanced Level</span><span id="sw-mit">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="projection-box" id="proj-box"></div>
+
+  <div class="journey-section">
+    <p class="section-label">Your Full Path — Resources & Timeline</p>
+    <div class="journey-track" id="journey-track"></div>
+  </div>
+</div>
+
+<script>
+const STAGES = [
+  { id:0, name:"Arithmetic & Pre-Algebra", hoursNeeded:80,
+    desc:"The bedrock. Fractions, decimals, exponents, number theory, order of operations. Most students rush past this — don't. A shaky foundation makes everything above harder than it needs to be.",
+    resources:[
+      {type:"free",name:"Khan Academy – Pre-Algebra",url:"https://www.khanacademy.org/math/pre-algebra"},
+      {type:"video",name:"Professor Leonard – Pre-Algebra (YouTube)",url:"https://www.youtube.com/playlist?list=PLDesaqWTN534cMCt0F8J0VnGKhNnqG2aD"},
+      {type:"book",name:"Beast Academy (AoPS) – Deep arithmetic intuition",url:"https://beastacademy.com/"},
+      {type:"free",name:"Brilliant.org – Foundational Math",url:"https://brilliant.org/courses/math-fundamentals/"},
+      {type:"book",name:"AoPS – Introduction to Number Theory",url:"https://artofproblemsolving.com/store/item/intro-number-theory"},
+    ]},
+  { id:1, name:"Early Algebra", hoursNeeded:120,
+    desc:"Variables, linear equations, inequalities, graphing, systems, quadratics. This is where math becomes a language. The goal isn't to memorize steps — it's to understand what you're actually doing and why.",
+    resources:[
+      {type:"free",name:"Khan Academy – Algebra 1",url:"https://www.khanacademy.org/math/algebra"},
+      {type:"book",name:"AoPS – Introduction to Algebra",url:"https://artofproblemsolving.com/store/item/intro-algebra"},
+      {type:"video",name:"Professor Leonard – Algebra Full Course (YouTube)",url:"https://www.youtube.com/playlist?list=PLDesaqWTN53ZVrodTKJHT_p5dOOT64JWo"},
+      {type:"free",name:"Desmos Graphing Calculator",url:"https://www.desmos.com/calculator"},
+      {type:"book",name:"Algebra by Michael Artin (for the ambitious)",url:"https://www.amazon.com/Algebra-2nd-Michael-Artin/dp/0132413779"},
+    ]},
+  { id:2, name:"Advanced Algebra", hoursNeeded:150,
+    desc:"Polynomials, complex numbers, logarithms, exponential functions, sequences, series, combinatorics. This is the territory that separates good students from great ones. Don't rush it.",
+    resources:[
+      {type:"free",name:"Khan Academy – Algebra 2",url:"https://www.khanacademy.org/math/algebra2"},
+      {type:"book",name:"AoPS – Intermediate Algebra",url:"https://artofproblemsolving.com/store/item/intermediate-algebra"},
+      {type:"video",name:"3Blue1Brown – Essence of Math (YouTube)",url:"https://www.youtube.com/c/3blue1brown"},
+      {type:"free",name:"MIT OCW – Applied Mathematics",url:"https://ocw.mit.edu/courses/18-310-principles-of-applied-mathematics-fall-2013/"},
+      {type:"free",name:"AoPS – AMC 10/12 Problem Sets",url:"https://artofproblemsolving.com/contests/amc"},
+    ]},
+  { id:3, name:"Geometry", hoursNeeded:130,
+    desc:"Euclidean proofs, similarity, congruence, circles, coordinate geometry, trig foundations. Proof-writing here trains the logical rigor you need for everything above. Don't skip the proofs.",
+    resources:[
+      {type:"free",name:"Khan Academy – Geometry",url:"https://www.khanacademy.org/math/geometry"},
+      {type:"book",name:"AoPS – Introduction to Geometry",url:"https://artofproblemsolving.com/store/item/intro-geometry"},
+      {type:"free",name:"GeoGebra – Interactive Geometry Tool",url:"https://www.geogebra.org/"},
+      {type:"video",name:"Professor Leonard – Geometry (YouTube)",url:"https://www.youtube.com/c/ProfessorLeonard"},
+      {type:"book",name:"Geometry Revisited – Coxeter & Greitzer",url:"https://www.amazon.com/Geometry-Revisited-New-Mathematical-Library/dp/0883856190"},
+    ]},
+  { id:4, name:"Pre-Calculus", hoursNeeded:160,
+    desc:"Trig deep dive, polar coordinates, vectors, conics, limits intro. The bridge to calculus. Master this fully — every gap here becomes a wall later.",
+    resources:[
+      {type:"free",name:"Khan Academy – Precalculus",url:"https://www.khanacademy.org/math/precalculus"},
+      {type:"video",name:"Professor Leonard – Precalculus Full Course (YouTube)",url:"https://www.youtube.com/c/ProfessorLeonard"},
+      {type:"book",name:"Precalculus – Stewart, Redlin & Watson",url:"https://www.amazon.com/Precalculus-Mathematics-Calculus-James-Stewart/dp/1305071759"},
+      {type:"video",name:"3Blue1Brown – Essence of Trigonometry (YouTube)",url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDNPOjrT6KVlfJuKtYTftqH6"},
+      {type:"free",name:"Paul's Online Math Notes – Algebra & Trig",url:"https://tutorial.math.lamar.edu/Classes/Alg/Alg.aspx"},
+    ]},
+  { id:5, name:"Calculus I", hoursNeeded:200,
+    desc:"Limits, continuity, all derivative rules, applications, and introduction to integration. This is where math becomes a tool for understanding how the real world works. Take your time.",
+    resources:[
+      {type:"free",name:"Khan Academy – AP Calculus AB",url:"https://www.khanacademy.org/math/ap-calculus-ab"},
+      {type:"video",name:"Professor Leonard – Calculus 1 Full Course (YouTube)",url:"https://www.youtube.com/playlist?list=PLF797E961509B4EB5"},
+      {type:"video",name:"3Blue1Brown – Essence of Calculus (YouTube)",url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr"},
+      {type:"book",name:"Calculus – James Stewart",url:"https://www.amazon.com/Calculus-James-Stewart/dp/1285740629"},
+      {type:"free",name:"MIT OCW – Single Variable Calculus (18.01)",url:"https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/"},
+    ]},
+  { id:6, name:"Calculus II & Beyond", hoursNeeded:300,
+    desc:"Integration techniques, series, multivariable calculus, linear algebra, differential equations. University level. This is where the top students operate.",
+    resources:[
+      {type:"free",name:"Khan Academy – AP Calculus BC",url:"https://www.khanacademy.org/math/ap-calculus-bc"},
+      {type:"video",name:"Professor Leonard – Calculus 2 & 3 (YouTube)",url:"https://www.youtube.com/c/ProfessorLeonard"},
+      {type:"free",name:"MIT OCW – Multivariable Calculus (18.02)",url:"https://ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/"},
+      {type:"book",name:"Linear Algebra Done Right – Sheldon Axler",url:"https://www.amazon.com/Linear-Algebra-Right-Undergraduate-Mathematics/dp/3319110799"},
+      {type:"free",name:"MIT OCW – Linear Algebra with Gilbert Strang (18.06)",url:"https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/"},
+    ]},
+];
+
+const HOURS_TO_NEXT = [80,120,150,130,160,200,300];
+const STORAGE_KEY = 'apexmath_result';
+
+let userEmail='', sessionId=Math.random().toString(36).slice(2);
+let qCount=0, correct=0, wrong=0, currentLevel=1, userLevel=1;
+const MAX_Q=10;
+let selectedDays=new Set([1,2,3,4]);
+
+// ── THEME ────────────────────────────────────────────────────
+function toggleThemeMenu(){
+  document.getElementById('theme-dropdown').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.theme-wrap')) {
+    document.getElementById('theme-dropdown').classList.remove('open');
+  }
+});
+function setTheme(t, btn) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('apexmath_theme', t);
+  document.getElementById('theme-dropdown').classList.remove('open');
+}
+// Restore theme
+const savedTheme = localStorage.getItem('apexmath_theme');
+if (savedTheme !== null) {
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.querySelectorAll('.theme-opt').forEach(b => {
+    if (b.dataset.t === savedTheme) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+}
+
+// ── LOGO CLICK ───────────────────────────────────────────────
+function handleLogoClick() {
+  const saved = getSavedResult();
+  if (saved) {
+    showResultFromSaved(saved, true);
+  } else {
+    showScreen('s-landing');
+    document.getElementById('nav-status').textContent = 'Coming Soon';
+  }
+}
+
+// ── SAVED RESULT ─────────────────────────────────────────────
+function getSavedResult() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
+}
+function saveResult(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ── WAITLIST ─────────────────────────────────────────────────
+async function joinWaitlist() {
+  const email = document.getElementById('email-input').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').style.outline = '1px solid var(--red)'; return;
+  }
+  userEmail = email;
+  try { await fetch('/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})}); } catch(e){}
+  showScreen('s-diagnostic');
+  document.getElementById('nav-status').textContent = 'Diagnostic';
+  loadQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startFresh() {
+  qCount=0; correct=0; wrong=0; currentLevel=1; userLevel=1;
+  showScreen('s-diagnostic');
+  document.getElementById('nav-status').textContent = 'Diagnostic';
+  loadQuestion();
+}
+
+// ── DIAGNOSTIC ───────────────────────────────────────────────
+async function loadQuestion() {
+  document.getElementById('loading').classList.add('on');
+  document.getElementById('opts').innerHTML = '';
+  document.getElementById('q-text').textContent = '';
+  try {
+    const res = await fetch('/question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,currentLevel,correct,wrong})});
+    const data = await res.json();
+    document.getElementById('loading').classList.remove('on');
+    if (data.done || qCount >= MAX_Q) { showResult(); return; }
+    currentLevel = data.level;
+    renderQuestion(data.question, data.levelName);
+  } catch(e) {
+    document.getElementById('loading').classList.remove('on');
+    document.getElementById('q-text').textContent = 'Error loading. Please refresh.';
+  }
+}
+
+function renderQuestion(q, levelName) {
+  qCount++;
+  const labels = ['A','B','C','D'];
+  document.getElementById('prog-label').textContent = `Question ${qCount} of ${MAX_Q}`;
+  document.getElementById('prog-level').textContent = levelName;
+  document.getElementById('pfill').style.width = `${(qCount/MAX_Q)*100}%`;
+  const qt = document.getElementById('q-text');
+  qt.textContent = q.q; qt.classList.remove('fade'); void qt.offsetWidth; qt.classList.add('fade');
+  const opts = document.getElementById('opts'); opts.innerHTML = '';
+  q.opts.forEach((opt,i) => {
+    const btn = document.createElement('button'); btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${labels[i]}</span>${opt}`;
+    btn.onclick = () => handleAnswer(i, q.ans, opts);
+    opts.appendChild(btn);
+  });
+}
+
+function handleAnswer(chosen, correct_ans, optsEl) {
+  const isCorrect = chosen === correct_ans;
+  if (isCorrect) correct++; else wrong++;
+  optsEl.querySelectorAll('.opt').forEach((b,i) => {
+    b.classList.add('disabled');
+    if (i === correct_ans) b.classList.add('correct');
+    if (i === chosen && !isCorrect) b.classList.add('wrong');
+  });
+  setTimeout(() => { if (qCount >= MAX_Q) showResult(); else loadQuestion(); }, 800);
+}
+
+// ── RESULT ───────────────────────────────────────────────────
+async function showResult() {
+  userLevel = currentLevel;
+  const resultData = { level: userLevel, score: correct, total: MAX_Q, email: userEmail };
+  saveResult(resultData);
+  renderResult(resultData, false);
+  try { await fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,score:correct,total:MAX_Q})}); } catch(e){}
+}
+
+function showResultFromSaved(data, fromLogo) {
+  userLevel = data.level;
+  renderResult(data, fromLogo);
+}
+
+function renderResult(data, showRetakeBanner) {
+  showScreen('s-result');
+  document.getElementById('nav-status').textContent = 'Your Map';
+  const stage = STAGES[data.level];
+
+  document.getElementById('r-level').textContent = stage.name;
+  document.getElementById('r-score').textContent = `${data.score} / ${data.total} correct · Diagnostic complete`;
+  document.getElementById('r-desc').textContent = stage.desc;
+
+  if (showRetakeBanner && data.email) {
+    document.getElementById('retake-banner').classList.add('show');
+    document.getElementById('retake-email').textContent = data.email;
+  } else {
+    document.getElementById('retake-banner').classList.remove('show');
+  }
+
+  const hoursToCalc = HOURS_TO_NEXT.slice(data.level, 5).reduce((a,b)=>a+b, 0);
+  const hoursToAdv = HOURS_TO_NEXT.slice(data.level).reduce((a,b)=>a+b, 0);
+  const levelsAway = Math.max(0, 5 - data.level);
+
+  // Friendly projection text — no scary hour totals
+  const weeksToCalc5 = Math.ceil(hoursToCalc / 5);
+  const weeksToAdv5 = Math.ceil(hoursToAdv / 5);
+
+  document.getElementById('proj-box').innerHTML = `
+    <div class="proj-item"><div class="proj-num">${levelsAway}</div><div class="proj-label">Levels to Calculus</div></div>
+    <div class="proj-divider"></div>
+    <div class="proj-item"><div class="proj-num">${STAGES.length - 1 - data.level}</div><div class="proj-label">Levels Ahead of You</div></div>
+    <div class="proj-divider"></div>
+    <p class="proj-text">At just <strong>1 hour a day, 5 days a week</strong>, you can reach Calculus in roughly <strong>${weeksToCalc5} weeks</strong> — and the highest level in <strong>${weeksToAdv5} weeks</strong>. Use the planner on the right to see your exact dates.</p>`;
+
+  // Build journey
+  const track = document.getElementById('journey-track');
+  track.innerHTML = '';
+  STAGES.forEach((s, i) => {
+    const isCurrent = i === data.level;
+    const isNext = i === data.level + 1;
+    const isDone = i < data.level;
+    const dotClass = isCurrent ? 'current' : isDone ? 'done' : '';
+    const dotIcon = isDone ? `<svg viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+    const weeksThis = Math.round(HOURS_TO_NEXT[i] / 5);
+    const timeLabel = isDone ? 'Completed' : `~${weeksThis} weeks at 1hr/day`;
+    const nextCallout = isNext ? `<div class="next-callout">⟶ <strong>Up next.</strong> Once you've worked through your current level, this is where you're headed.</div>` : '';
+
+    track.innerHTML += `
+      <div class="journey-stage${isCurrent?' is-current':''}${isNext?' is-next':''}">
+        <div class="stage-dot ${dotClass}">${dotIcon}</div>
+        <div class="stage-content">
+          <div class="stage-header">
+            <div class="stage-name${isCurrent?' cl':''}">${s.name}${isCurrent?' — You Are Here':''}</div>
+            <div class="stage-tags">
+              ${isCurrent?'<span class="tag ct">Current Level</span>':''}
+              ${isNext?'<span class="tag nt">Up Next</span>':''}
+              <span class="tag tt">${timeLabel}</span>
+            </div>
+          </div>
+          ${nextCallout}
+          <div class="stage-desc">${s.desc}</div>
+          <div class="resources">
+            ${s.resources.map(r=>`
+              <div class="resource-row">
+                <span class="res-type ${r.type}">${r.type}</span>
+                <span class="res-name">${r.name}</span>
+                <a class="res-link" href="${r.url}" target="_blank" rel="noopener">Visit →</a>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // Animate stages in
+  setTimeout(() => {
+    document.querySelectorAll('.journey-stage').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), i * 80);
+    });
+  }, 100);
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('sw-start').value = today;
+  calcSchedule();
+}
+
+// ── SCHEDULE ─────────────────────────────────────────────────
+function toggleSchedule() {
+  document.getElementById('sw-body').classList.toggle('collapsed');
+  document.getElementById('sw-arrow').classList.toggle('open');
+}
+function toggleDay(btn) {
+  const d = parseInt(btn.dataset.d);
+  btn.classList.toggle('sel');
+  if (selectedDays.has(d)) selectedDays.delete(d); else selectedDays.add(d);
+  calcSchedule();
+}
+function calcSchedule() {
+  const startVal = document.getElementById('sw-start').value;
+  const hours = parseFloat(document.getElementById('sw-hours').value);
+  if (!startVal || selectedDays.size === 0) return;
+  const hrsPerWeek = selectedDays.size * hours;
+  const hoursToNext = HOURS_TO_NEXT[userLevel] || 120;
+  const hoursToCalc = HOURS_TO_NEXT.slice(userLevel, 5).reduce((a,b)=>a+b, 0);
+  const hoursToAdv = HOURS_TO_NEXT.slice(userLevel).reduce((a,b)=>a+b, 0);
+  const start = new Date(startVal);
+  document.getElementById('sw-result').classList.add('on');
+  document.getElementById('sw-hrs-week').textContent = `${hrsPerWeek.toFixed(1)}h`;
+  document.getElementById('sw-next').textContent = fmt(addWeeks(start, hoursToNext / hrsPerWeek));
+  document.getElementById('sw-calc').textContent = fmt(addWeeks(start, hoursToCalc / hrsPerWeek));
+  document.getElementById('sw-mit').textContent = fmt(addWeeks(start, hoursToAdv / hrsPerWeek));
+}
+function addWeeks(date, weeks) { const d = new Date(date); d.setDate(d.getDate() + Math.round(weeks*7)); return d; }
+function fmt(date) { return date.toLocaleDateString('en-US', {month:'short', year:'numeric'}); }
+
+// ── INIT ─────────────────────────────────────────────────────
+fetch('/waitlist/count').then(r=>r.json()).then(d=>{
+  if (d.count > 0) document.getElementById('count-label').textContent = `${d.count} student${d.count!==1?'s':''} already in`;
+}).catch(()=>{});
+</script>
+</body>
+</html>
