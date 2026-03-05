@@ -200,22 +200,25 @@
 
     /* ── DASHBOARD ── */
     #s-dashboard { position:relative;z-index:1; }
-    .dash-wrap { max-width:860px;margin:0 auto;padding:4rem 3rem; }
-    .dash-top { margin-bottom:3rem; }
-    .dash-greet { font-family:"DM Serif Display",serif;font-size:clamp(2rem,4vw,3rem);letter-spacing:-0.03em;color:var(--text);line-height:1.1;margin-bottom:0.4rem; }
-    .dash-level { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent); }
-    .dash-cards { display:grid;grid-template-columns:140px 1fr 1fr;gap:1rem; }
-    .dash-card { background:var(--surface);border:1px solid var(--border);padding:1.5rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:0.5rem; }
-    .dash-card-streak { align-items:center;justify-content:center;text-align:center; }
-    .dash-card-main { border-color:var(--accent-mid); }
-    .dc-label { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
-    .dc-num { font-family:"DM Serif Display",serif;font-size:3rem;color:var(--accent);line-height:1; }
-    .dc-sub { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
-    .dc-desc { font-size:0.85rem;color:var(--text2);line-height:1.6;flex:1; }
-    .dc-btn { margin-top:auto;padding:0.7rem 1.2rem;background:var(--accent);color:#fff;border:none;font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:flex-start; }
-    .dc-btn:hover { opacity:0.85; }
-    .dc-btn-ghost { margin-top:auto;padding:0.7rem 1.2rem;background:none;color:var(--text2);border:1px solid var(--border);font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start; }
+    .dash-hero { min-height:calc(100vh - 62px);display:flex;flex-direction:column;justify-content:center;padding:4rem 3rem 2rem;border-bottom:1px solid var(--border);position:relative; }
+    .dash-hero-inner { display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;max-width:960px;margin:0 auto;width:100%; }
+    .dash-greet { font-family:"DM Serif Display",serif;font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:-0.03em;color:var(--text);line-height:1.05;margin-bottom:0.5rem; }
+    .dash-level-name { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:2rem; }
+    .dash-streak-row { display:flex;align-items:baseline;gap:0.5rem; }
+    .dash-streak-fire { font-size:1.8rem;line-height:1; }
+    .dash-streak-num { font-family:"DM Serif Display",serif;font-size:3.5rem;color:var(--text);line-height:1;letter-spacing:-0.04em; }
+    .dash-streak-label { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3); }
+    .dash-hero-right { display:flex;flex-direction:column; }
+    .dash-quiz-card { background:var(--surface);border:1.5px solid var(--accent-mid);padding:2rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:1rem; }
+    .dqc-label { font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent); }
+    .dqc-desc { font-size:0.9rem;color:var(--text2);line-height:1.7; }
+    .dc-btn { padding:0.85rem 1.5rem;background:var(--accent);color:#fff;border:none;font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:flex-start;font-weight:500; }
+    .dc-btn:hover:not(:disabled) { opacity:0.85; }
+    .dc-btn:disabled { opacity:0.45;cursor:default; }
+    .dc-btn-ghost { padding:0.85rem 1.5rem;background:none;color:var(--text2);border:1px solid var(--border);font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start; }
     .dc-btn-ghost:hover { border-color:var(--accent);color:var(--accent); }
+    .dash-scroll-hint { margin-top:3rem;font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:color 0.2s;padding:0; }
+    .dash-scroll-hint:hover { color:var(--accent); }
     #s-daily { position:relative;z-index:1; }
     .daily-wrap { max-width:660px;margin:0 auto;padding:4rem 3rem; }
     .daily-header { margin-bottom:3rem; }
@@ -250,8 +253,8 @@
       .landing-foot{gap:2rem;flex-wrap:wrap;}
       .proj-divider{display:none;}
       .modal{margin:1rem;padding:2rem;}
-      .dash-cards{grid-template-columns:1fr;}
-      .dash-wrap{padding:2.5rem 1.5rem;}
+      .dash-hero{padding:3rem 1.5rem 1.5rem;min-height:auto;}
+      .dash-hero-inner{grid-template-columns:1fr;gap:2.5rem;}
       .daily-wrap{padding:2.5rem 1.5rem;}
       .done-wrap{padding:4rem 1.5rem;}
     }
@@ -406,29 +409,38 @@
 
 <!-- ── DASHBOARD ── -->
 <div class="screen" id="s-dashboard">
-  <div class="dash-wrap">
-    <div class="dash-top">
-      <div class="dash-greet" id="dash-greet">Good morning.</div>
-      <div class="dash-level" id="dash-level"></div>
+
+  <!-- HERO -->
+  <div class="dash-hero">
+    <div class="dash-hero-inner">
+      <div class="dash-hero-left">
+        <div class="dash-greet" id="dash-greet">Good morning.</div>
+        <div class="dash-level-name" id="dash-level-name"></div>
+        <div class="dash-streak-row">
+          <span class="dash-streak-fire">🔥</span>
+          <span class="dash-streak-num" id="dash-streak">0</span>
+          <span class="dash-streak-label">day streak</span>
+        </div>
+      </div>
+      <div class="dash-hero-right">
+        <div class="dash-quiz-card">
+          <div class="dqc-label" id="dash-quiz-label">Today's Quiz</div>
+          <div class="dqc-desc" id="dash-quiz-desc">5 questions at your level. Get 3 or more right to keep your streak alive.</div>
+          <button class="dc-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
+        </div>
+      </div>
     </div>
-    <div class="dash-cards">
-      <div class="dash-card dash-card-streak">
-        <div class="dc-label">Current Streak</div>
-        <div class="dc-num" id="dash-streak">0</div>
-        <div class="dc-sub">days in a row</div>
-      </div>
-      <div class="dash-card dash-card-main" id="dash-main-card">
-        <div class="dc-label" id="dash-quiz-label">Today's Quiz</div>
-        <div class="dc-desc" id="dash-quiz-desc">5 questions at your level. Get 3+ right to keep your streak.</div>
-        <button class="dc-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
-      </div>
-      <div class="dash-card">
-        <div class="dc-label">Your Path</div>
-        <div class="dc-desc">View your full roadmap and resources for every level.</div>
-        <button class="dc-btn-ghost" onclick="showScreen('s-result')">View Roadmap →</button>
-      </div>
-    </div>
+    <button class="dash-scroll-hint" onclick="document.getElementById('dash-resources').scrollIntoView({behavior:'smooth'})">
+      Your resources ↓
+    </button>
   </div>
+
+  <!-- RESOURCES -->
+  <div id="dash-resources" class="journey-section">
+    <p class="section-label">Your Full Path — Resources & Timeline</p>
+    <div class="journey-track" id="dash-journey-track"></div>
+  </div>
+
 </div>
 
 <!-- ── DAILY QUIZ ── -->
@@ -603,10 +615,9 @@ async function submitAuth() {
       qCount=0; correct=0; wrong=0; currentLevel=1; userLevel=1;
       sessionId = Math.random().toString(36).slice(2);
       showScreen('s-diagnostic');
-      
       loadQuestion();
     } else {
-      // Login → go to dashboard
+      // Login → always dashboard
       showDashboard();
     }
   } catch(e) {
@@ -829,17 +840,57 @@ async function showDashboard() {
     const hr = new Date().getHours();
     const greet = hr < 12 ? 'Good morning.' : hr < 17 ? 'Good afternoon.' : 'Good evening.';
     document.getElementById('dash-greet').textContent = greet;
-    document.getElementById('dash-level').textContent = `Current Level — ${user.level_name}`;
+    document.getElementById('dash-level-name').textContent = user.level_name;
     document.getElementById('dash-streak').textContent = streak;
 
     if (completedToday) {
       document.getElementById('dash-quiz-label').textContent = passedToday ? "Today's Quiz — Done ✓" : "Today's Quiz — Try Again";
       document.getElementById('dash-quiz-desc').textContent = passedToday
-        ? `Streak kept. Come back tomorrow.`
-        : `You got less than 3 correct. Give it another shot.`;
-      document.getElementById('dash-quiz-btn').textContent = passedToday ? 'Review Roadmap →' : 'Retry Quiz →';
-      if (passedToday) document.getElementById('dash-quiz-btn').onclick = () => showScreen('s-result');
+        ? 'Streak kept. Come back tomorrow.'
+        : 'You got less than 3 correct. Give it another shot.';
+      document.getElementById('dash-quiz-btn').textContent = passedToday ? 'Come Back Tomorrow' : 'Retry Quiz →';
+      if (passedToday) document.getElementById('dash-quiz-btn').disabled = true;
     }
+
+    // Render journey track inside dashboard
+    userLevel = user.level;
+    const track = document.getElementById('dash-journey-track');
+    track.innerHTML = '';
+    STAGES.forEach((s, i) => {
+      const isCurrent = i === user.level;
+      const isNext = i === user.level + 1;
+      const isDone = i < user.level;
+      const dotClass = isCurrent ? 'current' : isDone ? 'done' : '';
+      const dotIcon = isDone ? `<svg viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+      const weeksThis = Math.round(HOURS_TO_NEXT[i] / 5);
+      const timeLabel = isDone ? 'Completed' : `~${weeksThis} weeks at 1hr/day`;
+      const nextCallout = isNext ? `<div class="next-callout">⟶ <strong>Up next.</strong> Once you've worked through your current level, this is where you're headed.</div>` : '';
+      track.innerHTML += `
+        <div class="journey-stage${isCurrent ? ' is-current' : ''}${isNext ? ' is-next' : ''}">
+          <div class="stage-dot ${dotClass}">${dotIcon}</div>
+          <div class="stage-content">
+            <div class="stage-header">
+              <div class="stage-name${isCurrent ? ' cl' : ''}">${s.name}${isCurrent ? ' — You Are Here' : ''}</div>
+              <div class="stage-tags">
+                ${isCurrent ? '<span class="tag ct">Current Level</span>' : ''}
+                ${isNext ? '<span class="tag nt">Up Next</span>' : ''}
+                <span class="tag tt">${timeLabel}</span>
+              </div>
+            </div>
+            ${nextCallout}
+            <div class="stage-desc">${s.desc}</div>
+            <div class="resources">
+              ${s.resources.map(r => `<div class="resource-row"><span class="res-type ${r.type}">${r.type}</span><span class="res-name">${r.name}</span><a class="res-link" href="${r.url}" target="_blank" rel="noopener">Visit →</a></div>`).join('')}
+            </div>
+          </div>
+        </div>`;
+    });
+    setTimeout(() => {
+      document.querySelectorAll('#dash-journey-track .journey-stage').forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), i * 80);
+      });
+    }, 100);
+
   } catch(e) {}
 }
 
