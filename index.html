@@ -198,6 +198,45 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
     .fade { animation:fadeUp 0.35s ease forwards; }
 
+    /* ── DASHBOARD ── */
+    #s-dashboard { position:relative;z-index:1; }
+    .dash-wrap { max-width:860px;margin:0 auto;padding:4rem 3rem; }
+    .dash-top { margin-bottom:3rem; }
+    .dash-greet { font-family:"DM Serif Display",serif;font-size:clamp(2rem,4vw,3rem);letter-spacing:-0.03em;color:var(--text);line-height:1.1;margin-bottom:0.4rem; }
+    .dash-level { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent); }
+    .dash-cards { display:grid;grid-template-columns:140px 1fr 1fr;gap:1rem; }
+    .dash-card { background:var(--surface);border:1px solid var(--border);padding:1.5rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:0.5rem; }
+    .dash-card-streak { align-items:center;justify-content:center;text-align:center; }
+    .dash-card-main { border-color:var(--accent-mid); }
+    .dc-label { font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3); }
+    .dc-num { font-family:"DM Serif Display",serif;font-size:3rem;color:var(--accent);line-height:1; }
+    .dc-sub { font-family:"DM Mono",monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3); }
+    .dc-desc { font-size:0.85rem;color:var(--text2);line-height:1.6;flex:1; }
+    .dc-btn { margin-top:auto;padding:0.7rem 1.2rem;background:var(--accent);color:#fff;border:none;font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:flex-start; }
+    .dc-btn:hover { opacity:0.85; }
+    .dc-btn-ghost { margin-top:auto;padding:0.7rem 1.2rem;background:none;color:var(--text2);border:1px solid var(--border);font-family:"DM Mono",monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;align-self:flex-start; }
+    .dc-btn-ghost:hover { border-color:var(--accent);color:var(--accent); }
+    #s-daily { position:relative;z-index:1; }
+    .daily-wrap { max-width:660px;margin:0 auto;padding:4rem 3rem; }
+    .daily-header { margin-bottom:3rem; }
+    .daily-progress-top { display:flex;justify-content:space-between;margin-bottom:0.6rem; }
+    .idk-wrap { margin-top:2rem; }
+    .idk-btn { display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.85rem 1.1rem;background:none;border:1.5px solid var(--border);color:var(--text3);font-family:"DM Sans",sans-serif;font-size:0.88rem;cursor:pointer;transition:border-color 0.2s,color 0.2s; }
+    .idk-btn:hover { border-color:var(--accent);color:var(--text); }
+    .idk-arrow { transition:transform 0.3s ease;display:inline-block;font-size:0.75rem; }
+    .idk-arrow.open { transform:rotate(180deg); }
+    .explainer { max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .explainer.open { max-height:600px; }
+    .explainer-inner { padding:1.5rem;background:var(--surface);border:1.5px solid var(--accent-mid);border-top:none; }
+    .exp-title { font-family:"DM Serif Display",serif;font-size:1.1rem;letter-spacing:-0.02em;color:var(--text);margin-bottom:0.75rem; }
+    .exp-body { font-size:0.88rem;color:var(--text2);line-height:1.8;margin-bottom:1.25rem; }
+    .exp-resources { display:flex;flex-direction:column;gap:0.4rem; }
+    #s-daily-done { position:relative;z-index:1; }
+    .done-wrap { max-width:500px;margin:0 auto;padding:7rem 3rem;text-align:center; }
+    .done-icon { font-size:3rem;margin-bottom:1rem; }
+    .done-title { font-family:"DM Serif Display",serif;font-size:2.2rem;letter-spacing:-0.03em;color:var(--text);margin-bottom:0.6rem; }
+    .done-sub { font-size:0.95rem;color:var(--text2);line-height:1.7;margin-bottom:1rem; }
+    .done-streak { font-family:"DM Mono",monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);padding:0.5rem 1rem;border:1px solid var(--accent-mid);background:var(--accent-light);display:inline-block; }
     @media(max-width:700px){
       nav{padding:1.2rem 1.5rem;}
       #s-landing{padding:4rem 1.5rem 3rem;}
@@ -209,9 +248,12 @@
       .journey-stage.is-current{margin:0 -0.75rem;padding:1.5rem 0.75rem;}
       .retake-banner{padding:1rem 1.5rem;}
       .landing-foot{gap:2rem;flex-wrap:wrap;}
-      .wform input{width:200px;}
       .proj-divider{display:none;}
       .modal{margin:1rem;padding:2rem;}
+      .dash-cards{grid-template-columns:1fr;}
+      .dash-wrap{padding:2.5rem 1.5rem;}
+      .daily-wrap{padding:2.5rem 1.5rem;}
+      .done-wrap{padding:4rem 1.5rem;}
     }
   </style>
 </head>
@@ -362,6 +404,72 @@
   </div>
 </div>
 
+<!-- ── DASHBOARD ── -->
+<div class="screen" id="s-dashboard">
+  <div class="dash-wrap">
+    <div class="dash-top">
+      <div class="dash-greet" id="dash-greet">Good morning.</div>
+      <div class="dash-level" id="dash-level"></div>
+    </div>
+    <div class="dash-cards">
+      <div class="dash-card dash-card-streak">
+        <div class="dc-label">Current Streak</div>
+        <div class="dc-num" id="dash-streak">0</div>
+        <div class="dc-sub">days in a row</div>
+      </div>
+      <div class="dash-card dash-card-main" id="dash-main-card">
+        <div class="dc-label" id="dash-quiz-label">Today's Quiz</div>
+        <div class="dc-desc" id="dash-quiz-desc">5 questions at your level. Get 3+ right to keep your streak.</div>
+        <button class="dc-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
+      </div>
+      <div class="dash-card">
+        <div class="dc-label">Your Path</div>
+        <div class="dc-desc">View your full roadmap and resources for every level.</div>
+        <button class="dc-btn-ghost" onclick="showScreen('s-result')">View Roadmap →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DAILY QUIZ ── -->
+<div class="screen" id="s-daily">
+  <div class="daily-wrap">
+    <div class="daily-header">
+      <div class="daily-progress-top">
+        <span class="prog-label" id="dq-label">Question 1 of 5</span>
+        <span class="prog-level" id="dq-level"></span>
+      </div>
+      <div class="pbar"><div class="pfill" id="dq-fill"></div></div>
+    </div>
+    <div class="q-text" id="dq-text"></div>
+    <div class="opts" id="dq-opts"></div>
+    <div class="idk-wrap">
+      <button class="idk-btn" id="idk-btn" onclick="toggleExplainer()">
+        <span>I don't know this</span>
+        <span class="idk-arrow" id="idk-arrow">▾</span>
+      </button>
+      <div class="explainer" id="explainer">
+        <div class="explainer-inner" id="explainer-inner">
+          <div class="exp-title" id="exp-title"></div>
+          <div class="exp-body" id="exp-body"></div>
+          <div class="exp-resources" id="exp-resources"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DAILY COMPLETE ── -->
+<div class="screen" id="s-daily-done">
+  <div class="done-wrap">
+    <div class="done-icon" id="done-icon"></div>
+    <div class="done-title" id="done-title"></div>
+    <div class="done-sub" id="done-sub"></div>
+    <div class="done-streak" id="done-streak"></div>
+    <button class="dc-btn" style="margin-top:2rem" onclick="showDashboard()">Back to Dashboard</button>
+  </div>
+</div>
+
 <script>
 const STAGES = [
   { id:0, name:"Arithmetic & Pre-Algebra", hoursNeeded:80, desc:"The bedrock. Fractions, decimals, exponents, number theory, order of operations. Most students rush past this — don't. A shaky foundation makes everything above harder than it needs to be.", resources:[{type:"free",name:"Khan Academy – Pre-Algebra",url:"https://www.khanacademy.org/math/pre-algebra"},{type:"video",name:"Professor Leonard – Pre-Algebra (YouTube)",url:"https://www.youtube.com/playlist?list=PLDesaqWTN534cMCt0F8J0VnGKhNnqG2aD"},{type:"book",name:"Beast Academy (AoPS) – Deep arithmetic intuition",url:"https://beastacademy.com/"},{type:"free",name:"Brilliant.org – Foundational Math",url:"https://brilliant.org/courses/math-fundamentals/"},{type:"book",name:"AoPS – Introduction to Number Theory",url:"https://artofproblemsolving.com/store/item/intro-number-theory"}]},
@@ -412,12 +520,8 @@ async function checkAuth() {
       currentUser = data.user;
       userEmail = currentUser.email;
       updateNavAuth();
-      // If they have saved results, show them
-      const saved = getSavedResult();
-      if (!saved && currentUser.level !== undefined) {
-        const resultData = { level: currentUser.level, score: currentUser.score, total: currentUser.total || 10, email: currentUser.email };
-        saveResult(resultData);
-      }
+      // Logged in → go straight to dashboard
+      showDashboard();
     } else {
       clearToken();
     }
@@ -502,15 +606,8 @@ async function submitAuth() {
       
       loadQuestion();
     } else {
-      // Login → restore saved results if they exist
-      const saved = getSavedResult();
-      if (currentUser.level !== undefined) {
-        const rd = { level:currentUser.level, score:currentUser.score||0, total:currentUser.total||10, email:currentUser.email };
-        saveResult(rd);
-        renderResult(rd, false);
-      } else if (saved) {
-        renderResult(saved, false);
-      }
+      // Login → go to dashboard
+      showDashboard();
     }
   } catch(e) {
     errEl.textContent = 'Network error. Please try again.'; errEl.classList.add('show');
@@ -539,9 +636,10 @@ if (savedTheme !== null) {
 
 // ── LOGO CLICK ────────────────────────────────────────────────
 function handleLogoClick() {
+  if (currentUser) { showDashboard(); return; }
   const saved = getSavedResult();
   if (saved) { showResultFromSaved(saved, true); }
-  else { showScreen('s-landing');  }
+  else { showScreen('s-landing'); }
 }
 
 // ── STORAGE ───────────────────────────────────────────────────
@@ -718,9 +816,137 @@ function fmt(date){return date.toLocaleDateString('en-US',{month:'short',year:'n
 
 // ── INIT ──────────────────────────────────────────────────────
 checkAuth();
-fetch('/waitlist/count').then(r=>r.json()).then(d=>{
-  if(d.count>0)document.getElementById('count-label').textContent=`${d.count} student${d.count!==1?'s':''} already in`;
-}).catch(()=>{});
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function showDashboard() {
+  showScreen('s-dashboard');
+  try {
+    const res = await fetch('/dashboard', { headers:{ Authorization:`Bearer ${getToken()}` } });
+    const data = await res.json();
+    const { user, streak, completedToday, passedToday } = data;
+
+    // Greeting based on time
+    const hr = new Date().getHours();
+    const greet = hr < 12 ? 'Good morning.' : hr < 17 ? 'Good afternoon.' : 'Good evening.';
+    document.getElementById('dash-greet').textContent = greet;
+    document.getElementById('dash-level').textContent = `Current Level — ${user.level_name}`;
+    document.getElementById('dash-streak').textContent = streak;
+
+    if (completedToday) {
+      document.getElementById('dash-quiz-label').textContent = passedToday ? "Today's Quiz — Done ✓" : "Today's Quiz — Try Again";
+      document.getElementById('dash-quiz-desc').textContent = passedToday
+        ? `Streak kept. Come back tomorrow.`
+        : `You got less than 3 correct. Give it another shot.`;
+      document.getElementById('dash-quiz-btn').textContent = passedToday ? 'Review Roadmap →' : 'Retry Quiz →';
+      if (passedToday) document.getElementById('dash-quiz-btn').onclick = () => showScreen('s-result');
+    }
+  } catch(e) {}
+}
+
+// ── DAILY QUIZ ────────────────────────────────────────────────
+let dailyQuestions = [], dailyIndex = 0, dailyCorrect = 0;
+let explainerOpen = false;
+
+const EXPLANATIONS = {
+  0: { title:"Arithmetic Foundations", body:"This problem tests core number skills — fractions, decimals, or order of operations. Remember PEMDAS: Parentheses, Exponents, Multiplication/Division (left to right), Addition/Subtraction (left to right). Work through it step by step, never skip steps.", resources:[{name:"Khan Academy – Pre-Algebra",url:"https://www.khanacademy.org/math/pre-algebra"},{name:"Professor Leonard on YouTube",url:"https://www.youtube.com/c/ProfessorLeonard"}] },
+  1: { title:"Algebra Essentials", body:"Algebra is about finding unknown values. When solving equations, whatever you do to one side you must do to the other. Isolate the variable by undoing operations in reverse order — addition/subtraction first, then multiplication/division.", resources:[{name:"Khan Academy – Algebra 1",url:"https://www.khanacademy.org/math/algebra"},{name:"AoPS – Introduction to Algebra",url:"https://artofproblemsolving.com/store/item/intro-algebra"}] },
+  2: { title:"Advanced Algebra", body:"This involves polynomials, logarithms, or exponential functions. For logs, remember log_b(x)=y means b^y=x. For exponentials, the key rule is that exponents add when you multiply the same base: a^m × a^n = a^(m+n).", resources:[{name:"Khan Academy – Algebra 2",url:"https://www.khanacademy.org/math/algebra2"},{name:"3Blue1Brown – YouTube",url:"https://www.youtube.com/c/3blue1brown"}] },
+  3: { title:"Geometry", body:"Geometry relies on knowing your key formulas and properties. For triangles, angles sum to 180°. For circles, C=2πr and A=πr². For proofs, identify what you know, what you need, and which theorem connects them.", resources:[{name:"Khan Academy – Geometry",url:"https://www.khanacademy.org/math/geometry"},{name:"GeoGebra – Interactive Tool",url:"https://www.geogebra.org/"}] },
+  4: { title:"Pre-Calculus", body:"Pre-calc heavily features trigonometry. The unit circle is everything — memorize sin, cos, tan values at 0°, 30°, 45°, 60°, 90°. For identities, sin²θ + cos²θ = 1 is the master identity everything else derives from.", resources:[{name:"Khan Academy – Precalculus",url:"https://www.khanacademy.org/math/precalculus"},{name:"Paul's Online Math Notes",url:"https://tutorial.math.lamar.edu/"}] },
+  5: { title:"Calculus I", body:"Calculus is about rates of change. For derivatives: power rule says d/dx[xⁿ] = nxⁿ⁻¹. Chain rule: derivative of f(g(x)) = f'(g(x)) × g'(x). Always identify which rule applies before differentiating.", resources:[{name:"3Blue1Brown – Essence of Calculus",url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr"},{name:"MIT OCW – Single Variable Calculus",url:"https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/"}] },
+  6: { title:"Calculus II & Beyond", body:"This covers integration techniques, series, or multivariable concepts. For integration, try u-substitution first — let u equal the inner function. For series convergence, the ratio test is your most reliable tool.", resources:[{name:"Professor Leonard – Calculus 2",url:"https://www.youtube.com/c/ProfessorLeonard"},{name:"MIT OCW – Multivariable Calculus",url:"https://ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/"}] },
+};
+
+async function startDailyQuiz() {
+  try {
+    const res = await fetch('/daily/questions', { headers:{ Authorization:`Bearer ${getToken()}` } });
+    const data = await res.json();
+    dailyQuestions = data.questions;
+    dailyIndex = 0; dailyCorrect = 0;
+    showScreen('s-daily');
+    renderDailyQuestion();
+    // Set explainer content based on level
+    const exp = EXPLANATIONS[data.level] || EXPLANATIONS[1];
+    document.getElementById('exp-title').textContent = exp.title;
+    document.getElementById('exp-body').textContent = exp.body;
+    document.getElementById('exp-resources').innerHTML = exp.resources.map(r =>
+      `<div class="resource-row"><span class="res-name">${r.name}</span><a class="res-link" href="${r.url}" target="_blank" rel="noopener">Visit →</a></div>`
+    ).join('');
+  } catch(e) { alert('Error loading quiz. Please try again.'); }
+}
+
+function renderDailyQuestion() {
+  const q = dailyQuestions[dailyIndex];
+  const labels = ['A','B','C','D'];
+  document.getElementById('dq-label').textContent = `Question ${dailyIndex+1} of 5`;
+  document.getElementById('dq-fill').style.width = `${((dailyIndex)/5)*100}%`;
+  const qt = document.getElementById('dq-text');
+  qt.textContent = q.q; qt.classList.remove('fade'); void qt.offsetWidth; qt.classList.add('fade');
+  const opts = document.getElementById('dq-opts'); opts.innerHTML = '';
+  q.opts.forEach((opt,i) => {
+    const btn = document.createElement('button'); btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${labels[i]}</span>${opt}`;
+    btn.onclick = () => handleDailyAnswer(i, q.ans, opts);
+    opts.appendChild(btn);
+  });
+  // Reset explainer
+  explainerOpen = false;
+  document.getElementById('explainer').classList.remove('open');
+  document.getElementById('idk-arrow').classList.remove('open');
+}
+
+function handleDailyAnswer(chosen, correct_ans, optsEl) {
+  const isCorrect = chosen === correct_ans;
+  if (isCorrect) dailyCorrect++;
+  optsEl.querySelectorAll('.opt').forEach((b,i) => {
+    b.classList.add('disabled');
+    if (i === correct_ans) b.classList.add('correct');
+    if (i === chosen && !isCorrect) b.classList.add('wrong');
+  });
+  document.getElementById('idk-btn').style.pointerEvents = 'none';
+  setTimeout(() => {
+    dailyIndex++;
+    if (dailyIndex >= 5) finishDailyQuiz();
+    else { renderDailyQuestion(); document.getElementById('idk-btn').style.pointerEvents = ''; }
+  }, 900);
+}
+
+function toggleExplainer() {
+  explainerOpen = !explainerOpen;
+  document.getElementById('explainer').classList.toggle('open', explainerOpen);
+  document.getElementById('idk-arrow').classList.toggle('open', explainerOpen);
+}
+
+async function finishDailyQuiz() {
+  const passed = dailyCorrect >= 3;
+  let streak = 0;
+  try {
+    const res = await fetch('/daily/complete', {
+      method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`},
+      body: JSON.stringify({ score: dailyCorrect })
+    });
+    const data = await res.json();
+    streak = data.streak || 0;
+  } catch(e) {}
+
+  showScreen('s-daily-done');
+  document.getElementById('dq-fill').style.width = '100%';
+
+  if (passed) {
+    document.getElementById('done-icon').textContent = '✓';
+    document.getElementById('done-title').textContent = `${dailyCorrect}/5 — Nice work.`;
+    document.getElementById('done-sub').textContent = 'You passed today\'s quiz. Keep showing up and the level will follow.';
+    document.getElementById('done-streak').textContent = `🔥 ${streak} day streak`;
+  } else {
+    document.getElementById('done-icon').textContent = '◌';
+    document.getElementById('done-title').textContent = `${dailyCorrect}/5 — Not quite.`;
+    document.getElementById('done-sub').textContent = 'You need 3 or more to keep your streak. Review the concepts and come back tomorrow.';
+    document.getElementById('done-streak').textContent = 'Streak not counted — try again tomorrow';
+    document.getElementById('done-streak').style.borderColor = 'var(--border)';
+    document.getElementById('done-streak').style.background = 'var(--bg2)';
+    document.getElementById('done-streak').style.color = 'var(--text3)';
+  }
+}
 </script>
 </body>
 </html>
