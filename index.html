@@ -248,246 +248,279 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .next-callout{font-size:.82rem;color:var(--text2);background:var(--bg);border-left:3px solid var(--accent);padding:.6rem .85rem;margin-bottom:.75rem}
 
 /* ──────────────────────────────────────
-   DASHBOARD
+   DASHBOARD — Scrollable, fun, no tabs
 ────────────────────────────────────── */
-#s-dashboard{}
-/* Toolbar */
-.dash-toolbar{position:sticky;top:0;z-index:150;background:rgba(10,12,9,.93);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 1.5rem;backdrop-filter:blur(16px);overflow-x:auto}
-.dtb-btn{display:flex;align-items:center;gap:.4rem;padding:.8rem .9rem;background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;margin-bottom:-1px;flex-shrink:0}
-.dtb-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.dtb-btn:hover{color:rgba(255,255,255,.7)}
-.dtb-btn.active{color:#fff;border-bottom-color:var(--accent)}
-.dtb-spacer{flex:1}
-.dtab-panel{display:none}
-.dtab-panel.active{display:block}
+#s-dashboard{background:var(--bg)}
 
-/* Hero */
-.dash-hero{min-height:calc(100vh - 101px);background:#0a0c09;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.dash-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
-.dash-orb-1{width:550px;height:550px;background:radial-gradient(circle,rgba(45,90,39,.3) 0%,transparent 70%);top:-100px;left:-80px;animation:orbPulse 12s ease-in-out infinite}
-.dash-orb-2{width:380px;height:380px;background:radial-gradient(circle,rgba(45,90,39,.18) 0%,transparent 70%);bottom:-60px;right:8%;animation:orbPulse 16s ease-in-out infinite reverse}
-.dash-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:55px 55px;pointer-events:none}
-#dash-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5}
-.dash-hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:2.5rem;align-items:start;max-width:1080px;margin:0 auto;width:100%;padding:3.5rem 2.5rem 3rem}
+/* Top bar */
+.dash-topbar{
+  position:sticky;top:0;z-index:150;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 2rem;
+}
+.dash-topbar-left{display:flex;align-items:center;gap:.75rem}
+.dash-level-chip{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1.5px solid var(--accent-mid);background:var(--accent-light);
+  padding:.28rem .7rem;border-radius:99px;
+}
+.dash-streak-chip{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;
+  color:var(--text);border:1.5px solid var(--border);background:var(--surface);
+  padding:.28rem .7rem;border-radius:99px;font-weight:500;
+}
+.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.35);background:rgba(255,120,0,.06);color:#d06000}
 
-/* XP Bar */
-.dash-xp-bar-wrap{margin-bottom:1.5rem;animation:fadeUp .6s .1s ease both}
-.dash-xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem}
-.dash-xp-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3)}
-.dash-xp-val{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;color:var(--accent)}
-.dash-xp-bar{height:4px;background:rgba(255,255,255,.08);overflow:hidden;border-radius:2px}
-.dash-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(168,220,160,.8));border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+/* XP bar in topbar */
+.dash-topbar-xp{display:flex;align-items:center;gap:.6rem;flex:1;max-width:220px;margin:0 1rem}
+.dash-topbar-xp-track{flex:1;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.dash-topbar-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.8));border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
 
-/* Greeting & Stats */
-.dash-greet{font-family:'DM Serif Display',serif;font-size:clamp(1.9rem,4vw,3.2rem);letter-spacing:-.03em;color:#fff;line-height:1.08;margin-bottom:.3rem;animation:fadeUp .6s .15s ease both}
-.dash-level-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(45,90,39,.4);background:rgba(45,90,39,.12);padding:.25rem .65rem;margin-bottom:1.75rem;animation:fadeUp .6s .2s ease both}
-.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:1.5rem;animation:fadeUp .6s .25s ease both}
-.dash-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:1rem .9rem;transition:all .25s;cursor:default}
-.dash-stat:hover{background:rgba(45,90,39,.1);border-color:rgba(45,90,39,.35)}
-.ds-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.25rem}
-.ds-val{font-family:'DM Serif Display',serif;font-size:2rem;color:#fff;line-height:1;letter-spacing:-.03em}
-.ds-val.green{color:var(--accent)}
-.ds-sub{font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.08em;color:rgba(255,255,255,.22);margin-top:.15rem}
+/* GREET SECTION */
+.dash-greet-section{
+  padding:2.25rem 2rem 1.5rem;
+  max-width:1100px;margin:0 auto;width:100%;
+}
+.dash-greet-text{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.8rem,4vw,2.8rem);
+  letter-spacing:-.03em;color:var(--text);line-height:1.1;
+  margin-bottom:.35rem;
+}
+.dash-greet-sub{font-size:.93rem;color:var(--text2);line-height:1.65}
 
-/* Week dots */
-.dash-week-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.45rem;animation:fadeUp .6s .3s ease both}
-.dash-week-dots{display:flex;gap:5px;animation:fadeUp .6s .32s ease both}
-.week-dot{width:36px;height:42px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'DM Mono',monospace;font-size:.55rem;color:rgba(255,255,255,.22);transition:all .3s;position:relative}
-.week-dot.done{background:rgba(45,90,39,.3);border-color:rgba(45,90,39,.6);color:var(--accent);box-shadow:0 0 10px rgba(45,90,39,.25)}
-.week-dot.today{border-color:rgba(45,90,39,.4);color:rgba(255,255,255,.5)}
-.week-dot.today::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent)}
-.wdot-day{font-size:.38rem;opacity:.55;letter-spacing:.06em}
+/* WEEK STRIP */
+.dash-week-strip{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.75rem 2rem 1.5rem;max-width:1100px;margin:0 auto;width:100%;
+  overflow-x:auto;
+}
+.week-pip{
+  display:flex;flex-direction:column;align-items:center;gap:.3rem;
+  min-width:44px;
+}
+.week-pip-circle{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;transition:all .3s;
+}
+.week-pip-circle.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-light)}
+.week-pip-circle.today{border-color:var(--accent);border-style:dashed}
+.week-pip-day{font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
 
-/* Right side */
-.dash-right{display:flex;flex-direction:column;gap:.65rem;animation:fadeUp .6s .2s ease both}
-.dash-quiz-card{background:linear-gradient(135deg,rgba(45,90,39,.22),rgba(45,90,39,.08));border:1px solid rgba(45,90,39,.42);padding:1.75rem;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(45,90,39,.12);transition:box-shadow .3s}
-.dash-quiz-card:hover{box-shadow:0 0 55px rgba(45,90,39,.22)}
-.dash-quiz-card::after{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(45,90,39,.2),transparent 70%);pointer-events:none}
-.dqc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
-.dqc-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.dqc-tag{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.1);padding:.13rem .45rem}
-.dqc-desc{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.65;margin-bottom:1.1rem}
-.action-btn{padding:.8rem 1.5rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .25s;display:inline-block;position:relative;overflow:hidden}
-.action-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-100%);transition:transform .5s}
-.action-btn:hover::before{transform:translateX(100%)}
-.action-btn:hover:not(:disabled){box-shadow:0 0 18px rgba(45,90,39,.4);transform:translateY(-1px)}
-.action-btn:disabled{opacity:.35;cursor:default;transform:none}
-.ghost-btn{padding:.7rem 1.2rem;background:rgba(255,255,255,.05);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:inline-block}
-.ghost-btn:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2)}
+/* TOOLS GRID — the main dashboard */
+.dash-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  max-width:900px;margin:0 auto;
+  padding:0 2rem 4rem;width:100%;
+}
 
-/* Quick cards row */
-.dash-quick-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
-.dqk-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:.85rem 1rem;cursor:pointer;transition:all .2s;text-align:left}
-.dqk-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
-.dqk-label{font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.25rem}
-.dqk-val{font-size:.82rem;color:rgba(255,255,255,.65)}
-.dqk-val.accent{color:var(--accent)}
+/* Base tool card */
+.tool-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:1.5rem;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+  text-align:left;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.tool-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+.tool-card:active{transform:translateY(-1px)}
 
-/* Badges row */
-.dash-badges-row{display:flex;gap:.4rem;flex-wrap:wrap;animation:fadeUp .6s .35s ease both}
-.badge{display:flex;align-items:center;gap:.4rem;padding:.35rem .7rem;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);transition:all .2s;cursor:default}
-.badge.earned{border-color:rgba(45,90,39,.45);background:rgba(45,90,39,.15);color:rgba(168,220,160,.8)}
-.badge-icon{font-size:.75rem}
+/* QUIZ card — featured, full width */
+.tool-card-quiz{
+  grid-column:1/-1;
+  background:linear-gradient(135deg,#0a1a0a,#0f2a0f);
+  border-color:rgba(45,90,39,.5);
+  color:#fff;
+  flex-direction:row;align-items:center;gap:1.75rem;
+  padding:2rem 2rem;
+}
+.tool-card-quiz:hover{box-shadow:0 12px 40px rgba(45,90,39,.3);border-color:rgba(45,90,39,.8)}
+.quiz-card-emoji{font-size:3rem;flex-shrink:0;filter:drop-shadow(0 0 12px rgba(45,90,39,.5))}
+.quiz-card-body{flex:1}
+.quiz-card-title{font-family:'DM Serif Display',serif;font-size:1.4rem;letter-spacing:-.02em;color:#fff;margin-bottom:.3rem}
+.quiz-card-sub{font-size:.86rem;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:1rem}
+.quiz-card-btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:all .2s;position:relative;overflow:hidden;
+}
+.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.quiz-card-btn:hover::after{transform:translateX(100%)}
+.quiz-card-btn:hover{box-shadow:0 0 20px rgba(45,90,39,.5);transform:translateY(-1px)}
+.quiz-card-btn:disabled{opacity:.35;cursor:default;transform:none}
+.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding:.35rem .75rem;border:1px solid rgba(45,90,39,.4);background:rgba(45,90,39,.15);border-radius:99px}
 
-/* Tab content areas */
-.tab-content{max-width:760px;margin:0 auto;padding:2.5rem 2.5rem 5rem;background:var(--bg)}
-.tab-h1{font-family:'DM Serif Display',serif;font-size:1.7rem;letter-spacing:-.025em;color:var(--text);margin-bottom:.35rem}
-.tab-sub{font-size:.87rem;color:var(--text2);line-height:1.7;margin-bottom:2rem}
-.tab-h1-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem}
+/* Tool card icon */
+.tc-icon{font-size:2rem;margin-bottom:.1rem}
+.tc-title{font-family:'DM Serif Display',serif;font-size:1.05rem;letter-spacing:-.01em;color:var(--text);line-height:1.2}
+.tc-sub{font-size:.8rem;color:var(--text2);line-height:1.6}
+.tc-cta{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.25rem}
 
-/* PATH TAB */
-.path-prog-wrap{margin-bottom:2rem}
-.path-prog-top{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.35rem}
-.path-prog-bar{height:4px;background:var(--bg2);overflow:hidden}
-.path-prog-fill{height:100%;background:var(--accent);transition:width .8s cubic-bezier(.4,0,.2,1)}
+/* practice card — different accent */
+.tool-card-practice{background:linear-gradient(135deg,#f5f2ed,#ece8e0);border-color:rgba(0,0,0,.1)}
+[data-theme="ink"] .tool-card-practice{background:linear-gradient(135deg,#1e1e22,#252528);border-color:rgba(255,255,255,.1)}
 
-/* PRACTICE TAB */
-.practice-level-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2rem}
-.prac-tab{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;padding:.38rem .75rem;background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s}
-.prac-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.prac-tab:hover:not(.active){border-color:var(--text3);color:var(--text)}
-.practice-card{background:var(--surface);border:1.5px solid var(--border);padding:1.75rem;margin-bottom:1rem;position:relative}
-.practice-q{font-size:1rem;color:var(--text);line-height:1.55;margin-bottom:1.25rem;font-weight:400}
-.practice-opts{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem}
-.prac-stat{display:flex;gap:1.5rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)}
-.prac-stat-item{display:flex;flex-direction:column;gap:.15rem}
-.prac-stat-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.prac-stat-val{font-family:'DM Serif Display',serif;font-size:1.2rem;letter-spacing:-.02em;color:var(--text)}
-.prac-stat-val.accent{color:var(--accent)}
-.prac-new-btn{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.1rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;margin-top:.75rem}
-.prac-new-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* streak card — orange tint */
+.tool-card-streak{background:linear-gradient(135deg,#fff8f0,#fff0e0);border-color:rgba(200,100,0,.15)}
+[data-theme="ink"] .tool-card-streak{background:linear-gradient(135deg,#1e1c18,#252218)}
 
-/* FORMULA SHEET TAB */
-.formula-search{width:100%;padding:.65rem .9rem;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;margin-bottom:1.5rem;transition:border-color .2s}
-.formula-search:focus{border-color:var(--accent)}
-.formula-search::placeholder{color:var(--text3)}
-.formula-level-select{padding:.4rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;outline:none;cursor:pointer;margin-bottom:1.5rem}
-.formula-cat{margin-bottom:2rem}
-.formula-cat-title{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.65rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
-.formula-item{display:flex;align-items:flex-start;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border)}
-.formula-item:last-child{border-bottom:none}
-.formula-math{font-family:'DM Mono',monospace;font-size:.88rem;color:var(--text);background:var(--bg);border:1px solid var(--border);padding:.3rem .6rem;flex-shrink:0;white-space:nowrap;letter-spacing:.04em}
-.formula-name{font-size:.84rem;color:var(--text2);line-height:1.6;flex:1}
+/* Streak big number */
+.streak-big{font-family:'DM Serif Display',serif;font-size:3.5rem;letter-spacing:-.04em;color:#c06000;line-height:1}
+.streak-label{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(192,96,0,.55);margin-top:.15rem}
 
-/* FLASHCARDS TAB */
-.flashcard-wrap{perspective:800px;margin-bottom:1.5rem;cursor:pointer}
-.flashcard{width:100%;height:220px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.2,.2,1)}
-.flashcard.flipped{transform:rotateY(180deg)}
-.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;border:1.5px solid var(--border);background:var(--surface)}
-.fc-back{transform:rotateY(180deg);background:var(--accent-light);border-color:var(--accent-mid)}
-.fc-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem}
-.fc-front .fc-label{color:var(--text3)}
-.fc-back .fc-label{color:var(--accent)}
-.fc-content{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text);line-height:1.4;letter-spacing:-.01em}
-.fc-back .fc-content{font-family:'DM Mono',monospace;font-size:.9rem;line-height:1.65;color:var(--text2)}
-.fc-hint{font-size:.78rem;color:var(--text3);margin-top:.5rem}
-.flashcard-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
-.fc-nav-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.45rem .9rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s}
-.fc-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.fc-counter{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--text3)}
-.fc-set-select{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;padding:.38rem .7rem;background:var(--bg);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;margin-bottom:1.25rem}
-.fc-rating{display:flex;gap:.5rem;justify-content:center;margin-top:1rem}
-.fc-rate-btn{padding:.4rem .85rem;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;transition:all .2s}
-.fc-rate-btn.easy{color:var(--accent);border-color:var(--accent-mid)}
-.fc-rate-btn.easy:hover{background:var(--accent-light)}
-.fc-rate-btn.hard{color:var(--red);border-color:rgba(192,57,43,.3)}
-.fc-rate-btn.hard:hover{background:var(--red-light)}
+/* Formula card — green */
+.tool-card-formulas{background:linear-gradient(135deg,var(--accent-light),var(--bg));border-color:var(--accent-mid)}
 
-/* WEAK SPOTS */
-.ws-item{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.85rem}
-.ws-top{display:flex;justify-content:space-between}
-.ws-topic{font-size:.87rem;color:var(--text)}
-.ws-count{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.06em;color:var(--text3)}
-.ws-bar-bg{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden}
-.ws-bar-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
-.ws-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:.87rem;line-height:1.7}
+/* BADGES SECTION */
+.dash-badges-section{max-width:900px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.dash-section-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem}
+.badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.badge-pill{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.4rem .9rem;border-radius:99px;
+  border:1.5px solid var(--border);background:var(--bg2);
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);transition:all .25s;cursor:default;
+}
+.badge-pill.earned{
+  border-color:var(--accent-mid);background:var(--accent-light);
+  color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-light);
+}
+.badge-pill.earned.new-badge{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.badge-emoji{font-size:.85rem}
 
-/* TIMER */
-.timer-face{text-align:center;padding:2.5rem 0 2rem}
-.timer-digits{font-family:'DM Serif Display',serif;font-size:clamp(3rem,8vw,5.5rem);letter-spacing:-.04em;color:var(--text);line-height:1;transition:color .3s}
-.timer-digits.running{color:var(--accent)}
-.timer-status{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:.55rem}
-.timer-btns{display:flex;gap:.65rem;margin-bottom:2rem}
-.timer-total-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:1.75rem}
-.timer-total-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.timer-total-val{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--accent);letter-spacing:-.02em}
-.timer-log-title{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem}
-.timer-log-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--text2)}
-.timer-log-dur{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.06em;color:var(--accent)}
+/* MODAL OVERLAY for sub-screens inside dashboard */
+.dash-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:none;align-items:flex-start;justify-content:center;
+  overflow-y:auto;padding:1.5rem;backdrop-filter:blur(6px);
+}
+.dash-modal.open{display:flex}
+.dash-modal-box{
+  background:var(--bg);border:1.5px solid var(--border);
+  width:100%;max-width:680px;border-radius:12px;
+  margin:auto;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+.dmb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.dmb-title{font-family:'DM Serif Display',serif;font-size:1.25rem;letter-spacing:-.02em;color:var(--text)}
+.dmb-close{background:none;border:none;font-size:1.25rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
+.dmb-close:hover{color:var(--text)}
+.dmb-body{padding:1.5rem}
 
-/* NOTES */
-.notes-area{width:100%;min-height:340px;padding:1rem;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;line-height:1.75;outline:none;resize:vertical;transition:border-color .2s}
-.notes-area:focus{border-color:var(--accent)}
-.notes-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
-.notes-saved{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);opacity:0;transition:opacity .3s}
-.notes-saved.show{opacity:1}
+/* settings inside modal */
+.setting-row2{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid var(--border);gap:1rem}
+.setting-row2:last-child{border-bottom:none}
+.setting-name2{font-size:.88rem;color:var(--text);margin-bottom:.12rem;font-weight:400}
+.setting-val2{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.04em;color:var(--text3)}
+.setting-btn2{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;padding:.32rem .7rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;border-radius:4px;flex-shrink:0}
+.setting-btn2:hover{border-color:var(--accent);color:var(--accent)}
+.setting-btn2.danger:hover{border-color:var(--red);color:var(--red)}
+.settings-sub2{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.settings-sub2.open{max-height:300px;padding:.75rem 0 .25rem}
 
-/* SETTINGS */
-.setting-group{margin-bottom:2rem}
-.setting-group-label{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.4rem;border-bottom:1px solid var(--border);margin-bottom:.25rem}
-.setting-row{display:flex;justify-content:space-between;align-items:center;padding:.9rem 0;border-bottom:1px solid var(--border);gap:1rem}
-.setting-row:last-child{border-bottom:none}
-.setting-name{font-size:.88rem;color:var(--text);margin-bottom:.15rem}
-.setting-val{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.04em;color:var(--text3)}
-.setting-btn{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .75rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.setting-btn:hover{border-color:var(--accent);color:var(--accent)}
-.setting-btn.danger:hover{border-color:var(--red);color:var(--red)}
-.settings-sub{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0}
-.settings-sub.open{max-height:320px;padding:.85rem 0 .5rem}
-.theme-pills{display:flex;gap:.45rem;flex-wrap:wrap;padding-top:.5rem}
-.theme-pill{display:flex;align-items:center;gap:.4rem;padding:.38rem .85rem;background:none;border:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
-.theme-pill:hover{border-color:var(--text3)}
-.theme-pill.active{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.t-swatch{width:9px;height:9px;border-radius:50%}
+/* Practice modal */
+.prac-level-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.prac-lvl-btn{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;padding:.32rem .7rem;background:none;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s;border-radius:4px}
+.prac-lvl-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.prac-lvl-btn:hover:not(.active){border-color:var(--text3);color:var(--text)}
+.prac-q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1rem}
+.prac-q-text{font-size:1rem;color:var(--text);line-height:1.55;margin-bottom:1rem;font-weight:400}
+.prac-stats-row{display:flex;gap:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+.pstat{display:flex;flex-direction:column;gap:.12rem}
+.pstat-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.pstat-val{font-family:'DM Serif Display',serif;font-size:1.2rem;letter-spacing:-.02em;color:var(--text)}
+.pstat-val.green{color:var(--accent)}
 
-/* DAILY QUIZ */
-#s-daily{background:var(--bg)}
-.daily-wrap{max-width:660px;margin:0 auto;padding:3.5rem 2.5rem 5rem}
-.daily-prog-wrap{margin-bottom:2rem}
-.daily-prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
-.dq-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.dq-level-tag{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-.dq-bar{height:3px;background:var(--bg2);overflow:hidden;margin-bottom:2rem}
-.dq-fill{height:100%;background:var(--accent);transition:width .4s ease}
-.dq-text{font-family:'DM Serif Display',serif;font-size:1.45rem;letter-spacing:-.02em;color:var(--text);line-height:1.45;margin-bottom:1.5rem}
-/* hint btn in daily */
-.dq-hint-btn{display:flex;align-items:center;gap:.4rem;background:none;border:none;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);cursor:pointer;margin-bottom:1rem;padding:0;transition:color .2s}
-.dq-hint-btn:hover{color:var(--accent)}
-.dq-hint-box{background:var(--gold-light,rgba(146,112,10,.1));border:1px solid rgba(146,112,10,.25);padding:.85rem 1rem;margin-bottom:1rem;font-size:.86rem;color:var(--text2);line-height:1.7;display:none}
-.dq-hint-box.show{display:block;animation:fadeUp .3s ease}
-/* answer explanation */
-.dq-solution{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.1rem 1.25rem;margin-top:.85rem;display:none;animation:fadeUp .35s ease}
-.dq-solution.show{display:block}
-.dq-solution.wrong{border-left-color:var(--red)}
-.dq-sol-verdict{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.45rem}
-.dq-sol-verdict.right{color:var(--accent)}
-.dq-sol-verdict.wrong{color:var(--red)}
-.dq-sol-body{font-size:.88rem;color:var(--text2);line-height:1.75;margin-bottom:.5rem}
-.dq-sol-steps{padding:.65rem .85rem;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;gap:.3rem;margin-bottom:.65rem}
-.dq-sol-step{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text);line-height:1.5}
-.dq-sol-step strong{color:var(--accent)}
-.dq-next-btn{padding:.65rem 1.25rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
-.dq-next-btn:hover{opacity:.85}
+/* Flashcard modal */
+.fc-card-outer{perspective:700px;cursor:pointer;margin-bottom:1rem}
+.fc-card-inner{width:100%;min-height:180px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.2,.2,1)}
+.fc-card-inner.flipped{transform:rotateY(180deg)}
+.fc-face2{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 2rem;text-align:center;border:1.5px solid var(--border);border-radius:8px;background:var(--surface)}
+.fc-back2{transform:rotateY(180deg);background:var(--accent-light);border-color:var(--accent-mid)}
+.fc-face-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem}
+.fc-back2 .fc-face-label{color:var(--accent)}
+.fc-face-content{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text);line-height:1.4;letter-spacing:-.01em}
+.fc-back2 .fc-face-content{font-family:'DM Mono',monospace;font-size:.84rem;line-height:1.65;color:var(--text2)}
+.fc-tap-hint{font-size:.75rem;color:var(--text3);margin-top:.4rem}
+.fc-nav-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.fc-nav-btn2{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .85rem;background:none;border:1.5px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;border-radius:4px}
+.fc-nav-btn2:hover{border-color:var(--accent);color:var(--accent)}
+.fc-counter2{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;color:var(--text3)}
+.fc-rate-row{display:flex;gap:.5rem;justify-content:center;margin-top:.85rem}
+.fc-rate2{padding:.38rem .9rem;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--border);background:none;cursor:pointer;transition:all .2s;border-radius:4px}
+.fc-rate2.easy{color:var(--accent);border-color:var(--accent-mid)}
+.fc-rate2.easy:hover{background:var(--accent-light)}
+.fc-rate2.hard{color:var(--red);border-color:rgba(192,57,43,.3)}
+.fc-rate2.hard:hover{background:var(--red-light)}
 
-/* confidence rating */
-.dq-confidence{display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem}
-.dq-conf-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.dq-conf-btn{padding:.3rem .65rem;font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text3);transition:all .2s}
-.dq-conf-btn:hover{border-color:var(--text2);color:var(--text2)}
-.dq-conf-btn.selected{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+/* Formula modal */
+.formula-search2{width:100%;padding:.6rem .85rem;background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;border-radius:6px;margin-bottom:1.25rem;transition:border-color .2s}
+.formula-search2:focus{border-color:var(--accent)}
+.formula-level-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.flvl-btn{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .65rem;background:none;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s;border-radius:4px}
+.flvl-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.formula-cat2{margin-bottom:1.5rem}
+.fcat-title{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-bottom:.6rem}
+.fitem{display:flex;align-items:flex-start;gap:.85rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.fitem:last-child{border-bottom:none}
+.fitem-math{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--text);background:var(--bg);border:1px solid var(--border);padding:.22rem .5rem;flex-shrink:0;white-space:nowrap;border-radius:4px}
+.fitem-name{font-size:.82rem;color:var(--text2);line-height:1.55;flex:1}
 
-/* DONE SCREEN */
-#s-daily-done{background:var(--bg)}
-.done-wrap{max-width:560px;margin:0 auto;padding:5rem 2.5rem;text-align:center}
-.done-icon{font-size:2.5rem;margin-bottom:1.5rem;display:block}
-.done-title{font-family:'DM Serif Display',serif;font-size:2.2rem;letter-spacing:-.03em;color:var(--text);margin-bottom:.6rem}
-.done-sub{font-size:.93rem;color:var(--text2);line-height:1.75;margin-bottom:1.75rem;max-width:380px;margin-left:auto;margin-right:auto}
-.done-streak-badge{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding:.5rem 1.25rem;border:1px solid var(--accent-mid);background:var(--accent-light);display:inline-block;margin-bottom:2rem}
-.done-breakdown{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;margin-bottom:2rem}
-.done-q{padding:.85rem .5rem;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:.35rem;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
-.done-q.passed{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
-.done-q.failed{border-color:var(--red);background:var(--red-light);color:var(--red)}
-.done-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+/* Weak spots modal */
+.ws-item2{margin-bottom:.85rem}
+.ws-top2{display:flex;justify-content:space-between;font-size:.86rem;color:var(--text);margin-bottom:.25rem}
+.ws-count2{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3)}
+.ws-bar-bg2{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.ws-bar-fill2{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* Timer modal */
+.timer-face2{text-align:center;padding:1.5rem 0 1rem}
+.timer-digits2{font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,8vw,4rem);letter-spacing:-.04em;color:var(--text);line-height:1;transition:color .3s}
+.timer-digits2.running{color:var(--accent)}
+.timer-status2{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:.4rem}
+.timer-btns2{display:flex;gap:.6rem;justify-content:center;margin-bottom:1.5rem}
+.timer-log-item{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--text2)}
+.timer-log-dur2{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent)}
+
+/* Notes modal */
+.notes-area2{width:100%;min-height:280px;padding:1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;line-height:1.75;outline:none;resize:vertical;transition:border-color .2s}
+.notes-area2:focus{border-color:var(--accent)}
+.notes-footer2{display:flex;justify-content:space-between;align-items:center;margin-top:.4rem}
+.notes-saved2{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);opacity:0;transition:opacity .3s}
+.notes-saved2.show{opacity:1}
+
+/* Path section inline */
+.path-stages{display:flex;flex-direction:column;gap:0}
+.ps-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.ps-item:last-child{border-bottom:none}
+.ps-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;margin-top:2px}
+.ps-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.ps-dot.current{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-light)}
+.ps-name{font-size:.9rem;color:var(--text);font-weight:400;margin-bottom:.15rem}
+.ps-name.current-level{color:var(--accent);font-weight:500}
+.ps-desc{font-size:.79rem;color:var(--text2);line-height:1.6}
+.ps-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border:1px solid var(--border);color:var(--text3);border-radius:3px;margin-right:.3rem;margin-top:.3rem}
+.ps-tag.here{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
 
 /* ── MOBILE ── */
 @media(max-width:680px){
@@ -749,250 +782,352 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
      DASHBOARD
 ══════════════════════════════════ -->
 <div class="screen" id="s-dashboard">
-  <!-- Dark toolbar -->
-  <div class="dash-toolbar">
-    <button class="dtb-btn active" data-tab="home" onclick="switchDTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</button>
-    <button class="dtb-btn" data-tab="path" onclick="switchDTab('path',this)"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>My Path</button>
-    <button class="dtb-btn" data-tab="practice" onclick="switchDTab('practice',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><polyline points="12,12 15,14"/></svg>Practice</button>
-    <button class="dtb-btn" data-tab="formulas" onclick="switchDTab('formulas',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Formulas</button>
-    <button class="dtb-btn" data-tab="flashcards" onclick="switchDTab('flashcards',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Flashcards</button>
-    <button class="dtb-btn" data-tab="weakspots" onclick="switchDTab('weakspots',this)"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Weak Spots</button>
-    <button class="dtb-btn" data-tab="timer" onclick="switchDTab('timer',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Timer</button>
-    <button class="dtb-btn" data-tab="notes" onclick="switchDTab('notes',this)"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Notes</button>
-    <div class="dtb-spacer"></div>
-    <button class="dtb-btn" data-tab="settings" onclick="switchDTab('settings',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+
+  <!-- TOPBAR -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <div class="dash-level-chip" id="tb-level-chip">⬡ Early Algebra</div>
+      <div class="dash-streak-chip" id="tb-streak-chip">🔥 0 days</div>
+    </div>
+    <div class="dash-topbar-xp">
+      <div class="dash-topbar-xp-label" id="tb-xp-label">0 XP</div>
+      <div class="dash-topbar-xp-track"><div class="dash-topbar-xp-fill" id="tb-xp-fill" style="width:0%"></div></div>
+    </div>
+    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️ Settings</button>
   </div>
 
-  <!-- HOME TAB -->
-  <div class="dtab-panel active" id="tab-home">
-    <div class="dash-hero" id="dash-hero">
-      <div class="dash-orb dash-orb-1"></div>
-      <div class="dash-orb dash-orb-2"></div>
-      <div class="dash-grid-bg"></div>
-      <canvas id="dash-canvas"></canvas>
-      <div class="dash-hero-inner">
-        <div>
-          <div class="dash-xp-bar-wrap">
-            <div class="dash-xp-top"><span class="dash-xp-label" id="xp-label">Level Progress</span><span class="dash-xp-val" id="xp-val">0 / 100 XP</span></div>
-            <div class="dash-xp-bar"><div class="dash-xp-fill" id="xp-fill" style="width:0%"></div></div>
-          </div>
-          <div class="dash-greet" id="dash-greet">Good morning.</div>
-          <div class="dash-level-badge" id="dash-level-badge">⬡ Early Algebra</div>
-          <div class="dash-stats">
-            <div class="dash-stat"><div class="ds-label">Streak</div><div class="ds-val green" id="dash-streak">0</div><div class="ds-sub">days</div></div>
-            <div class="dash-stat"><div class="ds-label">Quizzes</div><div class="ds-val" id="dash-quizzes">0</div><div class="ds-sub">done</div></div>
-            <div class="dash-stat"><div class="ds-label">Level</div><div class="ds-val" id="dash-level-num">1</div><div class="ds-sub">of 7</div></div>
-          </div>
-          <div class="dash-week-label">This week</div>
-          <div class="dash-week-dots" id="dash-week-dots"></div>
-          <div class="dash-badges-row" id="dash-badges" style="margin-top:1.25rem"></div>
+  <!-- GREETING -->
+  <div class="dash-greet-section">
+    <div class="dash-greet-text" id="dash-greet">Hey — good morning! 👋</div>
+    <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
+  </div>
+
+  <!-- WEEK STRIP -->
+  <div class="dash-week-strip" id="dash-week-strip"></div>
+
+  <!-- MAIN TOOL GRID -->
+  <div class="dash-grid">
+
+    <!-- DAILY QUIZ — full width featured card -->
+    <div class="tool-card tool-card-quiz" id="quiz-card-wrap">
+      <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
+      <div class="quiz-card-body">
+        <div class="quiz-card-title" id="quiz-card-title">Today's Quiz</div>
+        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive. Every wrong answer shows you why — no more guessing.</div>
+        <button class="quiz-card-btn" id="quiz-start-btn" onclick="startDailyQuiz()">
+          Let's go →
+        </button>
+      </div>
+    </div>
+
+    <!-- PRACTICE -->
+    <div class="tool-card tool-card-practice" onclick="openDashModal('modal-practice')">
+      <div class="tc-icon">⚡</div>
+      <div class="tc-title">Practice Mode</div>
+      <div class="tc-sub">Unlimited questions at any level. No streak pressure, just reps.</div>
+      <div class="tc-cta">Open Practice →</div>
+    </div>
+
+    <!-- STREAK card -->
+    <div class="tool-card tool-card-streak">
+      <div class="tc-icon">🔥</div>
+      <div class="streak-big" id="streak-big-num">0</div>
+      <div class="streak-label">day streak</div>
+      <div class="tc-sub" id="streak-card-sub" style="margin-top:.4rem">Complete today's quiz to keep it going!</div>
+    </div>
+
+    <!-- FLASHCARDS -->
+    <div class="tool-card" onclick="openDashModal('modal-flashcards')">
+      <div class="tc-icon">🃏</div>
+      <div class="tc-title">Flashcards</div>
+      <div class="tc-sub">Flip through key concepts and formulas. Rate what you know.</div>
+      <div class="tc-cta">Flip cards →</div>
+    </div>
+
+    <!-- FORMULA SHEET -->
+    <div class="tool-card tool-card-formulas" onclick="openDashModal('modal-formulas')">
+      <div class="tc-icon">📋</div>
+      <div class="tc-title">Formula Sheet</div>
+      <div class="tc-sub">Every formula you need, searchable and organized by level.</div>
+      <div class="tc-cta">Open sheet →</div>
+    </div>
+
+    <!-- WEAK SPOTS -->
+    <div class="tool-card" onclick="openDashModal('modal-weakspots')">
+      <div class="tc-icon">🎯</div>
+      <div class="tc-title">Weak Spots</div>
+      <div class="tc-sub" id="ws-card-sub">Topics you've missed. Fix these first.</div>
+      <div class="tc-cta">See weak spots →</div>
+    </div>
+
+    <!-- TIMER -->
+    <div class="tool-card" onclick="openDashModal('modal-timer')">
+      <div class="tc-icon">⏱️</div>
+      <div class="tc-title">Study Timer</div>
+      <div class="tc-sub">Track your sessions and weekly hours.</div>
+      <div class="tc-cta" id="timer-card-total">0h 0m this week →</div>
+    </div>
+
+    <!-- MY PATH — full width -->
+    <div class="tool-card" style="grid-column:1/-1" onclick="openDashModal('modal-path')">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="tc-icon">🗺️</div>
+        <div style="flex:1">
+          <div class="tc-title">Your Learning Path</div>
+          <div class="tc-sub">See every level from here to Calculus II — and what's next for you.</div>
         </div>
-        <div class="dash-right">
-          <div class="dash-quiz-card">
-            <div class="dqc-row"><div class="dqc-label" id="dqc-label">Today's Quiz</div><div class="dqc-tag" id="dqc-tag">5 questions</div></div>
-            <div class="dqc-desc" id="dqc-desc">Get 3 or more right to keep your streak. Every wrong answer shows you exactly what you missed.</div>
-            <button class="action-btn" id="dash-quiz-btn" onclick="startDailyQuiz()">Start Today's Quiz →</button>
-          </div>
-          <div class="dash-quick-cards">
-            <div class="dqk-card" onclick="switchDTab('practice',document.querySelector('[data-tab=practice]'))"><div class="dqk-label">Practice Mode</div><div class="dqk-val">Unlimited questions →</div></div>
-            <div class="dqk-card" onclick="switchDTab('formulas',document.querySelector('[data-tab=formulas]'))"><div class="dqk-label">Formula Sheet</div><div class="dqk-val">Your cheat sheet →</div></div>
-            <div class="dqk-card" onclick="switchDTab('flashcards',document.querySelector('[data-tab=flashcards]'))"><div class="dqk-label">Flashcards</div><div class="dqk-val">Flip &amp; review →</div></div>
-            <div class="dqk-card" onclick="switchDTab('weakspots',document.querySelector('[data-tab=weakspots]'))"><div class="dqk-label">Weak Spots</div><div class="dqk-val accent" id="weakspot-count-label">0 topics tracked</div></div>
-          </div>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-            <button class="ghost-btn" onclick="window.open('lessons.html','_blank')">Open Lessons ↗</button>
-            <button class="ghost-btn" id="dash-next-level-btn">Next: — →</button>
-          </div>
-        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
+      </div>
+      <div style="margin-top:.75rem;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden">
+        <div id="path-mini-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
       </div>
     </div>
-  </div>
 
-  <!-- PATH TAB -->
-  <div class="dtab-panel" id="tab-path">
-    <div class="tab-content">
-      <div class="tab-h1">Your Path</div>
-      <div class="tab-sub">Every level from where you are to Calculus II. Move at your own pace.</div>
-      <div class="path-prog-wrap">
-        <div class="path-prog-top"><span id="path-prog-label">Level 1 of 7</span><span id="path-prog-pct">0%</span></div>
-        <div class="path-prog-bar"><div class="path-prog-fill" id="path-prog-fill" style="width:0%"></div></div>
-      </div>
-      <div id="dash-journey-track"></div>
+    <!-- NOTES -->
+    <div class="tool-card" onclick="openDashModal('modal-notes')">
+      <div class="tc-icon">📝</div>
+      <div class="tc-title">My Notes</div>
+      <div class="tc-sub">Your personal notebook. Jot down anything — auto-saves per level.</div>
+      <div class="tc-cta">Open notes →</div>
     </div>
-  </div>
 
-  <!-- PRACTICE TAB -->
-  <div class="dtab-panel" id="tab-practice">
-    <div class="tab-content">
-      <div class="tab-h1">Practice Mode</div>
-      <div class="tab-sub">Unlimited questions at any level. No streak, no pressure — just reps.</div>
-      <div class="practice-level-tabs" id="prac-level-tabs"></div>
-      <div class="practice-card" id="prac-card">
-        <div class="practice-q" id="prac-q">Loading question…</div>
-        <div class="practice-opts" id="prac-opts"></div>
-        <div class="solution-box" id="prac-solution">
-          <div class="sol-verdict" id="prac-verdict"></div>
-          <div class="sol-explanation" id="prac-explanation"></div>
-          <div class="sol-steps" id="prac-steps"></div>
-          <button class="sol-next-btn" onclick="loadPracticeQuestion()">Next Question →</button>
-        </div>
-        <div class="prac-stat">
-          <div class="prac-stat-item"><div class="prac-stat-label">Correct</div><div class="prac-stat-val accent" id="prac-correct">0</div></div>
-          <div class="prac-stat-item"><div class="prac-stat-label">Attempted</div><div class="prac-stat-val" id="prac-attempted">0</div></div>
-          <div class="prac-stat-item"><div class="prac-stat-label">Accuracy</div><div class="prac-stat-val" id="prac-accuracy">—</div></div>
-        </div>
-      </div>
+    <!-- LESSONS -->
+    <div class="tool-card" onclick="window.open('lessons.html','_blank')">
+      <div class="tc-icon">📚</div>
+      <div class="tc-title">Lessons</div>
+      <div class="tc-sub">Step-by-step walkthroughs for every topic. Open in a new tab.</div>
+      <div class="tc-cta">Open lessons ↗</div>
     </div>
+
+  </div><!-- /dash-grid -->
+
+  <!-- BADGES ROW -->
+  <div class="dash-badges-section">
+    <div class="dash-section-label">Your Badges</div>
+    <div class="badges-row" id="dash-badges-row"></div>
   </div>
 
-  <!-- FORMULA SHEET TAB -->
-  <div class="dtab-panel" id="tab-formulas">
-    <div class="tab-content">
-      <div class="tab-h1-row"><div class="tab-h1">Formula Sheet</div>
-        <select class="formula-level-select" id="formula-level-select" onchange="renderFormulas()">
-          <option value="0">Level 0 — Arithmetic</option><option value="1">Level 1 — Algebra</option>
-          <option value="2">Level 2 — Adv. Algebra</option><option value="3">Level 3 — Geometry</option>
-          <option value="4">Level 4 — Pre-Calculus</option><option value="5">Level 5 — Calculus I</option>
-          <option value="6">Level 6 — Calculus II+</option>
-        </select>
-      </div>
-      <div class="tab-sub">Every formula you need, organized and searchable. Use it during practice.</div>
-      <input class="formula-search" id="formula-search" placeholder="Search formulas… e.g. quadratic, slope, derivative" oninput="renderFormulas()"/>
-      <div id="formula-content"></div>
-    </div>
-  </div>
+  <!-- ── MODALS ────────────────────────────────────── -->
 
-  <!-- FLASHCARDS TAB -->
-  <div class="dtab-panel" id="tab-flashcards">
-    <div class="tab-content">
-      <div class="tab-h1">Flashcards</div>
-      <div class="tab-sub">Click the card to flip. Rate yourself — hard cards come back sooner.</div>
-      <select class="fc-set-select" id="fc-set-select" onchange="loadFlashcardSet()">
-        <option value="0">Level 0 — Arithmetic</option><option value="1">Level 1 — Algebra</option>
-        <option value="2">Level 2 — Adv. Algebra</option><option value="3">Level 3 — Geometry</option>
-        <option value="4">Level 4 — Pre-Calculus</option><option value="5">Level 5 — Calculus I</option>
-        <option value="6">Level 6 — Calculus II+</option>
-      </select>
-      <div class="flashcard-nav">
-        <button class="fc-nav-btn" onclick="prevCard()">← Prev</button>
-        <span class="fc-counter" id="fc-counter">1 / 10</span>
-        <button class="fc-nav-btn" onclick="nextCard()">Next →</button>
+  <!-- PRACTICE MODAL -->
+  <div class="dash-modal" id="modal-practice" onclick="if(event.target===this)closeDashModal('modal-practice')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⚡ Practice Mode</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-practice')">✕</button>
       </div>
-      <div class="flashcard-wrap" onclick="flipCard()">
-        <div class="flashcard" id="flashcard">
-          <div class="fc-face fc-front"><div class="fc-label">Concept</div><div class="fc-content" id="fc-front-text">—</div><div class="fc-hint">Click to see definition</div></div>
-          <div class="fc-face fc-back"><div class="fc-label">Definition / Formula</div><div class="fc-content" id="fc-back-text">—</div></div>
-        </div>
-      </div>
-      <div class="fc-rating">
-        <button class="fc-rate-btn hard" onclick="rateCard('hard')">😅 Hard — Show again</button>
-        <button class="fc-rate-btn easy" onclick="rateCard('easy')">✓ Got it</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- WEAK SPOTS TAB -->
-  <div class="dtab-panel" id="tab-weakspots">
-    <div class="tab-content">
-      <div class="tab-h1">Weak Spots</div>
-      <div class="tab-sub">Topics you've missed the most. These are your highest-leverage study targets.</div>
-      <div id="ws-empty" class="ws-empty">
-        <div style="font-size:2rem;margin-bottom:.75rem">🎯</div>
-        No data yet. Complete a few quizzes and your weak spots will appear here.
-      </div>
-      <div id="ws-list"></div>
-    </div>
-  </div>
-
-  <!-- TIMER TAB -->
-  <div class="dtab-panel" id="tab-timer">
-    <div class="tab-content">
-      <div class="tab-h1">Study Timer</div>
-      <div class="tab-sub">Track your sessions. Every minute counts.</div>
-      <div class="timer-face">
-        <div class="timer-digits" id="timer-display">00:00:00</div>
-        <div class="timer-status" id="timer-status">ready to start</div>
-      </div>
-      <div class="timer-btns">
-        <button class="action-btn" style="padding:.7rem 1.3rem;font-size:.6rem" id="timer-start-btn" onclick="timerStart()">Start</button>
-        <button class="setting-btn" id="timer-stop-btn" onclick="timerStop()" disabled>Stop</button>
-        <button class="setting-btn" onclick="timerReset()">Discard</button>
-      </div>
-      <div class="timer-total-row"><span class="timer-total-label">Total this week</span><span class="timer-total-val" id="timer-total">0h 0m</span></div>
-      <div class="timer-log-title">Session history</div>
-      <div id="timer-log"></div>
-    </div>
-  </div>
-
-  <!-- NOTES TAB -->
-  <div class="dtab-panel" id="tab-notes">
-    <div class="tab-content">
-      <div class="tab-h1-row">
-        <div class="tab-h1">Notes</div>
-        <select class="formula-level-select" id="notes-level-select" onchange="switchNotesLevel()">
-          <option value="0">Level 0</option><option value="1">Level 1</option><option value="2">Level 2</option>
-          <option value="3">Level 3</option><option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option>
-        </select>
-      </div>
-      <div class="tab-sub">Your personal notebook. Auto-saves per level.</div>
-      <textarea class="notes-area" id="notes-area" placeholder="Write anything — formulas, worked examples, reminders…" oninput="autoSaveNote()"></textarea>
-      <div class="notes-footer"><span class="notes-saved" id="notes-saved">Saved</span><span style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)" id="notes-count">0 chars</span></div>
-    </div>
-  </div>
-
-  <!-- SETTINGS TAB -->
-  <div class="dtab-panel" id="tab-settings">
-    <div class="tab-content">
-      <div class="tab-h1">Settings</div>
-      <div class="tab-sub">Account, appearance, and preferences.</div>
-      <div class="setting-group">
-        <div class="setting-group-label">Account</div>
-        <div class="setting-row"><div><div class="setting-name">Email</div><div class="setting-val" id="settings-email-val">—</div></div></div>
-        <div class="setting-row"><div><div class="setting-name">Password</div><div class="setting-val">••••••••</div></div><button class="setting-btn" onclick="toggleSettingsSub('sp-pw')">Change</button></div>
-        <div class="settings-sub" id="sp-pw">
-          <div style="display:flex;flex-direction:column;gap:.6rem;max-width:360px">
-            <input type="password" placeholder="Current password" id="sp-cur-pw" style="padding:.55rem .8rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;width:100%"/>
-            <input type="password" placeholder="New password" id="sp-new-pw" style="padding:.55rem .8rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;width:100%"/>
-            <button class="action-btn" style="align-self:flex-start;padding:.65rem 1.2rem;font-size:.58rem" onclick="changePassword()">Update Password</button>
-            <div id="sp-pw-msg" style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;color:var(--accent)"></div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1rem;line-height:1.65">Pick a level. Unlimited questions. No streak, no pressure.</p>
+        <div class="prac-level-row" id="prac-level-row2"></div>
+        <div class="prac-q-card">
+          <div class="prac-q-text" id="prac-q2">Loading…</div>
+          <div class="opts" id="prac-opts2"></div>
+          <div class="solution-box" id="prac-sol2">
+            <div class="sol-verdict" id="prac-verdict2"></div>
+            <div class="sol-explanation" id="prac-exp2"></div>
+            <div class="sol-steps" id="prac-steps2"></div>
+            <button class="sol-next-btn" onclick="loadPracticeQ2()">Next Question →</button>
           </div>
         </div>
+        <div class="prac-stats-row">
+          <div class="pstat"><div class="pstat-label">Correct</div><div class="pstat-val green" id="p2-correct">0</div></div>
+          <div class="pstat"><div class="pstat-label">Attempted</div><div class="pstat-val" id="p2-attempted">0</div></div>
+          <div class="pstat"><div class="pstat-label">Accuracy</div><div class="pstat-val" id="p2-accuracy">—</div></div>
+        </div>
       </div>
-      <div class="setting-group">
-        <div class="setting-group-label">Progress</div>
-        <div class="setting-row"><div><div class="setting-name">Current Level</div><div class="setting-val" id="settings-level-val">—</div></div><button class="setting-btn" onclick="toggleSettingsSub('sp-level')">Adjust</button></div>
-        <div class="settings-sub" id="sp-level">
-          <div style="display:flex;flex-direction:column;gap:.6rem;max-width:360px">
-            <select id="settings-level-select" style="padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.62rem;outline:none;cursor:pointer;width:100%">
-              <option value="0">Level 0 — Arithmetic</option><option value="1">Level 1 — Early Algebra</option>
-              <option value="2">Level 2 — Advanced Algebra</option><option value="3">Level 3 — Geometry</option>
-              <option value="4">Level 4 — Pre-Calculus</option><option value="5">Level 5 — Calculus I</option>
-              <option value="6">Level 6 — Calculus II+</option>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS MODAL -->
+  <div class="dash-modal" id="modal-flashcards" onclick="if(event.target===this)closeDashModal('modal-flashcards')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🃏 Flashcards</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-flashcards')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1rem">Click the card to flip it. Rate yourself honestly.</p>
+        <div class="formula-level-tabs" id="fc-level-tabs2"></div>
+        <div class="fc-nav-row">
+          <button class="fc-nav-btn2" onclick="fcPrev2()">← Prev</button>
+          <span class="fc-counter2" id="fc-counter2">1 / 5</span>
+          <button class="fc-nav-btn2" onclick="fcNext2()">Next →</button>
+        </div>
+        <div class="fc-card-outer" onclick="fcFlip2()">
+          <div class="fc-card-inner" id="fc-inner2">
+            <div class="fc-face2 fc-front-face">
+              <div class="fc-face-label">Concept — Click to reveal</div>
+              <div class="fc-face-content" id="fc-front2">—</div>
+              <div class="fc-tap-hint">👆 tap to flip</div>
+            </div>
+            <div class="fc-face2 fc-back2">
+              <div class="fc-face-label">Answer</div>
+              <div class="fc-face-content" id="fc-back2-text">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-rate-row">
+          <button class="fc-rate2 hard" onclick="fcRate2('hard')">😅 Hard — show again</button>
+          <button class="fc-rate2 easy" onclick="fcRate2('easy')">✓ Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULAS MODAL -->
+  <div class="dash-modal" id="modal-formulas" onclick="if(event.target===this)closeDashModal('modal-formulas')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">📋 Formula Sheet</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-formulas')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <input class="formula-search2" id="formula-search2" placeholder="Search… e.g. quadratic, slope, derivative" oninput="renderFormulas2()"/>
+        <div class="formula-level-tabs" id="formula-level-tabs2"></div>
+        <div id="formula-content2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEAK SPOTS MODAL -->
+  <div class="dash-modal" id="modal-weakspots" onclick="if(event.target===this)closeDashModal('modal-weakspots')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🎯 Weak Spots</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-weakspots')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1.25rem;line-height:1.65">Topics where you've missed the most questions. These are your highest-leverage study targets.</p>
+        <div id="ws-modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER MODAL -->
+  <div class="dash-modal" id="modal-timer" onclick="if(event.target===this)closeDashModal('modal-timer')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⏱️ Study Timer</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-timer')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <div class="timer-face2">
+          <div class="timer-digits2" id="timer-display2">00:00:00</div>
+          <div class="timer-status2" id="timer-status2">ready to start</div>
+        </div>
+        <div class="timer-btns2">
+          <button class="quiz-card-btn" style="padding:.65rem 1.2rem;font-size:.6rem" id="timer-btn-start2" onclick="timerStart2()">Start</button>
+          <button class="setting-btn2" id="timer-btn-stop2" onclick="timerStop2()" disabled>Stop</button>
+          <button class="setting-btn2" onclick="timerReset2()">Discard</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:1rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:1.25rem">
+          <span style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Total this week</span>
+          <span style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);letter-spacing:-.02em" id="timer-total2">0h 0m</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem">Sessions</div>
+        <div id="timer-log2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES MODAL -->
+  <div class="dash-modal" id="modal-notes" onclick="if(event.target===this)closeDashModal('modal-notes')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">📝 Notes</div>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <select id="notes-level-sel2" style="font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.06em;padding:.28rem .55rem;background:var(--bg);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;border-radius:4px" onchange="switchNote2()">
+            <option value="0">Lvl 0</option><option value="1">Lvl 1</option><option value="2">Lvl 2</option>
+            <option value="3">Lvl 3</option><option value="4">Lvl 4</option><option value="5">Lvl 5</option><option value="6">Lvl 6</option>
+          </select>
+          <button class="dmb-close" onclick="closeDashModal('modal-notes')">✕</button>
+        </div>
+      </div>
+      <div class="dmb-body">
+        <textarea class="notes-area2" id="notes-area2" placeholder="Write anything — formulas, tips, examples…" oninput="autoSaveNote2()"></textarea>
+        <div class="notes-footer2">
+          <span class="notes-saved2" id="notes-saved2">Saved ✓</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.06em;color:var(--text3)" id="notes-chars2">0 chars</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATH MODAL -->
+  <div class="dash-modal" id="modal-path" onclick="if(event.target===this)closeDashModal('modal-path')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🗺️ Your Learning Path</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-path')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <div style="margin-bottom:1.25rem">
+          <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.35rem">
+            <span id="path-modal-label">Level 1 of 7</span><span id="path-modal-pct">0%</span>
+          </div>
+          <div style="height:6px;background:var(--bg2);border-radius:99px;overflow:hidden">
+            <div id="path-modal-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
+          </div>
+        </div>
+        <div id="path-modal-stages" class="path-stages"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="dash-modal" id="modal-settings" onclick="if(event.target===this)closeDashModal('modal-settings')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⚙️ Settings</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-settings')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <!-- account -->
+        <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-bottom:.1rem">Account</div>
+        <div class="setting-row2"><div><div class="setting-name2">Email</div><div class="setting-val2" id="s2-email">—</div></div></div>
+        <div class="setting-row2"><div><div class="setting-name2">Password</div></div><button class="setting-btn2" onclick="toggleSub2('sp2-pw')">Change</button></div>
+        <div class="settings-sub2" id="sp2-pw">
+          <div style="display:flex;flex-direction:column;gap:.5rem;max-width:320px">
+            <input type="password" id="s2-cur-pw" placeholder="Current password" style="padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%;border-radius:4px"/>
+            <input type="password" id="s2-new-pw" placeholder="New password" style="padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%;border-radius:4px"/>
+            <button class="quiz-card-btn" style="align-self:flex-start;padding:.55rem 1rem;font-size:.56rem;border-radius:4px" onclick="changePassword2()">Update</button>
+            <div id="s2-pw-msg" style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--accent)"></div>
+          </div>
+        </div>
+        <!-- level -->
+        <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.1rem">Progress</div>
+        <div class="setting-row2"><div><div class="setting-name2">Level</div><div class="setting-val2" id="s2-level">—</div></div><button class="setting-btn2" onclick="toggleSub2('sp2-level')">Adjust</button></div>
+        <div class="settings-sub2" id="sp2-level">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.5rem 0">
+            <select id="s2-level-sel" style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.04em;padding:.4rem .6rem;background:var(--bg);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;border-radius:4px">
+              <option value="0">Lvl 0 — Arithmetic</option><option value="1">Lvl 1 — Algebra</option>
+              <option value="2">Lvl 2 — Adv. Algebra</option><option value="3">Lvl 3 — Geometry</option>
+              <option value="4">Lvl 4 — Pre-Calc</option><option value="5">Lvl 5 — Calc I</option>
+              <option value="6">Lvl 6 — Calc II+</option>
             </select>
-            <button class="action-btn" style="align-self:flex-start;padding:.65rem 1.2rem;font-size:.58rem" onclick="updateLevel()">Save Level</button>
+            <button class="quiz-card-btn" style="padding:.5rem 1rem;font-size:.56rem;border-radius:4px" onclick="updateLevel2()">Save</button>
           </div>
         </div>
-        <div class="setting-row"><div><div class="setting-name">Diagnostic</div><div class="setting-val">Retake to re-place your level</div></div><button class="setting-btn" onclick="confirmRetake()">Retake</button></div>
-      </div>
-      <div class="setting-group">
-        <div class="setting-group-label">Appearance</div>
-        <div class="setting-row" style="border:none;padding-top:.6rem">
-          <div class="theme-pills">
-            <button class="theme-pill" data-t="" onclick="setThemePill('',this)"><div class="t-swatch" style="background:#2d5a27"></div>Forest</button>
-            <button class="theme-pill" data-t="slate" onclick="setThemePill('slate',this)"><div class="t-swatch" style="background:#1a56db"></div>Slate</button>
-            <button class="theme-pill" data-t="sand" onclick="setThemePill('sand',this)"><div class="t-swatch" style="background:#b45309"></div>Sand</button>
-            <button class="theme-pill" data-t="ink" onclick="setThemePill('ink',this)"><div class="t-swatch" style="background:#a8c5a0"></div>Ink</button>
-          </div>
+        <div class="setting-row2"><div><div class="setting-name2">Diagnostic</div><div class="setting-val2">Retake to update your level</div></div><button class="setting-btn2" onclick="confirmRetake()">Retake</button></div>
+        <!-- appearance -->
+        <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.6rem">Appearance</div>
+        <div class="theme-pills" id="s2-theme-pills" style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button class="theme-pill" data-t="" onclick="setThemePill('',this)"><div class="t-swatch" style="background:#2d5a27"></div>Forest</button>
+          <button class="theme-pill" data-t="slate" onclick="setThemePill('slate',this)"><div class="t-swatch" style="background:#1a56db"></div>Slate</button>
+          <button class="theme-pill" data-t="sand" onclick="setThemePill('sand',this)"><div class="t-swatch" style="background:#b45309"></div>Sand</button>
+          <button class="theme-pill" data-t="ink" onclick="setThemePill('ink',this)"><div class="t-swatch" style="background:#a8c5a0"></div>Ink</button>
         </div>
-      </div>
-      <div class="setting-group">
-        <div class="setting-group-label">Danger Zone</div>
-        <div class="setting-row"><div><div class="setting-name">Reset Streak</div><div class="setting-val">Set streak back to 0</div></div><button class="setting-btn danger" onclick="confirmResetStreak()">Reset</button></div>
-        <div class="setting-row" style="border:none"><div><div class="setting-name">Sign Out</div></div><button class="setting-btn danger" onclick="signOut()">Sign Out</button></div>
+        <!-- danger -->
+        <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.1rem">Danger Zone</div>
+        <div class="setting-row2"><div><div class="setting-name2">Reset Streak</div></div><button class="setting-btn2 danger" onclick="confirmResetStreak()">Reset</button></div>
+        <div class="setting-row2" style="border:none"><div><div class="setting-name2">Sign Out</div></div><button class="setting-btn2 danger" onclick="signOut()">Sign Out</button></div>
       </div>
     </div>
   </div>
+
 </div><!-- /s-dashboard -->
+
+
 
 <!-- ══════════════════════════════════
      DAILY QUIZ
@@ -1539,123 +1674,148 @@ function calcSchedule(){
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
+// ── MODAL SYSTEM ─────────────────────────────────────────────────────────────
+function openDashModal(id){
+  const m=document.getElementById(id);
+  if(!m)return;
+  m.classList.add('open');
+  document.body.style.overflow='hidden';
+  // Init content
+  if(id==='modal-weakspots') renderWeakSpots2();
+  if(id==='modal-timer') { renderTimerLog2(); renderTimerTotal2(); }
+  if(id==='modal-flashcards') initFcModal();
+  if(id==='modal-formulas') initFormulaModal();
+  if(id==='modal-practice') initPracticeModal();
+  if(id==='modal-path') renderPathModal();
+  if(id==='modal-notes') loadNote2();
+}
+function closeDashModal(id){
+  const m=document.getElementById(id); if(!m)return;
+  m.classList.remove('open'); document.body.style.overflow='';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function showDashboard(){
   showScreen('s-dashboard');
-  // Reset to home tab
-  document.querySelectorAll('.dtab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.dtb-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-home').classList.add('active');
-  document.querySelector('.dtb-btn[data-tab="home"]').classList.add('active');
 
   try{
     const res=await fetch('/dashboard',{headers:{Authorization:`Bearer ${getToken()}`}});
     const data=await res.json();
     const{user,streak,completedToday,passedToday}=data;
+    const totalQ=data.totalQuizzes||0;
 
+    // Greeting
     const hr=new Date().getHours();
-    document.getElementById('dash-greet').textContent=(hr<12?'Good morning,':hr<17?'Good afternoon,':'Good evening,')+' '+user.email.split('@')[0]+'.';
-    document.getElementById('dash-level-badge').textContent='⬡ '+user.level_name;
-    document.getElementById('dqc-tag').textContent=user.level_name;
-    document.getElementById('settings-email-val').textContent=user.email;
-    document.getElementById('settings-level-val').textContent=user.level_name;
-    document.getElementById('settings-level-select').value=user.level;
-    document.getElementById('notes-level-select').value=user.level;
+    const name=user.email.split('@')[0];
+    const greetMsg=hr<12?`Good morning, ${name}! ☀️`:hr<17?`Hey ${name}! 👋`:`Evening, ${name}! 🌙`;
+    document.getElementById('dash-greet').textContent=greetMsg;
+    const streakLine=streak>=7?'🔥 You're on fire! Keep it going.':streak>=3?`${streak} days in a row — you're building something real.`:streak===1?'Day 1. The streak starts now.':'Complete today's quiz to start a streak!';
+    document.getElementById('dash-greet-sub').textContent=streakLine;
 
-    // Info cards
-    const nextStage=STAGES[user.level+1];
-    document.getElementById('dash-next-level-btn').textContent='Next: '+(nextStage?nextStage.name:'Top Level ✓')+' →';
+    // Topbar
+    document.getElementById('tb-level-chip').textContent='⬡ '+user.level_name;
+    const sc=document.getElementById('tb-streak-chip');
+    sc.textContent='🔥 '+streak+' day'+(streak!==1?'s':'');
+    sc.className='dash-streak-chip'+(streak>=3?' on-fire':'');
 
     // XP bar
-    const totalQ=data.totalQuizzes||0;
     const xp=(totalQ*10+(streak*5))%100;
-    const xpTotal=100;
-    document.getElementById('xp-label').textContent=`Level ${user.level+1} Progress`;
-    document.getElementById('xp-val').textContent=`${xp} / ${xpTotal} XP`;
-    setTimeout(()=>{document.getElementById('xp-fill').style.width=xp+'%';},300);
+    document.getElementById('tb-xp-label').textContent=xp+' XP';
+    setTimeout(()=>{document.getElementById('tb-xp-fill').style.width=xp+'%';},300);
 
-    // Animated counts
-    setTimeout(()=>{
-      animateCount('dash-streak',0,streak,800);
-      animateCount('dash-quizzes',0,totalQ,1000);
-      animateCount('dash-level-num',0,user.level+1,600);
-    },200);
+    // Week strip
+    renderWeekStrip(data.weekDays||[]);
 
-    // Quiz card state
-    if(completedToday){
-      document.getElementById('dqc-label').textContent=passedToday?"Today's Quiz — Done ✓":"Try Again";
-      document.getElementById('dqc-desc').textContent=passedToday?'Streak kept. Come back tomorrow.':'You got less than 3. Give it another shot.';
-      document.getElementById('dash-quiz-btn').textContent=passedToday?'Done for Today':'Retry Quiz →';
-      document.getElementById('dash-quiz-btn').disabled=passedToday;
-    }else{
-      document.getElementById('dqc-label').textContent="Today's Quiz";
-      document.getElementById('dash-quiz-btn').disabled=false;
-      document.getElementById('dash-quiz-btn').textContent="Start Today's Quiz →";
+    // Streak card
+    document.getElementById('streak-big-num').textContent=streak;
+    document.getElementById('streak-card-sub').textContent=completedToday&&passedToday?'Locked in for today ✓':completedToday?'Tried today, keep at it!':'Take today's quiz to keep it!';
+
+    // Quiz card
+    if(completedToday&&passedToday){
+      document.getElementById('quiz-emoji').textContent='✅';
+      document.getElementById('quiz-card-title').textContent="Today's done!";
+      document.getElementById('quiz-card-sub').textContent='You nailed it. Streak locked in. Come back tomorrow.';
+      const qbtn=document.getElementById('quiz-start-btn');
+      qbtn.style.display='none';
+      const badge=document.getElementById('quiz-done-badge-el')||(() => {
+        const b=document.createElement('div');b.className='quiz-done-badge';b.id='quiz-done-badge-el';
+        document.getElementById('quiz-card-wrap').querySelector('.quiz-card-body').appendChild(b);return b;
+      })();
+      badge.textContent='🔥 '+streak+' day streak — see you tomorrow';
+    } else if(completedToday&&!passedToday){
+      document.getElementById('quiz-emoji').textContent='💪';
+      document.getElementById('quiz-card-title').textContent='Give it another shot';
+      document.getElementById('quiz-card-sub').textContent='You need 3/5 to keep your streak. You can do this.';
+      document.getElementById('quiz-start-btn').textContent='Try Again →';
+      document.getElementById('quiz-start-btn').disabled=false;
+    } else {
+      document.getElementById('quiz-emoji').textContent='🎯';
+      document.getElementById('quiz-card-title').textContent="Today's Quiz";
+      document.getElementById('quiz-start-btn').textContent='Let's go →';
+      document.getElementById('quiz-start-btn').disabled=false;
     }
 
-    // Week dots
-    renderWeekDots(data.weekDays||[]);
-
-    // Badges
-    renderBadges(streak,totalQ,passedToday&&dailyCorrect===5);
-
-    // Weak spot count
+    // Weak spots card
     const ws=getWeakSpots();
     const wsCount=Object.keys(ws).length;
-    document.getElementById('weakspot-count-label').textContent=wsCount>0?wsCount+' topics tracked':'0 topics tracked';
+    document.getElementById('ws-card-sub').textContent=wsCount>0?`${wsCount} topics tracked — tap to see what to work on`:'No weak spots yet. Complete quizzes and they'll show here.';
 
-    // Journey
+    // Path progress (mini bar)
     userLevel=user.level;
-    renderDashJourney(user.level);
-    loadNote(user.level);
+    const pathPct=Math.round((user.level/(STAGES.length-1))*100);
+    document.getElementById('path-mini-fill').style.width=pathPct+'%';
+    document.getElementById('path-progress-inline').textContent='Level '+(user.level+1)+' of '+STAGES.length+' →';
 
-    // Theme pills sync
+    // Timer total
+    renderTimerTotal2();
+    const tc=document.getElementById('timer-card-total');
+    if(tc) tc.textContent=document.getElementById('timer-total2')?.textContent||'0h 0m'+' this week →';
+
+    // Badges
+    renderBadges2(streak,totalQ,passedToday&&dailyCorrect===5);
+
+    // Settings modal values
+    document.getElementById('s2-email').textContent=user.email;
+    document.getElementById('s2-level').textContent=user.level_name;
+    document.getElementById('s2-level-sel').value=user.level;
+
+    // Notes default level
+    document.getElementById('notes-level-sel2').value=user.level;
+
+    // Practice
+    pracLevel=user.level;
+    pracCorrectCount=0; pracAttempted=0;
+
+    // Theme pills
     const t=localStorage.getItem('apexmath_theme')||'';
     document.querySelectorAll('.theme-pill').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
 
-    // Practice level
-    pracLevel=user.level;
-    buildPracticeTabs(user.level);
-    loadPracticeQuestion();
+    setTimeout(startDashCanvas,150);
 
-    // Formulas default to user level
-    document.getElementById('formula-level-select').value=user.level;
-    renderFormulas();
-
-    // Flashcards default
-    document.getElementById('fc-set-select').value=user.level;
-    loadFlashcardSet();
-
-    // Canvas
-    setTimeout(startDashCanvas, 100);
-    renderTimerTotal();
-
-  }catch(e){console.error(e);}
+  }catch(e){console.error('Dashboard error',e);}
 }
 
-function renderWeekDots(passedDays){
-  const wrap=document.getElementById('dash-week-dots'); wrap.innerHTML='';
+function renderWeekStrip(passedDays){
+  const wrap=document.getElementById('dash-week-strip'); if(!wrap)return;
+  wrap.innerHTML='';
   const dayLabels=['Su','Mo','Tu','We','Th','Fr','Sa'];
   const today=new Date();
   for(let i=6;i>=0;i--){
     const d=new Date(today); d.setDate(today.getDate()-i);
     const key=d.toISOString().split('T')[0];
     const isToday=i===0, isDone=passedDays.includes(key);
-    const dot=document.createElement('div');
-    dot.className='week-dot'+(isDone?' done':'')+(isToday&&!isDone?' today':'');
-    dot.innerHTML=`<div class="wdot-day">${dayLabels[d.getDay()]}</div>${isDone?'✓':isToday?'·':''}`;
-    wrap.appendChild(dot);
+    const pip=document.createElement('div'); pip.className='week-pip';
+    const circle=document.createElement('div');
+    circle.className='week-pip-circle'+(isDone?' done':isToday?' today':'');
+    circle.textContent=isDone?'✓':isToday?'·':'';
+    const label=document.createElement('div'); label.className='week-pip-day';
+    label.textContent=dayLabels[d.getDay()];
+    pip.appendChild(circle); pip.appendChild(label);
+    wrap.appendChild(pip);
   }
 }
 
-function renderDashJourney(level){
-  const pct=Math.round((level/(STAGES.length-1))*100);
-  document.getElementById('path-prog-fill').style.width=pct+'%';
-  document.getElementById('path-prog-label').textContent='Level '+(level+1)+' of '+STAGES.length;
-  document.getElementById('path-prog-pct').textContent=pct+'% complete';
-  renderJourney(level,document.getElementById('dash-journey-track'));
-}
-
-function renderBadges(streak,totalQ,perfect){
+function renderBadges2(streak,totalQ,perfect){
   const earned=new Set(JSON.parse(localStorage.getItem('apexmath_badges')||'[]'));
   if(totalQ>=1)earned.add('first_quiz');
   if(streak>=3)earned.add('streak_3');
@@ -1663,28 +1823,284 @@ function renderBadges(streak,totalQ,perfect){
   if(totalQ>=10)earned.add('practice_10');
   if(perfect)earned.add('perfect_quiz');
   localStorage.setItem('apexmath_badges',JSON.stringify([...earned]));
-  const wrap=document.getElementById('dash-badges'); wrap.innerHTML='';
+  const wrap=document.getElementById('dash-badges-row'); if(!wrap)return; wrap.innerHTML='';
   BADGES_DEF.forEach(b=>{
     const el=document.createElement('div');
-    el.className='badge'+(earned.has(b.id)?' earned':'');
+    el.className='badge-pill'+(earned.has(b.id)?' earned':'');
     el.title=b.desc;
-    el.innerHTML=`<span class="badge-icon">${b.icon}</span>${b.label}`;
+    el.innerHTML=`<span class="badge-emoji">${b.icon}</span>${b.label}`;
     wrap.appendChild(el);
   });
 }
 
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function switchDTab(name,btn){
-  document.querySelectorAll('.dtb-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.dtab-panel').forEach(p=>p.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-  if(name==='timer')renderTimerLog();
-  if(name==='weakspots')renderWeakSpots();
-  if(name==='formulas')renderFormulas();
-  if(name==='flashcards')loadFlashcardSet();
-  if(name==='practice'){loadPracticeQuestion();}
+// keep old renderBadges for any legacy calls
+function renderBadges(streak,totalQ,perfect){ renderBadges2(streak,totalQ,perfect); }
+
+// ── PRACTICE MODAL ────────────────────────────────────────────────────────────
+let p2Level=1, p2Pool=[], p2Idx=0, p2Correct=0, p2Attempted=0;
+
+function initPracticeModal(){
+  const row=document.getElementById('prac-level-row2'); if(!row||row.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='prac-lvl-btn'+(i===pracLevel?' active':'');
+    btn.textContent='Level '+i;
+    btn.onclick=()=>{
+      document.querySelectorAll('.prac-lvl-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); p2Level=i; p2Pool=[]; p2Idx=0; loadPracticeQ2();
+    };
+    row.appendChild(btn);
+  });
+  p2Level=pracLevel; loadPracticeQ2();
 }
+
+function loadPracticeQ2(){
+  const pool=PRACTICE_QS[p2Level]||PRACTICE_QS[1];
+  if(!pool||!pool.length)return;
+  if(!p2Pool.length||p2Idx>=p2Pool.length){p2Pool=[...pool].sort(()=>Math.random()-.5);p2Idx=0;}
+  const q=p2Pool[p2Idx++];
+  document.getElementById('prac-sol2').classList.remove('show','wrong-solution');
+  document.getElementById('prac-q2').textContent=q.q;
+  const optsEl=document.getElementById('prac-opts2'); optsEl.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='opt';
+    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    btn.onclick=()=>{
+      const isC=i===q.ans; p2Attempted++;
+      if(isC)p2Correct++; else trackWrongAnswer(STAGES[p2Level]?.name||'General');
+      optsEl.querySelectorAll('.opt').forEach((b,j)=>{b.classList.add('disabled');if(j===q.ans)b.classList.add('correct');if(j===i&&!isC)b.classList.add('wrong');});
+      const sol=document.getElementById('prac-sol2');
+      sol.className='solution-box show'+(isC?'':' wrong-solution');
+      document.getElementById('prac-verdict2').textContent=isC?'✓ Correct!':'✗ Incorrect';
+      document.getElementById('prac-verdict2').className='sol-verdict '+(isC?'right':'wrong');
+      document.getElementById('prac-exp2').textContent=q.explanation||`Correct: ${q.opts[q.ans]}`;
+      const st=document.getElementById('prac-steps2');
+      if(q.steps){st.style.display='flex';st.innerHTML=q.steps.map((s,k)=>`<div class="sol-step"><strong>Step ${k+1}:</strong> ${s}</div>`).join('');}else st.style.display='none';
+      document.getElementById('p2-correct').textContent=p2Correct;
+      document.getElementById('p2-attempted').textContent=p2Attempted;
+      document.getElementById('p2-accuracy').textContent=Math.round(p2Correct/p2Attempted*100)+'%';
+      if(p2Attempted>=10){const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');if(!b.includes('practice_10')){b.push('practice_10');localStorage.setItem('apexmath_badges',JSON.stringify(b));}}
+    };
+    optsEl.appendChild(btn);
+  });
+}
+
+// ── FLASHCARD MODAL ──────────────────────────────────────────────────────────
+let fc2Set=[], fc2Idx=0, fc2Flipped=false, fc2Level=1;
+
+function initFcModal(){
+  const tabs=document.getElementById('fc-level-tabs2'); if(!tabs||tabs.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='flvl-btn'+(i===userLevel?' active':'');
+    btn.textContent='L'+i;
+    btn.onclick=()=>{document.querySelectorAll('#fc-level-tabs2 .flvl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');fc2Level=i;loadFcSet2();};
+    tabs.appendChild(btn);
+  });
+  fc2Level=userLevel; loadFcSet2();
+}
+
+function loadFcSet2(){
+  fc2Set=[...(FLASHCARD_SETS[fc2Level]||[])].sort(()=>Math.random()-.5);
+  fc2Idx=0; fc2Flipped=false;
+  document.getElementById('fc-inner2').classList.remove('flipped');
+  renderFc2();
+  const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');
+  if(!b.includes('flashcard_fan')){b.push('flashcard_fan');localStorage.setItem('apexmath_badges',JSON.stringify(b));}
+}
+
+function renderFc2(){
+  if(!fc2Set.length)return;
+  const c=fc2Set[fc2Idx];
+  document.getElementById('fc-front2').textContent=c.front;
+  document.getElementById('fc-back2-text').textContent=c.back;
+  document.getElementById('fc-counter2').textContent=`${fc2Idx+1} / ${fc2Set.length}`;
+  fc2Flipped=false; document.getElementById('fc-inner2').classList.remove('flipped');
+}
+
+function fcFlip2(){fc2Flipped=!fc2Flipped;document.getElementById('fc-inner2').classList.toggle('flipped',fc2Flipped);}
+function fcNext2(){fc2Idx=(fc2Idx+1)%fc2Set.length;renderFc2();}
+function fcPrev2(){fc2Idx=(fc2Idx-1+fc2Set.length)%fc2Set.length;renderFc2();}
+function fcRate2(r){if(r==='hard'){const c=fc2Set.splice(fc2Idx,1)[0];fc2Set.push(c);if(fc2Idx>=fc2Set.length)fc2Idx=0;renderFc2();}else fcNext2();}
+
+// ── FORMULA MODAL ─────────────────────────────────────────────────────────────
+let fm2Level=1;
+function initFormulaModal(){
+  const tabs=document.getElementById('formula-level-tabs2'); if(!tabs||tabs.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='flvl-btn'+(i===userLevel?' active':'');
+    btn.textContent='L'+i;
+    btn.onclick=()=>{document.querySelectorAll('#formula-level-tabs2 .flvl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');fm2Level=i;renderFormulas2();};
+    tabs.appendChild(btn);
+  });
+  fm2Level=userLevel; renderFormulas2();
+}
+function renderFormulas2(){
+  const search=(document.getElementById('formula-search2')?.value||'').toLowerCase().trim();
+  const cats=FORMULAS[fm2Level]||[];
+  const wrap=document.getElementById('formula-content2'); if(!wrap)return; wrap.innerHTML='';
+  cats.forEach(cat=>{
+    const items=search?cat.items.filter(f=>f.math.toLowerCase().includes(search)||f.name.toLowerCase().includes(search)):cat.items;
+    if(!items.length)return;
+    const div=document.createElement('div'); div.className='formula-cat2';
+    div.innerHTML=`<div class="fcat-title">${cat.cat}</div>`+items.map(f=>`<div class="fitem"><div class="fitem-math">${f.math}</div><div class="fitem-name">${f.name}</div></div>`).join('');
+    wrap.appendChild(div);
+  });
+  if(!wrap.children.length) wrap.innerHTML=`<div style="color:var(--text3);font-size:.84rem;padding:1rem 0">No formulas found${search?' for "'+search+'"':''}</div>`;
+}
+
+// ── WEAK SPOTS MODAL ──────────────────────────────────────────────────────────
+function renderWeakSpots2(){
+  const ws=getWeakSpots();
+  const entries=Object.entries(ws).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const wrap=document.getElementById('ws-modal-content'); if(!wrap)return;
+  if(!entries.length){
+    wrap.innerHTML='<div style="text-align:center;padding:2rem 1rem;color:var(--text3);font-size:.86rem;line-height:1.7"><div style="font-size:2rem;margin-bottom:.75rem">🎯</div>No data yet. Complete quizzes and your weak spots will appear here.</div>';
+    return;
+  }
+  const max=entries[0][1];
+  wrap.innerHTML=entries.map(([topic,count])=>{
+    const pct=Math.round((count/max)*100);
+    const color=pct>60?'var(--red)':'var(--accent)';
+    return`<div class="ws-item2"><div class="ws-top2"><span>${topic}</span><span class="ws-count2">missed ${count}×</span></div><div class="ws-bar-bg2"><div class="ws-bar-fill2" style="width:${pct}%;background:${color}"></div></div></div>`;
+  }).join('');
+}
+// keep old renderWeakSpots
+function renderWeakSpots(){ renderWeakSpots2(); }
+
+// ── PATH MODAL ────────────────────────────────────────────────────────────────
+function renderPathModal(){
+  const pct=Math.round((userLevel/(STAGES.length-1))*100);
+  document.getElementById('path-modal-label').textContent='Level '+(userLevel+1)+' of '+STAGES.length;
+  document.getElementById('path-modal-pct').textContent=pct+'%';
+  setTimeout(()=>{document.getElementById('path-modal-fill').style.width=pct+'%';},100);
+  const wrap=document.getElementById('path-modal-stages'); if(!wrap)return; wrap.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const isCurrent=i===userLevel,isDone=i<userLevel;
+    const el=document.createElement('div'); el.className='ps-item';
+    const dot=document.createElement('div');
+    dot.className='ps-dot'+(isDone?' done':isCurrent?' current':'');
+    dot.textContent=isDone?'✓':'';
+    const body=document.createElement('div'); body.style.flex='1';
+    let tags='';
+    if(isCurrent) tags+=`<span class="ps-tag here">You are here</span>`;
+    if(i===userLevel+1) tags+=`<span class="ps-tag" style="color:var(--gold,#92700a);border-color:rgba(146,112,10,.25)">Up next</span>`;
+    tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+Math.round(HOURS_TO_NEXT[i]/5)+' weeks'}</span>`;
+    body.innerHTML=`<div class="ps-name${isCurrent?' current-level':''}">${s.name}</div><div style="margin-bottom:.3rem">${tags}</div><div class="ps-desc">${s.desc}</div>`;
+    el.appendChild(dot); el.appendChild(body);
+    wrap.appendChild(el);
+  });
+}
+
+// ── TIMER MODAL ───────────────────────────────────────────────────────────────
+let t2Interval=null, t2StartTime=0, t2Elapsed=0, t2Running=false;
+function timerStart2(){
+  if(t2Running)return; t2Running=true; t2StartTime=Date.now()-t2Elapsed;
+  t2Interval=setInterval(timerTick2,1000);
+  document.getElementById('timer-btn-start2').disabled=true;
+  document.getElementById('timer-btn-stop2').disabled=false;
+  document.getElementById('timer-status2').textContent='running…';
+  document.getElementById('timer-digits2').classList.add('running');
+}
+function timerStop2(){
+  if(!t2Running)return; t2Running=false; clearInterval(t2Interval);
+  t2Elapsed=Date.now()-t2StartTime;
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  sessions.push({date:new Date().toLocaleDateString(),dur:t2Elapsed});
+  localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
+  t2Elapsed=0;
+  document.getElementById('timer-btn-start2').disabled=false;
+  document.getElementById('timer-btn-stop2').disabled=true;
+  document.getElementById('timer-status2').textContent='session saved ✓';
+  document.getElementById('timer-digits2').classList.remove('running');
+  renderTimerTotal2(); renderTimerLog2();
+}
+function timerReset2(){
+  t2Running=false; clearInterval(t2Interval); t2Elapsed=0;
+  document.getElementById('timer-digits2').textContent='00:00:00';
+  document.getElementById('timer-btn-start2').disabled=false;
+  document.getElementById('timer-btn-stop2').disabled=true;
+  document.getElementById('timer-status2').textContent='ready to start';
+  document.getElementById('timer-digits2').classList.remove('running');
+}
+function timerTick2(){
+  t2Elapsed=Date.now()-t2StartTime;
+  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  document.getElementById('timer-digits2').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+function renderTimerTotal2(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<7*24*3600*1000).reduce((a,s)=>a+s.dur,0);
+  const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
+  const txt=`${h}h ${m}m`;
+  const el=document.getElementById('timer-total2');if(el)el.textContent=txt;
+  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week →';
+}
+function renderTimerLog2(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const log=document.getElementById('timer-log2'); if(!log)return;
+  if(!sessions.length){log.innerHTML='<div style="font-size:.84rem;color:var(--text3)">No sessions yet.</div>';return;}
+  log.innerHTML=sessions.slice(-8).reverse().map(s=>{
+    const m=Math.floor(s.dur/60000),sec=Math.floor((s.dur%60000)/1000);
+    return`<div class="timer-log-item"><span>${s.date}</span><span class="timer-log-dur2">${m}m ${sec}s</span></div>`;
+  }).join('');
+}
+
+// ── NOTES MODAL ───────────────────────────────────────────────────────────────
+function loadNote2(){
+  const level=document.getElementById('notes-level-sel2')?.value||userLevel;
+  const a=document.getElementById('notes-area2'); if(!a)return;
+  a.value=localStorage.getItem('apexmath_note_'+level)||'';
+  document.getElementById('notes-chars2').textContent=a.value.length+' chars';
+}
+function autoSaveNote2(){
+  const level=document.getElementById('notes-level-sel2').value;
+  const v=document.getElementById('notes-area2').value;
+  localStorage.setItem('apexmath_note_'+level,v);
+  document.getElementById('notes-chars2').textContent=v.length+' chars';
+  const s=document.getElementById('notes-saved2'); s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),2000);
+}
+function switchNote2(){loadNote2();}
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────────
+function toggleSub2(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
+async function changePassword2(){
+  const cur=document.getElementById('s2-cur-pw').value, nw=document.getElementById('s2-new-pw').value;
+  if(!cur||!nw){document.getElementById('s2-pw-msg').textContent='Fill both fields.';return;}
+  try{
+    const res=await fetch('/auth/change-password',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({currentPassword:cur,newPassword:nw})});
+    const data=await res.json();
+    document.getElementById('s2-pw-msg').textContent=res.ok?'Password updated!':data.error||'Error.';
+  }catch(e){document.getElementById('s2-pw-msg').textContent='Connection error.';}
+}
+async function updateLevel2(){
+  const level=parseInt(document.getElementById('s2-level-sel').value);
+  try{
+    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
+    if(res.ok){closeDashModal('modal-settings');userLevel=level;showDashboard();}
+  }catch(e){}
+}
+
+// keep legacy names working
+function timerStart(){timerStart2();}
+function timerStop(){timerStop2();}
+function timerReset(){timerReset2();}
+function timerTick(){timerTick2();}
+function renderTimerTotal(){renderTimerTotal2();}
+function renderTimerLog(){renderTimerLog2();}
+function changePassword(){changePassword2();}
+async function updateLevel(){
+  const level=parseInt(document.getElementById('settings-level-select')?.value||document.getElementById('s2-level-sel').value);
+  try{
+    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
+    if(res.ok){userLevel=level;showDashboard();}
+  }catch(e){}
+}
+function switchDTab(name,btn){
+  // Legacy - open modals instead for new UI
+  const map={practice:'modal-practice',formulas:'modal-formulas',flashcards:'modal-flashcards',weakspots:'modal-weakspots',timer:'modal-timer',notes:'modal-notes',path:'modal-path',settings:'modal-settings'};
+  if(map[name]) openDashModal(map[name]);
+}
+function renderDashJourney(level){ userLevel=level; }
 
 // ── DAILY QUIZ ────────────────────────────────────────────────────────────────
 let currentDailyQ = null;
