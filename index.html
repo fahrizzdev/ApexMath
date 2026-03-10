@@ -1212,7 +1212,7 @@ const FORMULAS = {
     {cat:'Limits',items:[{math:'lim(x→a) f(x) = L',name:'Limit notation'},{math:'lim(x→0) sin(x)/x = 1',name:'Important trig limit'},{math:'lim(x→∞) 1/x = 0',name:'Limit at infinity'}]},
   ],
   5:[
-    {cat:'Derivatives',items:[{math:"d/dx[xⁿ] = nxⁿ⁻¹",name:'Power rule'},{math:"d/dx[f·g] = f'g + fg'",name:'Product rule'},{math:"d/dx[f/g] = (f'g − fg')/g²",name:'Quotient rule'},{math:"d/dx[f(g(x))] = f'(g(x))·g'(x)",name:'Chain rule'}]},
+    {cat:'Derivatives',items:[{math:"d/dx[xⁿ] = nxⁿ⁻¹",name:'Power rule'},{math:"d/dx[f·g] = f'g + fg`",name:'Product rule'},{math:"d/dx[f/g] = (f'g − fg`)/g²",name:'Quotient rule'},{math:"d/dx[f(g(x))] = f'(g(x))·g'(x)",name:'Chain rule'}]},
     {cat:'Common Derivatives',items:[{math:"d/dx[sin x] = cos x",name:'Sine'},{math:"d/dx[cos x] = −sin x",name:'Cosine'},{math:"d/dx[eˣ] = eˣ",name:'Exponential'},{math:"d/dx[ln x] = 1/x",name:'Natural log'}]},
     {cat:'Integration',items:[{math:"∫xⁿ dx = xⁿ⁺¹/(n+1) + C",name:'Power rule for integrals'},{math:"∫ₐᵇ f(x)dx = F(b) − F(a)",name:'Fundamental Theorem (Part 2)'},{math:"∫eˣ dx = eˣ + C",name:'Exponential integral'}]},
   ],
@@ -1264,7 +1264,7 @@ const FLASHCARD_SETS = {
   5:[
     {front:'Power rule for derivatives',back:"d/dx[xⁿ] = nxⁿ⁻¹. Bring the exponent down, reduce power by 1."},
     {front:'Chain rule',back:"d/dx[f(g(x))] = f'(g(x)) · g'(x). Derivative of outside × derivative of inside."},
-    {front:'Product rule',back:"d/dx[f·g] = f'g + fg'"},
+    {front:'Product rule',back:"d/dx[f·g] = f'g + fg`"},
     {front:'Fundamental Theorem of Calculus',back:'∫ₐᵇ f(x)dx = F(b) − F(a), where F is the antiderivative of f.'},
     {front:'Derivative of sin x',back:"d/dx[sin x] = cos x"},
     {front:'Derivative of eˣ',back:"d/dx[eˣ] = eˣ (it's its own derivative!)"},
@@ -1709,7 +1709,7 @@ async function showDashboard(){
     const name=user.email.split('@')[0];
     const greetMsg=hr<12?`Good morning, ${name}! ☀️`:hr<17?`Hey ${name}! 👋`:`Evening, ${name}! 🌙`;
     document.getElementById('dash-greet').textContent=greetMsg;
-    const streakLine=streak>=7?'🔥 You're on fire! Keep it going.':streak>=3?`${streak} days in a row — you're building something real.`:streak===1?'Day 1. The streak starts now.':'Complete today's quiz to start a streak!';
+    const streakLine=streak>=7?`🔥 You're on fire! Keep it going.`:streak>=3?`${streak} days in a row — you're building something real.`:streak===1?`Day 1. The streak starts now.`:`Complete today's quiz to start a streak!`;
     document.getElementById('dash-greet-sub').textContent=streakLine;
 
     // Topbar
@@ -1728,7 +1728,7 @@ async function showDashboard(){
 
     // Streak card
     document.getElementById('streak-big-num').textContent=streak;
-    document.getElementById('streak-card-sub').textContent=completedToday&&passedToday?'Locked in for today ✓':completedToday?'Tried today, keep at it!':'Take today's quiz to keep it!';
+    document.getElementById('streak-card-sub').textContent=completedToday&&passedToday?`Locked in for today ✓`:completedToday?`Tried today, keep at it!`:`Take today's quiz to keep it!`;
 
     // Quiz card
     if(completedToday&&passedToday){
@@ -1751,14 +1751,14 @@ async function showDashboard(){
     } else {
       document.getElementById('quiz-emoji').textContent='🎯';
       document.getElementById('quiz-card-title').textContent="Today's Quiz";
-      document.getElementById('quiz-start-btn').textContent='Let's go →';
+    document.getElementById('quiz-start-btn').textContent=`Let's go →`;
       document.getElementById('quiz-start-btn').disabled=false;
     }
 
     // Weak spots card
     const ws=getWeakSpots();
     const wsCount=Object.keys(ws).length;
-    document.getElementById('ws-card-sub').textContent=wsCount>0?`${wsCount} topics tracked — tap to see what to work on`:'No weak spots yet. Complete quizzes and they'll show here.';
+    document.getElementById('ws-card-sub').textContent=wsCount>0?`${wsCount} topics tracked — tap to see what to work on`:`No weak spots yet. Complete quizzes and they'll show here.`;
 
     // Path progress (mini bar)
     userLevel=user.level;
