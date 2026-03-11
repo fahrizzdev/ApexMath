@@ -250,9 +250,9 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* ──────────────────────────────────────
    DASHBOARD — Scrollable, fun, no tabs
 ────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════
-   DASHBOARD — redesigned with diverse shapes & interactivity
-══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   DASHBOARD — clean modern redesign
+════════════════════════════════════════ */
 #s-dashboard{background:var(--bg)}
 
 /* Top bar */
@@ -267,238 +267,194 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--accent);border:1.5px solid var(--accent-mid);background:var(--accent-light);
-  padding:.28rem .7rem;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+  padding:.28rem .75rem;border-radius:4px;
 }
 .dash-streak-chip{
   display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;
   color:var(--text);border:1.5px solid var(--border);background:var(--surface);
-  padding:.28rem .7rem;font-weight:500;border-radius:3px;
+  padding:.28rem .7rem;border-radius:4px;font-weight:500;
 }
-.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.35);background:rgba(255,120,0,.06);color:#d06000}
+.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.3);background:rgba(255,120,0,.05);color:#c85000}
 
-/* XP bar in topbar */
-.dash-topbar-xp{display:flex;align-items:center;gap:.6rem;flex:1;max-width:220px;margin:0 1rem}
-.dash-topbar-xp-track{flex:1;height:4px;background:var(--bg2);overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,4px 100%)}
-.dash-topbar-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.8));transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+/* XP bar */
+.dash-topbar-xp{display:flex;align-items:center;gap:.65rem;flex:1;max-width:200px;margin:0 1.25rem}
+.dash-topbar-xp-track{flex:1;height:3px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.dash-topbar-xp-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 .dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
 
-/* HERO SECTION — replaces boring greet section */
-.dash-hero{
-  position:relative;overflow:hidden;
+/* GREET */
+.dash-greet-section{
   padding:2.5rem 2rem 0;
-  max-width:1100px;margin:0 auto;width:100%;
+  max-width:960px;margin:0 auto;width:100%;
 }
-.dash-hero-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse 60% 80% at 90% 50%, var(--accent-light) 0%, transparent 70%);
-  pointer-events:none;
-}
-.dash-hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;align-items:start;gap:2rem}
 .dash-greet-text{
   font-family:'DM Serif Display',serif;
-  font-size:clamp(1.6rem,3.5vw,2.6rem);
+  font-size:clamp(1.7rem,3.5vw,2.5rem);
   letter-spacing:-.03em;color:var(--text);line-height:1.1;
-  margin-bottom:.35rem;
+  margin-bottom:.3rem;
 }
-.dash-greet-sub{font-size:.9rem;color:var(--text2);line-height:1.65;margin-bottom:1.5rem}
+.dash-greet-sub{font-size:.88rem;color:var(--text2);line-height:1.7}
 
-/* XP RING — visual interest in hero */
-.dash-xp-ring-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.4rem}
-.dash-xp-ring{position:relative;width:80px;height:80px}
-.dash-xp-ring svg{transform:rotate(-90deg)}
-.dash-xp-ring-bg{fill:none;stroke:var(--bg2);stroke-width:6}
-.dash-xp-ring-fill{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;
-  stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)}
-.dash-xp-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.dash-xp-num{font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;color:var(--text);letter-spacing:-.02em}
-.dash-xp-sub{font-family:'DM Mono',monospace;font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.dash-xp-ring-title{font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-
-/* WEEK STRIP — redesigned as horizontal bar with diamond markers */
+/* WEEK STRIP */
 .dash-week-strip{
-  display:flex;align-items:center;gap:.4rem;
-  padding:1.25rem 2rem;max-width:1100px;margin:0 auto;width:100%;
+  display:flex;align-items:center;gap:.5rem;
+  padding:1.5rem 2rem 0;max-width:960px;margin:0 auto;width:100%;
   overflow-x:auto;
 }
 .week-pip{display:flex;flex-direction:column;align-items:center;gap:.3rem;min-width:40px}
 .week-pip-circle{
-  width:32px;height:32px;
-  border:2px solid var(--border);background:var(--surface);
+  width:34px;height:34px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--surface);
   display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;transition:all .35s;
-  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  font-size:.8rem;transition:all .3s;
 }
-.week-pip-circle.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-light)}
-.week-pip-circle.today{border-color:var(--accent);clip-path:none;border-radius:50%}
+.week-pip-circle.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px var(--accent-light)}
+.week-pip-circle.today{border-color:var(--accent);border-width:2px}
 .week-pip-day{font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.week-connector{flex:1;height:1px;background:var(--border);min-width:8px;max-width:20px}
 
-/* ══════════════
-   MAIN GRID — Asymmetric Bento Layout
-══════════════ */
+/* ════════════════════════════════════════
+   BENTO GRID — asymmetric, modern
+════════════════════════════════════════ */
 .dash-grid{
   display:grid;
-  grid-template-columns:2fr 1fr 1fr;
-  grid-template-rows:auto auto auto;
+  grid-template-columns:1.4fr 1fr 1fr;
+  grid-auto-rows:auto;
   gap:1rem;
-  max-width:1000px;margin:0 auto;
-  padding:0 2rem 4rem;width:100%;
+  max-width:960px;margin:0 auto;
+  padding:1.5rem 2rem 4rem;width:100%;
 }
 
-/* Base card — no border-radius, shape variety via specific classes */
+/* Base card */
 .tool-card{
   background:var(--surface);
-  border:1.5px solid var(--border);
+  border:1px solid var(--border);
+  border-radius:10px;
   padding:1.4rem;
   cursor:pointer;
-  transition:transform .2s cubic-bezier(.4,0,.2,1), box-shadow .2s, border-color .2s;
+  transition:box-shadow .2s ease, transform .18s ease, border-color .2s;
   position:relative;overflow:hidden;
   text-align:left;
   display:flex;flex-direction:column;gap:.55rem;
 }
-.tool-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.12)}
-.tool-card:active{transform:translateY(-1px)}
-/* Shape variants */
-.tc-shape-sharp{border-radius:0}
-.tc-shape-snip{border-radius:0;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)}
-.tc-shape-snip-bl{border-radius:0;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))}
-.tc-shape-round{border-radius:16px}
-.tc-shape-pill-top{border-radius:99px 99px 8px 8px}
-.tc-shape-diamond-cut{border-radius:0;clip-path:polygon(0 12px,12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)}
+.tool-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(0,0,0,.08);
+  border-color:var(--accent-mid);
+}
+.tool-card:active{transform:translateY(0)}
 
-/* QUIZ card — hero position, col-span */
+/* Subtle left accent line on hover */
+.tool-card::after{
+  content:'';position:absolute;left:0;top:16px;bottom:16px;width:2.5px;
+  background:var(--accent);border-radius:0 2px 2px 0;
+  opacity:0;transition:opacity .2s;
+}
+.tool-card:hover::after{opacity:1}
+.tool-card-quiz::after,.tool-card-streak::after{display:none}
+
+/* QUIZ — full-width hero, col 1-2 */
 .tool-card-quiz{
-  grid-column:1/3;grid-row:1;
-  background:linear-gradient(145deg,#071507,#0e230e,#0a1a0a);
-  border-color:rgba(45,90,39,.4);
-  color:#fff;
-  flex-direction:row;align-items:stretch;gap:0;
-  padding:0;
-  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);
+  grid-column:1/3;
+  background:linear-gradient(135deg,#0b1a0b 0%,#112411 100%);
+  border:1px solid rgba(45,90,39,.45);
+  border-radius:12px;
+  flex-direction:row;align-items:center;gap:1.5rem;
+  padding:1.75rem 2rem;
 }
-.tool-card-quiz:hover{box-shadow:0 16px 48px rgba(45,90,39,.35);border-color:rgba(45,90,39,.7)}
-.quiz-card-left{
-  background:rgba(45,90,39,.15);
-  width:72px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  border-right:1px solid rgba(45,90,39,.25);
+.tool-card-quiz:hover{
+  box-shadow:0 10px 36px rgba(45,90,39,.25);
+  border-color:rgba(45,90,39,.7);
+  transform:translateY(-2px);
 }
-.quiz-card-emoji{font-size:2.2rem;filter:drop-shadow(0 0 12px rgba(45,90,39,.7))}
-.quiz-card-body{flex:1;padding:1.75rem 1.75rem 1.5rem}
+.quiz-card-emoji{font-size:2.5rem;flex-shrink:0;filter:drop-shadow(0 2px 12px rgba(45,90,39,.6))}
+.quiz-card-body{flex:1}
 .quiz-card-title{font-family:'DM Serif Display',serif;font-size:1.35rem;letter-spacing:-.02em;color:#fff;margin-bottom:.25rem}
-.quiz-card-sub{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:1rem}
+.quiz-card-sub{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.65;margin-bottom:.85rem}
 .quiz-card-btn{
   display:inline-flex;align-items:center;gap:.5rem;
-  padding:.7rem 1.4rem;background:var(--accent);color:#fff;border:none;
+  padding:.65rem 1.4rem;background:var(--accent);color:#fff;border:none;
   font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
-  cursor:pointer;border-radius:0;transition:all .2s;position:relative;overflow:hidden;
-  clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%);
+  cursor:pointer;border-radius:6px;transition:all .2s;position:relative;overflow:hidden;
 }
-.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);transition:transform .55s}
+.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .5s}
 .quiz-card-btn:hover::after{transform:translateX(100%)}
-.quiz-card-btn:hover{box-shadow:0 0 24px rgba(45,90,39,.6);transform:translateY(-1px)}
+.quiz-card-btn:hover{box-shadow:0 0 18px rgba(45,90,39,.55);transform:translateY(-1px)}
 .quiz-card-btn:disabled{opacity:.3;cursor:default;transform:none}
-.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#a8c5a0;padding:.3rem .7rem;border:1px solid rgba(45,90,39,.4);background:rgba(45,90,39,.2)}
+.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#a8c5a0;padding:.3rem .7rem;border:1px solid rgba(45,90,39,.35);background:rgba(45,90,39,.18);border-radius:4px}
 
-/* STREAK card — tall right column */
+/* STREAK — tall right col, rows 1-2 */
 .tool-card-streak{
   grid-column:3;grid-row:1/3;
-  background:linear-gradient(175deg,#fff8f0,#fff3e5,#fff8f0);
-  border-color:rgba(200,100,0,.2);
+  background:linear-gradient(160deg,#fffaf4 0%,#fff3e3 100%);
+  border:1px solid rgba(200,100,0,.18);
+  border-radius:12px;
   justify-content:space-between;
-  padding:1.5rem;
 }
-[data-theme="ink"] .tool-card-streak{background:linear-gradient(175deg,#201c16,#252218,#201c16)}
+[data-theme="ink"] .tool-card-streak{
+  background:linear-gradient(160deg,#201c16 0%,#1e1a12 100%);
+  border-color:rgba(200,120,20,.2);
+}
 .streak-big{
   font-family:'DM Serif Display',serif;
-  font-size:4.5rem;letter-spacing:-.05em;color:#c06000;line-height:1;
-  text-shadow:0 2px 20px rgba(200,100,0,.2);
+  font-size:4rem;letter-spacing:-.05em;color:#b85a00;line-height:1;
+  margin-top:.25rem;
 }
-.streak-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(192,96,0,.5);margin-top:.1rem}
-.streak-flame-row{display:flex;gap:.2rem;margin-top:.5rem}
-.streak-dot{width:8px;height:8px;background:rgba(200,100,0,.15);border-radius:50%;transition:background .3s}
-.streak-dot.lit{background:#c06000}
+[data-theme="ink"] .streak-big{color:#d4822a}
+.streak-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(184,90,0,.5)}
+.streak-week-row{display:flex;gap:.3rem;margin-top:.5rem}
+.swr-dot{width:6px;height:6px;border-radius:50%;background:rgba(184,90,0,.15);transition:background .3s}
+.swr-dot.lit{background:#b85a00}
 
-/* PRACTICE card */
+/* PRACTICE — col 1, row 2 */
 .tool-card-practice{
-  grid-column:1;grid-row:2;
-  background:linear-gradient(135deg,var(--bg2),var(--surface));
-  border-color:var(--border);
+  grid-column:1;
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--surface) 100%);
 }
+[data-theme="ink"] .tool-card-practice{background:linear-gradient(135deg,#202024,#252528)}
 
-/* FLASHCARDS */
-.tool-card-flash{
-  grid-column:2;grid-row:2;
-}
-
-/* FORMULA SHEET */
+/* FORMULA */
 .tool-card-formulas{
-  background:linear-gradient(135deg,var(--accent-light),var(--surface));
+  background:linear-gradient(135deg,var(--accent-light) 0%,var(--surface) 100%);
   border-color:var(--accent-mid);
 }
 
-/* PATH — spans full width */
+/* PATH — full width */
 .tool-card-path{
   grid-column:1/4;
-  background:var(--surface);
-  flex-direction:row;align-items:center;gap:1.5rem;
-  padding:1.25rem 1.5rem;
+  flex-direction:row;align-items:center;gap:1.25rem;
+  padding:1.1rem 1.5rem;
 }
-.path-progress-track{
-  flex:1;height:8px;
-  background:var(--bg2);overflow:hidden;
-  clip-path:polygon(0 0,100% 0,100% 100%,8px 100%);
-}
-.path-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.7));transition:width 1.2s ease;position:relative}
-.path-progress-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:12px;background:rgba(255,255,255,.4);filter:blur(2px)}
+.path-bar-wrap{flex:1}
+.path-bar-track{height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-top:.35rem}
+.path-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(100,200,80,.7));border-radius:2px;transition:width 1.1s ease}
+.path-label-row{display:flex;justify-content:space-between;align-items:baseline}
 
-/* BOTTOM ROW — 3 col */
-.tool-card-weak{grid-column:1}
-.tool-card-timer{grid-column:2}
-.tool-card-notes{grid-column:3}
-.tool-card-lessons{grid-column:1}
+/* LESSONS — col 1-2 in last row */
+.tool-card-lessons{grid-column:1/3}
 
-/* Icon and text styles */
-.tc-icon{font-size:1.75rem;margin-bottom:.05rem}
-.tc-icon-lg{font-size:2.5rem}
-.tc-tag{
-  font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text3);border:1px solid var(--border);padding:.15rem .5rem;
-  display:inline-block;margin-bottom:.25rem;
-}
+/* Card content */
+.tc-icon{font-size:1.75rem;line-height:1;margin-bottom:.05rem}
 .tc-title{font-family:'DM Serif Display',serif;font-size:1rem;letter-spacing:-.01em;color:var(--text);line-height:1.2}
-.tc-sub{font-size:.78rem;color:var(--text2);line-height:1.6}
-.tc-cta{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.2rem}
-.tc-cta::after{content:'→';transition:transform .2s}
-.tool-card:hover .tc-cta::after{transform:translateX(3px)}
-
-/* Hover accent line */
-.tool-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:var(--accent);transform:scaleY(0);transform-origin:bottom;
-  transition:transform .22s cubic-bezier(.4,0,.2,1);
-}
-.tool-card:hover::before{transform:scaleY(1)}
-.tool-card-quiz::before{display:none}
-.tool-card-streak::before{left:auto;right:0;background:rgba(200,100,0,.5)}
+.tc-sub{font-size:.78rem;color:var(--text2);line-height:1.6;flex:1}
+.tc-cta{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.15rem;transition:gap .2s}
+.tool-card:hover .tc-cta{gap:.5rem}
 
 /* BADGES SECTION */
-.dash-badges-section{max-width:1000px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
-.dash-section-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
-.dash-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.dash-badges-section{max-width:900px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.dash-section-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem}
 .badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
 .badge-pill{
   display:flex;align-items:center;gap:.4rem;
-  padding:.35rem .85rem;
+  padding:.4rem .9rem;border-radius:99px;
   border:1.5px solid var(--border);background:var(--bg2);
-  font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);transition:all .25s;cursor:default;border-radius:2px;
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);transition:all .25s;cursor:default;
 }
 .badge-pill.earned{
   border-color:var(--accent-mid);background:var(--accent-light);
   color:var(--accent);
-  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+  box-shadow:0 0 0 3px var(--accent-light);
 }
 .badge-pill.earned.new-badge{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
@@ -896,141 +852,113 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
     <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️ Settings</button>
   </div>
 
-  <!-- HERO SECTION -->
-  <div class="dash-hero">
-    <div class="dash-hero-bg"></div>
-    <div class="dash-hero-inner">
-      <div>
-        <div class="dash-greet-text" id="dash-greet">Hey — good morning! 👋</div>
-        <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
-        <!-- WEEK STRIP inline -->
-        <div class="dash-week-strip" id="dash-week-strip" style="padding:0;margin:0;max-width:none"></div>
-      </div>
-      <div class="dash-xp-ring-wrap">
-        <div class="dash-xp-ring">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="dash-xp-ring-bg" cx="40" cy="40" r="35"/>
-            <circle class="dash-xp-ring-fill" id="xp-ring-fill" cx="40" cy="40" r="35"/>
-          </svg>
-          <div class="dash-xp-ring-label">
-            <div class="dash-xp-num" id="xp-ring-num">0</div>
-            <div class="dash-xp-sub">XP</div>
-          </div>
-        </div>
-        <div class="dash-xp-ring-title">Progress</div>
-      </div>
-    </div>
+  <!-- GREETING -->
+  <div class="dash-greet-section">
+    <div class="dash-greet-text" id="dash-greet">Hey — good morning! 👋</div>
+    <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
   </div>
 
-  <!-- MAIN BENTO GRID -->
+  <!-- WEEK STRIP -->
+  <div class="dash-week-strip" id="dash-week-strip"></div>
+
+  <!-- MAIN GRID -->
   <div class="dash-grid">
 
-    <!-- DAILY QUIZ — hero card, col 1-2 -->
-    <div class="tool-card tool-card-quiz tc-shape-snip" id="quiz-card-wrap">
-      <div class="quiz-card-left">
-        <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
-      </div>
+    <!-- DAILY QUIZ — hero, col 1-2 -->
+    <div class="tool-card tool-card-quiz" id="quiz-card-wrap">
+      <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
       <div class="quiz-card-body">
         <div class="quiz-card-title" id="quiz-card-title">Today's Quiz</div>
-        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive.</div>
+        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive. Every wrong answer shows you why.</div>
         <button class="quiz-card-btn" id="quiz-start-btn" onclick="startDailyQuiz()">Let's go →</button>
       </div>
     </div>
 
-    <!-- STREAK card — tall right col, rows 1-2 -->
-    <div class="tool-card tool-card-streak tc-shape-sharp">
-      <div class="tc-tag">Day Streak</div>
+    <!-- STREAK — tall right col, rows 1-2 -->
+    <div class="tool-card tool-card-streak">
+      <div class="tc-icon" style="font-size:1.3rem">🔥</div>
       <div class="streak-big" id="streak-big-num">0</div>
-      <div class="streak-label">🔥 days in a row</div>
-      <div class="streak-flame-row" id="streak-flame-row">
-        <div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div>
-        <div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div>
+      <div class="streak-label">day streak</div>
+      <div class="streak-week-row" id="swr-dots">
+        <div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div>
+        <div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div>
       </div>
-      <div class="tc-sub" id="streak-card-sub" style="margin-top:.5rem;font-size:.75rem">Complete today's quiz!</div>
+      <div class="tc-sub" id="streak-card-sub" style="margin-top:auto;padding-top:.75rem">Complete today's quiz to keep it going!</div>
     </div>
 
-    <!-- PRACTICE -->
-    <div class="tool-card tool-card-practice tc-shape-snip-bl" onclick="openDashModal('modal-practice')">
-      <div class="tc-tag">Drill</div>
+    <!-- PRACTICE — col 1, row 2 -->
+    <div class="tool-card tool-card-practice" onclick="openDashModal('modal-practice')">
       <div class="tc-icon">⚡</div>
       <div class="tc-title">Practice Mode</div>
-      <div class="tc-sub">Unlimited reps. No streak pressure.</div>
-      <div class="tc-cta">Open Practice</div>
+      <div class="tc-sub">Unlimited questions at any level. No streak pressure.</div>
+      <div class="tc-cta">Open practice →</div>
     </div>
 
-    <!-- FLASHCARDS -->
-    <div class="tool-card tool-card-flash tc-shape-diamond-cut" onclick="openDashModal('modal-flashcards')">
-      <div class="tc-tag">Memory</div>
+    <!-- FLASHCARDS — col 2, row 2 -->
+    <div class="tool-card" onclick="openDashModal('modal-flashcards')">
       <div class="tc-icon">🃏</div>
       <div class="tc-title">Flashcards</div>
-      <div class="tc-sub">Flip through key concepts. Rate what you know.</div>
-      <div class="tc-cta">Flip cards</div>
+      <div class="tc-sub">Flip through key concepts and formulas. Rate what you know.</div>
+      <div class="tc-cta">Flip cards →</div>
     </div>
 
     <!-- PATH — full width -->
-    <div class="tool-card tool-card-path tc-shape-sharp" style="grid-column:1/4" onclick="openDashModal('modal-path')">
-      <div class="tc-icon" style="font-size:1.4rem;flex-shrink:0">🗺️</div>
-      <div style="flex:1">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.5rem">
+    <div class="tool-card tool-card-path" onclick="openDashModal('modal-path')">
+      <div class="tc-icon" style="font-size:1.3rem;flex-shrink:0">🗺️</div>
+      <div class="path-bar-wrap">
+        <div class="path-label-row">
           <div class="tc-title">Your Learning Path</div>
-          <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
         </div>
-        <div class="path-progress-track">
-          <div id="path-mini-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.7));width:0%;transition:width 1.2s ease"></div>
+        <div class="path-bar-track">
+          <div id="path-mini-fill" class="path-bar-fill" style="width:0%"></div>
         </div>
       </div>
-      <div class="tc-cta" style="flex-shrink:0">View path</div>
     </div>
 
     <!-- FORMULA SHEET -->
-    <div class="tool-card tool-card-formulas tc-shape-snip" onclick="openDashModal('modal-formulas')">
-      <div class="tc-tag">Reference</div>
+    <div class="tool-card tool-card-formulas" onclick="openDashModal('modal-formulas')">
       <div class="tc-icon">📋</div>
       <div class="tc-title">Formula Sheet</div>
-      <div class="tc-sub">Every formula, searchable by level.</div>
-      <div class="tc-cta">Open sheet</div>
+      <div class="tc-sub">Every formula, searchable and organized by level.</div>
+      <div class="tc-cta">Open sheet →</div>
     </div>
 
     <!-- WEAK SPOTS -->
-    <div class="tool-card tool-card-weak tc-shape-sharp" onclick="openDashModal('modal-weakspots')">
-      <div class="tc-tag">Focus</div>
+    <div class="tool-card" onclick="openDashModal('modal-weakspots')">
       <div class="tc-icon">🎯</div>
       <div class="tc-title">Weak Spots</div>
-      <div class="tc-sub" id="ws-card-sub">Topics you've missed.</div>
-      <div class="tc-cta">Fix these</div>
+      <div class="tc-sub" id="ws-card-sub">Topics you've missed. Fix these first.</div>
+      <div class="tc-cta">See weak spots →</div>
     </div>
 
     <!-- TIMER -->
-    <div class="tool-card tool-card-timer tc-shape-snip-bl" onclick="openDashModal('modal-timer')">
-      <div class="tc-tag">Focus</div>
+    <div class="tool-card" onclick="openDashModal('modal-timer')">
       <div class="tc-icon">⏱️</div>
       <div class="tc-title">Study Timer</div>
-      <div class="tc-sub">Track sessions and weekly hours.</div>
-      <div class="tc-cta" id="timer-card-total">0h 0m this week</div>
+      <div class="tc-sub">Track your sessions and weekly hours.</div>
+      <div class="tc-cta" id="timer-card-total">0h 0m this week →</div>
     </div>
 
     <!-- NOTES -->
-    <div class="tool-card tool-card-notes tc-shape-sharp" onclick="openDashModal('modal-notes')">
-      <div class="tc-tag">Personal</div>
+    <div class="tool-card" onclick="openDashModal('modal-notes')">
       <div class="tc-icon">📝</div>
       <div class="tc-title">My Notes</div>
       <div class="tc-sub">Personal notebook. Auto-saves per level.</div>
-      <div class="tc-cta">Open notes</div>
+      <div class="tc-cta">Open notes →</div>
     </div>
 
-    <!-- LESSONS — full width bottom -->
-    <div class="tool-card tool-card-lessons tc-shape-snip" style="grid-column:1/3" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
-      <div class="tc-tag">Learn</div>
+    <!-- LESSONS — col 1-2 -->
+    <div class="tool-card tool-card-lessons" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
       <div class="tc-icon">📚</div>
       <div class="tc-title">Lessons</div>
-      <div class="tc-sub">Step-by-step walkthroughs for every topic. Opens in a new tab with your current theme.</div>
+      <div class="tc-sub">Step-by-step walkthroughs for every topic. Opens with your current theme.</div>
       <div class="tc-cta">Open lessons ↗</div>
     </div>
 
-
   </div><!-- /dash-grid -->
 
-  <!-- BADGES ROW -->
+  <!-- BADGES -->
   <div class="dash-badges-section">
     <div class="dash-section-label">Your Badges</div>
     <div class="badges-row" id="dash-badges-row"></div>
@@ -1847,19 +1775,14 @@ async function showDashboard(){
     sc.textContent='🔥 '+streak+' day'+(streak!==1?'s':'');
     sc.className='dash-streak-chip'+(streak>=3?' on-fire':'');
 
-    // XP ring
+    // XP bar
     const xp=(totalQ*10+(streak*5))%100;
     document.getElementById('tb-xp-label').textContent=xp+' XP';
-    document.getElementById('xp-ring-num').textContent=xp;
-    setTimeout(()=>{
-      document.getElementById('tb-xp-fill').style.width=xp+'%';
-      const ring=document.getElementById('xp-ring-fill');
-      if(ring){const circumference=220;ring.style.strokeDashoffset=circumference-(circumference*(xp/100));}
-    },300);
+    setTimeout(()=>{document.getElementById('tb-xp-fill').style.width=xp+'%';},300);
 
-    // Streak flame dots
-    const flameDots=document.querySelectorAll('.streak-dot');
-    flameDots.forEach((d,i)=>d.classList.toggle('lit',i<Math.min(streak,7)));
+    // Streak week dots
+    const swrDots=document.querySelectorAll('.swr-dot');
+    swrDots.forEach((d,i)=>d.classList.toggle('lit',i<Math.min(streak,7)));
 
     // Week strip
     renderWeekStrip(data.weekDays||[]);
@@ -1950,7 +1873,6 @@ function renderWeekStrip(passedDays){
     label.textContent=dayLabels[d.getDay()];
     pip.appendChild(circle); pip.appendChild(label);
     wrap.appendChild(pip);
-    if(i>0){const conn=document.createElement('div');conn.className='week-connector';conn.style.marginBottom='16px';wrap.appendChild(conn);}
   }
 }
 
