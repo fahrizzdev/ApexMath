@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <script>
-// Apply saved theme immediately to prevent flash — reads URL param or localStorage
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  const t = params.get('theme') || localStorage.getItem('apexmath_theme') || '';
-  if(t) localStorage.setItem('apexmath_theme', t);
-  document.documentElement.setAttribute('data-theme', t);
+  const p=new URLSearchParams(window.location.search);
+  const t=p.get('theme')||localStorage.getItem('apexmath_theme')||'';
+  if(t)localStorage.setItem('apexmath_theme',t);
+  document.documentElement.setAttribute('data-theme',t);
 })();
 </script>
 <head>
