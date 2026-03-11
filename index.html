@@ -248,18 +248,18 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .next-callout{font-size:.82rem;color:var(--text2);background:var(--bg);border-left:3px solid var(--accent);padding:.6rem .85rem;margin-bottom:.75rem}
 
 /* ──────────────────────────────────────
-   DASHBOARD — Scrollable, fun, no tabs
+   DASHBOARD
 ────────────────────────────────────── */
-#s-dashboard{background:var(--bg)}
+#s-dashboard{background:var(--bg);min-height:100vh}
 
 /* Top bar */
 .dash-topbar{
   position:sticky;top:0;z-index:150;
   background:var(--bg);border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:.75rem 2rem;
+  padding:.65rem 2rem;gap:1rem;
 }
-.dash-topbar-left{display:flex;align-items:center;gap:.75rem}
+.dash-topbar-left{display:flex;align-items:center;gap:.65rem;flex-shrink:0}
 .dash-level-chip{
   display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
@@ -274,11 +274,18 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 }
 .dash-streak-chip.on-fire{border-color:rgba(255,120,0,.35);background:rgba(255,120,0,.06);color:#d06000}
 
+/* LIVE TIMER in topbar */
+.dash-topbar-timer{display:flex;align-items:center;gap:.45rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.04em;color:var(--text2)}
+.dash-topbar-timer-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .18s}
+.dash-topbar-timer-btn:hover{border-color:var(--accent);color:var(--accent)}
+.dash-topbar-timer-btn.running{border-color:var(--red);color:var(--red);background:var(--red-light)}
+#tb-timer-display{min-width:48px;text-align:center}
+
 /* XP bar in topbar */
-.dash-topbar-xp{display:flex;align-items:center;gap:.6rem;flex:1;max-width:220px;margin:0 1rem}
-.dash-topbar-xp-track{flex:1;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.dash-topbar-xp{display:flex;align-items:center;gap:.55rem;flex:1;max-width:160px;margin:0 auto}
+.dash-topbar-xp-track{flex:1;height:4px;background:var(--bg2);border-radius:99px;overflow:hidden}
 .dash-topbar-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.8));border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
+.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
 
 /* GREET SECTION */
 .dash-greet-section{
@@ -316,11 +323,17 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* TOOLS GRID — the main dashboard */
 .dash-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:1rem;
-  max-width:900px;margin:0 auto;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:.85rem;
+  max-width:960px;margin:0 auto;
   padding:0 2rem 4rem;width:100%;
 }
+/* Quiz card always full width */
+.tool-card-quiz{grid-column:1/-1!important}
+/* Path card full width */
+.tool-card-path{grid-column:1/-1}
+/* Streak card — 1 col, Practice — 2 cols */
+.tool-card-practice{grid-column:span 2}
 
 /* Base tool card */
 .tool-card{
@@ -404,28 +417,30 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 @keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
 .badge-emoji{font-size:.85rem}
 
-/* MODAL OVERLAY for sub-screens inside dashboard */
+/* SLIDE-IN PANELS (replace modals) */
 .dash-modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
-  display:none;align-items:flex-start;justify-content:center;
-  overflow-y:auto;padding:1.5rem;backdrop-filter:blur(6px);
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;
+  display:none;justify-content:flex-end;backdrop-filter:blur(3px);
 }
 .dash-modal.open{display:flex}
 .dash-modal-box{
-  background:var(--bg);border:1.5px solid var(--border);
-  width:100%;max-width:680px;border-radius:12px;
-  margin:auto;overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  background:var(--bg);border-left:1.5px solid var(--border);
+  width:520px;max-width:100%;
+  height:100vh;display:flex;flex-direction:column;
+  box-shadow:-8px 0 40px rgba(0,0,0,.15);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
 }
+.dash-modal.open .dash-modal-box{transform:translateX(0)}
 .dmb-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
-  background:var(--surface);
+  padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
 }
-.dmb-title{font-family:'DM Serif Display',serif;font-size:1.25rem;letter-spacing:-.02em;color:var(--text)}
-.dmb-close{background:none;border:none;font-size:1.25rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
+.dmb-title{font-family:'DM Serif Display',serif;font-size:1.2rem;letter-spacing:-.02em;color:var(--text)}
+.dmb-close{background:none;border:none;font-size:1.2rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
 .dmb-close:hover{color:var(--text)}
-.dmb-body{padding:1.5rem}
+.dmb-body{padding:1.5rem;overflow-y:auto;flex:1}
 
 /* settings inside modal */
 .setting-row2{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid var(--border);gap:1rem}
@@ -793,7 +808,11 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
       <div class="dash-topbar-xp-label" id="tb-xp-label">0 XP</div>
       <div class="dash-topbar-xp-track"><div class="dash-topbar-xp-fill" id="tb-xp-fill" style="width:0%"></div></div>
     </div>
-    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️ Settings</button>
+    <div class="dash-topbar-timer">
+      <button class="dash-topbar-timer-btn" id="tb-timer-btn" onclick="tbTimerToggle()" title="Start study timer">▶</button>
+      <span id="tb-timer-display">0:00</span>
+    </div>
+    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️</button>
   </div>
 
   <!-- GREETING -->
@@ -820,15 +839,15 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
       </div>
     </div>
 
-    <!-- PRACTICE -->
-    <div class="tool-card tool-card-practice" onclick="openDashModal('modal-practice')">
+    <!-- PRACTICE — spans 2 cols -->
+    <div class="tool-card tool-card-practice" style="grid-column:span 2" onclick="openDashModal('modal-practice')">
       <div class="tc-icon">⚡</div>
       <div class="tc-title">Practice Mode</div>
-      <div class="tc-sub">Unlimited questions at any level. No streak pressure, just reps.</div>
-      <div class="tc-cta">Open Practice →</div>
+      <div class="tc-sub">Unlimited questions at your level. No streak pressure — just reps until it clicks.</div>
+      <div class="tc-cta">Start practicing →</div>
     </div>
 
-    <!-- STREAK card -->
+    <!-- STREAK card — 1 col -->
     <div class="tool-card tool-card-streak">
       <div class="tc-icon">🔥</div>
       <div class="streak-big" id="streak-big-num">0</div>
@@ -836,67 +855,67 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
       <div class="tc-sub" id="streak-card-sub" style="margin-top:.4rem">Complete today's quiz to keep it going!</div>
     </div>
 
-    <!-- FLASHCARDS -->
+    <!-- FLASHCARDS — 1 col, opens full side panel -->
     <div class="tool-card" onclick="openDashModal('modal-flashcards')">
       <div class="tc-icon">🃏</div>
       <div class="tc-title">Flashcards</div>
-      <div class="tc-sub">Flip through key concepts and formulas. Rate what you know.</div>
-      <div class="tc-cta">Flip cards →</div>
+      <div class="tc-sub">Flip through key concepts at your level. Rate what you know, skip what you don't.</div>
+      <div class="tc-cta">Open flashcards →</div>
     </div>
 
-    <!-- FORMULA SHEET -->
+    <!-- FORMULA SHEET — 1 col -->
     <div class="tool-card tool-card-formulas" onclick="openDashModal('modal-formulas')">
       <div class="tc-icon">📋</div>
       <div class="tc-title">Formula Sheet</div>
-      <div class="tc-sub">Every formula you need, searchable and organized by level.</div>
+      <div class="tc-sub">Every formula, searchable. Your reference for every session.</div>
       <div class="tc-cta">Open sheet →</div>
     </div>
 
-    <!-- WEAK SPOTS -->
+    <!-- WEAK SPOTS — 1 col -->
     <div class="tool-card" onclick="openDashModal('modal-weakspots')">
       <div class="tc-icon">🎯</div>
       <div class="tc-title">Weak Spots</div>
       <div class="tc-sub" id="ws-card-sub">Topics you've missed. Fix these first.</div>
-      <div class="tc-cta">See weak spots →</div>
-    </div>
-
-    <!-- TIMER -->
-    <div class="tool-card" onclick="openDashModal('modal-timer')">
-      <div class="tc-icon">⏱️</div>
-      <div class="tc-title">Study Timer</div>
-      <div class="tc-sub">Track your sessions and weekly hours.</div>
-      <div class="tc-cta" id="timer-card-total">0h 0m this week →</div>
+      <div class="tc-cta">Review now →</div>
     </div>
 
     <!-- MY PATH — full width -->
-    <div class="tool-card" style="grid-column:1/-1" onclick="openDashModal('modal-path')">
+    <div class="tool-card tool-card-path" onclick="openDashModal('modal-path')">
       <div style="display:flex;align-items:center;gap:1rem">
         <div class="tc-icon">🗺️</div>
         <div style="flex:1">
           <div class="tc-title">Your Learning Path</div>
-          <div class="tc-sub">See every level from here to Calculus II — and what's next for you.</div>
+          <div class="tc-sub">Every level from here to Calculus II — with timelines and what's next.</div>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
       </div>
-      <div style="margin-top:.75rem;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden">
+      <div style="margin-top:.75rem;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden">
         <div id="path-mini-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
       </div>
     </div>
 
-    <!-- NOTES -->
+    <!-- NOTES — 1 col -->
     <div class="tool-card" onclick="openDashModal('modal-notes')">
       <div class="tc-icon">📝</div>
       <div class="tc-title">My Notes</div>
-      <div class="tc-sub">Your personal notebook. Jot down anything — auto-saves per level.</div>
+      <div class="tc-sub">Your personal notebook. Auto-saves per level.</div>
       <div class="tc-cta">Open notes →</div>
     </div>
 
-    <!-- LESSONS -->
-    <div class="tool-card" onclick="window.open('lessons.html','_blank')">
+    <!-- LESSONS — 1 col -->
+    <div class="tool-card" onclick="window.location.href='lessons.html'">
       <div class="tc-icon">📚</div>
       <div class="tc-title">Lessons</div>
-      <div class="tc-sub">Step-by-step walkthroughs for every topic. Open in a new tab.</div>
-      <div class="tc-cta">Open lessons ↗</div>
+      <div class="tc-sub">94 step-by-step lessons from arithmetic to calculus. Worked examples, practice, checks.</div>
+      <div class="tc-cta">Open lessons →</div>
+    </div>
+
+    <!-- TIMER card — shows live session time -->
+    <div class="tool-card" id="timer-dash-card" onclick="openDashModal('modal-timer')">
+      <div class="tc-icon">⏱️</div>
+      <div class="tc-title">Study Timer</div>
+      <div class="tc-sub">Track your sessions. <span id="timer-card-total" style="color:var(--accent);font-weight:500">0h 0m this week</span></div>
+      <div class="tc-cta">View sessions →</div>
     </div>
 
   </div><!-- /dash-grid -->
@@ -1992,13 +2011,35 @@ function renderPathModal(){
 
 // ── TIMER MODAL ───────────────────────────────────────────────────────────────
 let t2Interval=null, t2StartTime=0, t2Elapsed=0, t2Running=false;
+
+// TOPBAR LIVE TIMER
+function tbTimerToggle(){
+  if(t2Running){ timerStop2(); }
+  else { timerStart2(); }
+  updateTopbarTimer();
+}
+function updateTopbarTimer(){
+  const btn=document.getElementById('tb-timer-btn');
+  if(!btn) return;
+  btn.textContent=t2Running?'⏸':'▶';
+  btn.className='dash-topbar-timer-btn'+(t2Running?' running':'');
+}
+function timerTickAll(){
+  t2Elapsed=Date.now()-t2StartTime;
+  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  const modal=document.getElementById('timer-digits2');
+  if(modal) modal.textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  const tb=document.getElementById('tb-timer-display');
+  if(tb) tb.textContent=h>0?`${h}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`:`${m}:${String(s%60).padStart(2,'0')}`;
+}
 function timerStart2(){
   if(t2Running)return; t2Running=true; t2StartTime=Date.now()-t2Elapsed;
-  t2Interval=setInterval(timerTick2,1000);
-  document.getElementById('timer-btn-start2').disabled=true;
-  document.getElementById('timer-btn-stop2').disabled=false;
-  document.getElementById('timer-status2').textContent='running…';
-  document.getElementById('timer-digits2').classList.add('running');
+  t2Interval=setInterval(timerTickAll,1000);
+  const s=document.getElementById('timer-btn-start2');if(s)s.disabled=true;
+  const st=document.getElementById('timer-btn-stop2');if(st)st.disabled=false;
+  const status=document.getElementById('timer-status2');if(status)status.textContent='running…';
+  const dig=document.getElementById('timer-digits2');if(dig)dig.classList.add('running');
+  updateTopbarTimer();
 }
 function timerStop2(){
   if(!t2Running)return; t2Running=false; clearInterval(t2Interval);
@@ -2007,11 +2048,12 @@ function timerStop2(){
   sessions.push({date:new Date().toLocaleDateString(),dur:t2Elapsed});
   localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
   t2Elapsed=0;
-  document.getElementById('timer-btn-start2').disabled=false;
-  document.getElementById('timer-btn-stop2').disabled=true;
-  document.getElementById('timer-status2').textContent='session saved ✓';
-  document.getElementById('timer-digits2').classList.remove('running');
-  renderTimerTotal2(); renderTimerLog2();
+  const s=document.getElementById('timer-btn-start2');if(s)s.disabled=false;
+  const st=document.getElementById('timer-btn-stop2');if(st)st.disabled=true;
+  const status=document.getElementById('timer-status2');if(status)status.textContent='session saved ✓';
+  const dig=document.getElementById('timer-digits2');if(dig)dig.classList.remove('running');
+  const tb=document.getElementById('tb-timer-display');if(tb)tb.textContent='0:00';
+  renderTimerTotal2(); renderTimerLog2(); updateTopbarTimer();
 }
 function timerReset2(){
   t2Running=false; clearInterval(t2Interval); t2Elapsed=0;
@@ -2021,18 +2063,14 @@ function timerReset2(){
   document.getElementById('timer-status2').textContent='ready to start';
   document.getElementById('timer-digits2').classList.remove('running');
 }
-function timerTick2(){
-  t2Elapsed=Date.now()-t2StartTime;
-  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
-  document.getElementById('timer-digits2').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-}
+// timerTick2 replaced by timerTickAll above
 function renderTimerTotal2(){
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
   const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<7*24*3600*1000).reduce((a,s)=>a+s.dur,0);
   const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
   const txt=`${h}h ${m}m`;
   const el=document.getElementById('timer-total2');if(el)el.textContent=txt;
-  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week →';
+  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week';
 }
 function renderTimerLog2(){
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
