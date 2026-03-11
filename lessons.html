@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<script>
+// Apply saved theme immediately to prevent flash — reads URL param or localStorage
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const t = params.get('theme') || localStorage.getItem('apexmath_theme') || '';
+  if(t) localStorage.setItem('apexmath_theme', t);
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -16,6 +25,9 @@
   --gold:#92700a;--gold-bg:rgba(146,112,10,0.08);
   --shadow:0 2px 12px rgba(0,0,0,0.07);
 }
+[data-theme="slate"]{--bg:#f0f2f5;--bg2:#e8ebef;--surface:#fff;--border:rgba(0,0,0,0.08);--text:#1a1c20;--text2:#636870;--text3:#9fa4ad;--accent:#1a56db;--accent-light:rgba(26,86,219,0.07);--accent-mid:rgba(26,86,219,0.16)}
+[data-theme="sand"]{--bg:#faf6f0;--bg2:#f2ece2;--surface:#fff;--border:rgba(0,0,0,0.07);--text:#2a2218;--text2:#7a6e62;--text3:#b0a99f;--accent:#b45309;--accent-light:rgba(180,83,9,0.07);--accent-mid:rgba(180,83,9,0.16)}
+[data-theme="ink"]{--bg:#1c1c1e;--bg2:#252528;--surface:#2c2c2f;--border:rgba(255,255,255,0.08);--text:#f0ede8;--text2:#9b978f;--text3:#5a5750;--accent:#a8c5a0;--accent-light:rgba(168,197,160,0.08);--accent-mid:rgba(168,197,160,0.18)}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;display:flex;min-height:100vh}
 
@@ -198,131 +210,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .lc-prog-fill{height:100%;background:var(--accent);border-radius:99px}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes badgePop{0%{transform:translate(-50%,-50%) scale(0)}70%{transform:translate(-50%,-50%) scale(1.08)}100%{transform:translate(-50%,-50%) scale(1)}}
-@keyframes toastSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* DARK MODE */
-body.dark{--bg:#1a1916;--bg2:#242320;--surface:#2d2c29;--border:rgba(255,255,255,0.08);--text:#e8e4dd;--text2:#a8a49d;--text3:#6b6860;--accent:#52a849;--accent-light:rgba(82,168,73,0.12);--accent-mid:rgba(82,168,73,0.22);--red:#e05c4e;--red-light:rgba(224,92,78,0.12);--gold:#c49a14;--gold-bg:rgba(196,154,20,0.1);--shadow:0 2px 16px rgba(0,0,0,0.4)}
-
-/* TOOLBAR */
-.toolbar{position:fixed;top:.85rem;right:.85rem;display:flex;gap:.35rem;z-index:900;align-items:center}
-.tb-btn{width:34px;height:34px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .18s;box-shadow:var(--shadow)}
-.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
-.tb-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.tb-btn.bm-on{color:#f59e0b;border-color:#f59e0b}
-
-/* BACK TO TOP */
-.btt{position:fixed;bottom:1.5rem;right:1rem;width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 3px 12px rgba(45,90,39,.4);transition:all .2s;z-index:800}
-.btt.show{display:flex}
-.btt:hover{transform:translateY(-2px)}
-
-/* TOAST */
-.toast-wrap{position:fixed;bottom:4rem;right:1rem;display:flex;flex-direction:column;gap:.4rem;z-index:9999;pointer-events:none}
-.toast{background:var(--surface);border:1.5px solid var(--border);border-radius:7px;padding:.55rem .9rem;font-size:.8rem;color:var(--text);box-shadow:var(--shadow);animation:toastSlide .25s ease;display:flex;align-items:center;gap:.45rem}
-.toast.ok{border-color:var(--accent);color:var(--accent)}
-
-/* CALCULATOR */
-.calc-wrap{position:fixed;bottom:4.5rem;right:1rem;width:272px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:1000;display:none;overflow:hidden}
-.calc-wrap.show{display:block}
-.calc-head{background:var(--bg2);padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.calc-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.9rem}
-.calc-display{background:var(--bg);padding:.75rem 1rem;text-align:right;border-bottom:1px solid var(--border)}
-.calc-expr{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);min-height:1em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:.15rem}
-.calc-num{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--text)}
-.calc-hist{max-height:52px;overflow-y:auto;padding:.25rem .75rem;border-bottom:1px solid var(--border)}
-.calc-hist p{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text3);cursor:pointer;padding:.1rem 0}
-.calc-hist p:hover{color:var(--accent)}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
-.ck{padding:.6rem .2rem;background:var(--surface);border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text2);transition:background .12s;text-align:center}
-.ck:hover{background:var(--bg2);color:var(--text)}
-.ck.op{color:var(--accent)}
-.ck.fn{font-size:.62rem;color:var(--text3)}
-.ck.eq{background:var(--accent);color:#fff;font-size:.85rem}
-.ck.eq:hover{opacity:.85}
-.ck.cl{color:var(--red)}
-
-/* NOTES PANEL */
-.notes-panel{position:fixed;top:0;right:0;bottom:0;width:310px;background:var(--surface);border-left:1.5px solid var(--border);box-shadow:-4px 0 20px rgba(0,0,0,.12);z-index:950;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s ease}
-.notes-panel.show{transform:translateX(0)}
-.panel-head{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.panel-title{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.panel-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:.1rem}
-.notes-ctx{padding:.45rem 1rem;font-size:.78rem;color:var(--accent);border-bottom:1px solid var(--border);flex-shrink:0;font-weight:500}
-.notes-ta{flex:1;border:none;background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;line-height:1.8;padding:1rem;resize:none;outline:none}
-.notes-foot{padding:.5rem 1rem;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.48rem;color:var(--text3);flex-shrink:0}
-
-/* GLOSSARY PANEL */
-.gloss-panel{position:fixed;top:0;left:280px;bottom:0;width:330px;background:var(--surface);border-right:1.5px solid var(--border);box-shadow:4px 0 20px rgba(0,0,0,.1);z-index:950;display:flex;flex-direction:column;transform:translateX(-110%);transition:transform .28s ease}
-.gloss-panel.show{transform:translateX(0)}
-.gloss-search-wrap{padding:.55rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.gloss-search-wrap input{width:100%;padding:.38rem .65rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;border-radius:4px}
-.gloss-search-wrap input:focus{border-color:var(--accent)}
-.gloss-list{overflow-y:auto;flex:1}
-.gloss-item{padding:.6rem 1rem;border-bottom:1px solid var(--border)}
-.gloss-term{font-family:'DM Serif Display',serif;font-size:.92rem;color:var(--text);margin-bottom:.18rem}
-.gloss-def{font-size:.78rem;color:var(--text2);line-height:1.6}
-
-/* STATS ON HOME */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:2rem;width:100%}
-.stat-box{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:.75rem .85rem;text-align:center}
-.stat-val{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text)}
-.stat-lbl{font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:.2rem}
-
-/* CONTINUE CARD */
-.continue-card{background:var(--accent-light);border:2px solid var(--accent-mid);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;width:100%;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between;text-align:left}
-.continue-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.cc-eye{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.25rem}
-.cc-title{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--text)}
-.cc-sub{font-size:.78rem;color:var(--text2);margin-top:.15rem}
-
-/* WEAK SPOTS */
-.section-head{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.65rem;margin-top:1.5rem;width:100%}
-.chip-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem;width:100%}
-.weak-chip{background:var(--red-light);border:1px solid rgba(192,57,43,.2);border-radius:99px;padding:.22rem .7rem;font-size:.76rem;color:var(--red);cursor:pointer;transition:all .15s}
-.weak-chip:hover{background:var(--red);color:#fff}
-.bm-chip{background:var(--surface);border:1.5px solid var(--border);border-radius:99px;padding:.22rem .75rem;font-size:.76rem;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.3rem}
-.bm-chip:hover{border-color:var(--accent);color:var(--accent)}
-
-/* DIFFICULTY STARS */
-.diff-row{display:flex;align-items:center;gap:.5rem;margin:.5rem 0}
-.diff-lbl{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
-.diff-star{font-size:1.2rem;cursor:pointer;opacity:.3;background:none;border:none;padding:0;transition:all .15s}
-.diff-star.on{opacity:1}
-.diff-star:hover{transform:scale(1.2)}
-
-/* BADGE POPUP */
-.badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9990;display:none}
-.badge-overlay.show{display:block}
-.badge-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:2.5rem 2rem;text-align:center;z-index:9991;box-shadow:0 20px 60px rgba(0,0,0,.25);min-width:300px;animation:badgePop .45s cubic-bezier(.34,1.56,.64,1) forwards}
-.badge-icon{font-size:3.5rem;margin-bottom:.65rem}
-.badge-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--accent);margin-bottom:.3rem}
-.badge-sub{font-size:.86rem;color:var(--text2);line-height:1.65;margin-bottom:1.25rem}
-.badge-ok{background:var(--accent);color:#fff;border:none;padding:.55rem 1.4rem;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase}
-
-/* RETAKE */
-.retake-btn{background:none;border:1.5px solid var(--border);border-radius:6px;padding:.45rem .9rem;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);cursor:pointer;margin-top:.65rem;transition:all .18s;display:inline-block}
-.retake-btn:hover{border-color:var(--accent);color:var(--accent)}
-
-/* RELATED LESSONS */
-.related-section{margin-top:1.75rem;padding-top:1.75rem;border-top:1px solid var(--border)}
-.related-grid{display:flex;flex-direction:column;gap:.38rem}
-.rel-btn{display:flex;align-items:center;gap:.7rem;padding:.55rem .85rem;background:var(--surface);border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem;color:var(--text2);transition:all .15s;text-align:left}
-.rel-btn:hover{border-color:var(--accent);color:var(--accent)}
-.rel-done{color:var(--accent);font-size:.65rem;margin-left:auto}
-
-/* KA LINK */
-.ka-link{display:inline-flex;align-items:center;gap:.35rem;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;color:var(--text3);text-decoration:none;padding:.28rem .6rem;border:1px solid var(--border);border-radius:4px;transition:all .15s;margin-top:.4rem}
-.ka-link:hover{border-color:#14bf96;color:#14bf96}
-
-/* SIDEBAR % per level */
-.lvl-pct{font-family:'DM Mono',monospace;font-size:.48rem;color:var(--text3);margin-left:auto;flex-shrink:0}
-.lvl-pct.full{color:var(--accent)}
-
-/* LESSON TIMER */
-.lesson-timer{font-family:'DM Mono',monospace;font-size:.52rem;color:var(--text3);display:inline-flex;align-items:center;gap:.3rem}
-
-/* PRINT */
-@media print{.toolbar,.btt,.calc-wrap,.notes-panel,.gloss-panel,.badge-overlay,.badge-box,.toast-wrap,.sidebar,.lesson-nav{display:none!important}.main{width:100%}body{background:#fff;color:#000}}
 
 /* Mobile */
 @media(max-width:700px){
@@ -335,71 +222,9 @@ body.dark{--bg:#1a1916;--bg2:#242320;--surface:#2d2c29;--border:rgba(255,255,255
 }
 </style>
 </head>
-<body class="fs-md">
-
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <button class="tb-btn" id="tb-dark" onclick="toggleDark()" title="Dark mode">🌙</button>
-  <button class="tb-btn" id="tb-font" onclick="cycleFont()" title="Font size">Aa</button>
-  <button class="tb-btn" id="tb-bm" onclick="toggleBookmark()" title="Bookmark lesson" style="display:none">☆</button>
-  <button class="tb-btn" id="tb-notes" onclick="toggleNotes()" title="My notes">📝</button>
-  <button class="tb-btn" id="tb-gloss" onclick="toggleGloss()" title="Glossary">📖</button>
-  <button class="tb-btn" id="tb-calc" onclick="toggleCalc()" title="Calculator">🔢</button>
-  <button class="tb-btn" onclick="window.print()" title="Print">🖨️</button>
-</div>
-
-<!-- BACK TO TOP -->
-<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-
-<!-- TOASTS -->
-<div class="toast-wrap" id="toast-wrap"></div>
-
-<!-- BADGE -->
-<div class="badge-overlay" id="badge-overlay" onclick="closeBadge()"></div>
-<div class="badge-box" id="badge-box" style="display:none">
-  <div class="badge-icon" id="badge-icon">🏆</div>
-  <div class="badge-title" id="badge-title">Level Complete!</div>
-  <div class="badge-sub" id="badge-sub"></div>
-  <button class="badge-ok" onclick="closeBadge()">Keep Going →</button>
-</div>
-
-<!-- CALCULATOR -->
-<div class="calc-wrap" id="calc-wrap">
-  <div class="calc-head"><span>Calculator</span><button class="calc-x" onclick="toggleCalc()">✕</button></div>
-  <div class="calc-display">
-    <div class="calc-expr" id="calc-expr">&nbsp;</div>
-    <div class="calc-num" id="calc-num">0</div>
-  </div>
-  <div class="calc-hist" id="calc-hist"></div>
-  <div class="calc-grid">
-    <button class="ck fn" onclick="ci('sin(')">sin</button><button class="ck fn" onclick="ci('cos(')">cos</button><button class="ck fn" onclick="ci('tan(')">tan</button><button class="ck fn" onclick="ci('log10(')">log</button>
-    <button class="ck fn" onclick="ci('Math.log(')">ln</button><button class="ck fn" onclick="ci('Math.sqrt(')">√</button><button class="ck fn" onclick="ci('Math.PI')">π</button><button class="ck fn" onclick="ci('Math.E')">e</button>
-    <button class="ck cl" onclick="cc()">C</button><button class="ck" onclick="cd()">⌫</button><button class="ck op" onclick="ci('%')">%</button><button class="ck op" onclick="ci('/')">÷</button>
-    <button class="ck" onclick="ci('7')">7</button><button class="ck" onclick="ci('8')">8</button><button class="ck" onclick="ci('9')">9</button><button class="ck op" onclick="ci('*')">×</button>
-    <button class="ck" onclick="ci('4')">4</button><button class="ck" onclick="ci('5')">5</button><button class="ck" onclick="ci('6')">6</button><button class="ck op" onclick="ci('-')">−</button>
-    <button class="ck" onclick="ci('1')">1</button><button class="ck" onclick="ci('2')">2</button><button class="ck" onclick="ci('3')">3</button><button class="ck op" onclick="ci('+')">+</button>
-    <button class="ck" onclick="ci('(')">( </button><button class="ck" onclick="ci('0')">0</button><button class="ck" onclick="ci('.')">.</button><button class="ck eq" onclick="ce()">=</button>
-    <button class="ck fn" style="grid-column:span 2" onclick="ci(')')">  )  </button><button class="ck fn" style="grid-column:span 2" onclick="ci('**2')">x²</button>
-  </div>
-</div>
-
-<!-- NOTES PANEL -->
-<div class="notes-panel" id="notes-panel">
-  <div class="panel-head"><span class="panel-title">📝 My Notes</span><button class="panel-x" onclick="toggleNotes()">✕</button></div>
-  <div class="notes-ctx" id="notes-ctx">Open a lesson to take notes</div>
-  <textarea class="notes-ta" id="notes-ta" placeholder="Type notes here… auto-saved." oninput="saveNote()"></textarea>
-  <div class="notes-foot">Saved to your browser</div>
-</div>
-
-<!-- GLOSSARY PANEL -->
-<div class="gloss-panel" id="gloss-panel">
-  <div class="panel-head"><span class="panel-title">📖 Math Glossary</span><button class="panel-x" onclick="toggleGloss()">✕</button></div>
-  <div class="gloss-search-wrap"><input type="text" id="gloss-input" placeholder="Search terms…" oninput="filterGloss(this.value)"/></div>
-  <div class="gloss-list" id="gloss-list"></div>
-</div>
+<body>
 
 <!-- SIDEBAR -->
-
 <aside class="sidebar">
   <div class="sidebar-head">
     <div class="sidebar-logo">Apex<em>Math</em> Lessons</div>
@@ -3913,476 +3738,145 @@ In the meantime, here are excellent free resources for <strong>${lesson.title}</
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STORAGE
-// ─────────────────────────────────────────────────────────────────────────────
-const LS = {
-  get:(k,d={})=>{try{return JSON.parse(localStorage.getItem(k)??'null')??d}catch{return d}},
-  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
-};
-function getProgress(){ return LS.get('apexmath_lessons',{}); }
-function markDone(id){
-  const p=getProgress(); p[id]=true; LS.set('apexmath_lessons',p);
-  checkLevelBadge(id);
-}
-function getBookmarks(){ return LS.get('apexmath_bm',[]); }
-function isBookmarked(id){ return getBookmarks().includes(id); }
-function toggleBookmark(){
-  if(!currentLessonId) return;
-  let bm=getBookmarks();
-  if(bm.includes(currentLessonId)) bm=bm.filter(x=>x!==currentLessonId);
-  else bm.push(currentLessonId);
-  LS.set('apexmath_bm',bm);
-  updateBmBtn();
-  toast(bm.includes(currentLessonId)?'⭐ Bookmarked':'Bookmark removed');
-}
-function updateBmBtn(){
-  const btn=document.getElementById('tb-bm');
-  if(!btn||!currentLessonId) return;
-  const on=isBookmarked(currentLessonId);
-  btn.textContent=on?'★':'☆';
-  btn.className='tb-btn'+(on?' bm-on':'');
-}
-function getNotes(){ return LS.get('apexmath_notes',{}); }
-function saveNote(){
-  const ta=document.getElementById('notes-ta');
-  if(!ta||!currentLessonId) return;
-  const n=getNotes(); n[currentLessonId]=ta.value; LS.set('apexmath_notes',n);
-}
-function getDiffs(){ return LS.get('apexmath_diff',{}); }
-function getWrong(){ return LS.get('apexmath_wrong',{}); }
-function recordWrong(id){
-  const w=getWrong(); w[id]=(w[id]||0)+1; LS.set('apexmath_wrong',w);
-}
-function getTimeSpent(){ return LS.get('apexmath_time',{}); }
-function getLastLesson(){ return LS.get('apexmath_last',null); }
-function setLastLesson(id){ LS.set('apexmath_last',id); }
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function getProgress(){ try{return JSON.parse(localStorage.getItem('apexmath_lessons')||'{}')}catch(e){return{}} }
+function markDone(id){ const p=getProgress(); p[id]=true; localStorage.setItem('apexmath_lessons',JSON.stringify(p)); }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DARK MODE / FONT SIZE
-// ─────────────────────────────────────────────────────────────────────────────
-function toggleDark(){
-  document.body.classList.toggle('dark');
-  LS.set('apexmath_dark',document.body.classList.contains('dark'));
-  document.getElementById('tb-dark').textContent = document.body.classList.contains('dark')?'☀️':'🌙';
-}
-const FONTS=['fs-sm','fs-md','fs-lg'];
-let fontIdx=1;
-function cycleFont(){
-  document.body.classList.remove(...FONTS);
-  fontIdx=(fontIdx+1)%3;
-  document.body.classList.add(FONTS[fontIdx]);
-  LS.set('apexmath_font',fontIdx);
-  const labels=['A','Aa','AAA'];
-  document.getElementById('tb-font').textContent=labels[fontIdx];
-}
-function loadPrefs(){
-  if(LS.get('apexmath_dark',false)){document.body.classList.add('dark');document.getElementById('tb-dark').textContent='☀️';}
-  fontIdx=LS.get('apexmath_font',1);
-  document.body.classList.remove(...FONTS);
-  document.body.classList.add(FONTS[fontIdx]);
-}
+// ── RENDER SIDEBAR ────────────────────────────────────────────────────────────
+let currentLessonId = null;
+let allLessonBtns = [];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────────────────────────────────────
-function toast(msg,ok=true){
-  const wrap=document.getElementById('toast-wrap');
-  const el=document.createElement('div');
-  el.className='toast'+(ok?' ok':'');
-  el.textContent=msg;
-  wrap.appendChild(el);
-  setTimeout(()=>el.style.opacity='0',2200);
-  setTimeout(()=>el.remove(),2500);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LEVEL BADGE
-// ─────────────────────────────────────────────────────────────────────────────
-function checkLevelBadge(id){
-  const [lvlNum]=id.split('-').map(Number);
-  const lvl=CURRICULUM[lvlNum];
-  if(!lvl) return;
-  const p=getProgress();
-  const done=lvl.lessons.filter(l=>p[l.id]).length;
-  if(done===lvl.lessons.length){
-    const seen=LS.get('apexmath_badges',[]);
-    if(!seen.includes(lvlNum)){
-      seen.push(lvlNum); LS.set('apexmath_badges',seen);
-      showBadge(lvl);
-    }
-  }
-}
-function showBadge(lvl){
-  document.getElementById('badge-icon').textContent=lvl.emoji||'🏆';
-  document.getElementById('badge-title').textContent=`Level ${lvl.level} Complete!`;
-  document.getElementById('badge-sub').textContent=`You've finished all ${lvl.lessons.length} lessons in ${lvl.name}. Outstanding work.`;
-  const box=document.getElementById('badge-box');
-  const ov=document.getElementById('badge-overlay');
-  box.style.display='block'; ov.classList.add('show');
-  // Re-trigger animation
-  box.style.animation='none'; box.offsetHeight;
-  box.style.animation='badgePop .45s cubic-bezier(.34,1.56,.64,1) forwards';
-}
-function closeBadge(){
-  document.getElementById('badge-box').style.display='none';
-  document.getElementById('badge-overlay').classList.remove('show');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CALCULATOR
-// ─────────────────────────────────────────────────────────────────────────────
-let calcExpr='', calcHistory=[];
-function toggleCalc(){
-  const w=document.getElementById('calc-wrap');
-  w.classList.toggle('show');
-}
-function ci(v){ calcExpr+=v; updateCalcDisplay(); }
-function cc(){ calcExpr=''; document.getElementById('calc-num').textContent='0'; document.getElementById('calc-expr').innerHTML='&nbsp;'; }
-function cd(){ calcExpr=calcExpr.slice(0,-1); updateCalcDisplay(); }
-function updateCalcDisplay(){
-  document.getElementById('calc-expr').textContent=calcExpr||'';
-  try{
-    let expr=calcExpr.replace(/Math\.PI/g,Math.PI).replace(/Math\.E/g,Math.E)
-      .replace(/Math\.sqrt\(/g,'Math.sqrt(').replace(/Math\.log\(/g,'Math.log(')
-      .replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(')
-      .replace(/log10\(/g,'Math.log10(');
-    const r=Function('"use strict";return('+expr+')')();
-    if(isFinite(r)) document.getElementById('calc-num').textContent=+r.toFixed(8)+'';
-  }catch{}
-}
-function ce(){
-  try{
-    let expr=calcExpr.replace(/Math\.PI/g,Math.PI).replace(/Math\.E/g,Math.E)
-      .replace(/Math\.sqrt\(/g,'Math.sqrt(').replace(/Math\.log\(/g,'Math.log(')
-      .replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(')
-      .replace(/log10\(/g,'Math.log10(');
-    const r=Function('"use strict";return('+expr+')')();
-    const result=+r.toFixed(10)+'';
-    calcHistory.unshift(calcExpr+' = '+result);
-    if(calcHistory.length>8) calcHistory.pop();
-    renderCalcHist();
-    document.getElementById('calc-num').textContent=result;
-    document.getElementById('calc-expr').textContent=calcExpr+' =';
-    calcExpr=result;
-  }catch{ document.getElementById('calc-num').textContent='Error'; }
-}
-function renderCalcHist(){
-  const h=document.getElementById('calc-hist');
-  h.innerHTML=calcHistory.map(x=>`<p onclick="calcExpr='${x.split(' = ')[1]}';updateCalcDisplay()">${x}</p>`).join('');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NOTES PANEL
-// ─────────────────────────────────────────────────────────────────────────────
-function toggleNotes(){
-  const p=document.getElementById('notes-panel');
-  p.classList.toggle('show');
-  if(p.classList.contains('show') && currentLessonId){
-    const n=getNotes();
-    document.getElementById('notes-ta').value=n[currentLessonId]||'';
-  }
-}
-function updateNotesCtx(){
-  if(!currentLessonId) return;
-  let title=''; for(const lvl of CURRICULUM){const l=lvl.lessons.find(x=>x.id===currentLessonId);if(l){title=l.title;break;}}
-  document.getElementById('notes-ctx').textContent=title||'';
-  const n=getNotes();
-  document.getElementById('notes-ta').value=n[currentLessonId]||'';
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GLOSSARY
-// ─────────────────────────────────────────────────────────────────────────────
-const GLOSSARY=[
-  {t:'Absolute Value',d:'The distance of a number from zero; always non-negative. |−5|=5.'},
-  {t:'Antiderivative',d:'A function F(x) whose derivative is f(x). Used in integration.'},
-  {t:'Asymptote',d:'A line a curve approaches but never touches.'},
-  {t:'Base',d:'The number being raised to a power. In 2³, 2 is the base.'},
-  {t:'Coefficient',d:'The number multiplying a variable. In 3x, 3 is the coefficient.'},
-  {t:'Common Denominator',d:'A shared multiple of two or more denominators.'},
-  {t:'Composite Function',d:'f(g(x)): applying one function to the output of another.'},
-  {t:'Continuity',d:'A function is continuous if its graph has no breaks, holes, or jumps.'},
-  {t:'Critical Point',d:'Where f\'(x)=0 or f\'(x) is undefined. Candidates for max/min.'},
-  {t:'Definite Integral',d:'∫ₐᵇ f(x)dx — the signed area under a curve from a to b.'},
-  {t:'Denominator',d:'Bottom number of a fraction.'},
-  {t:'Derivative',d:'Instantaneous rate of change of a function. Slope of the tangent.'},
-  {t:'Determinant',d:'A scalar value from a square matrix encoding scaling/orientation.'},
-  {t:'Differential Equation',d:'An equation relating a function to its derivatives.'},
-  {t:'Domain',d:'All valid input values (x-values) for a function.'},
-  {t:'Exponent',d:'How many times to multiply the base by itself. 2³ = 2×2×2 = 8.'},
-  {t:'Factor',d:'A number that divides evenly into another. 3 is a factor of 12.'},
-  {t:'Function',d:'A rule assigning exactly one output to each input.'},
-  {t:'GCF',d:'Greatest Common Factor: the largest factor shared by two numbers.'},
-  {t:'Hypotenuse',d:'The longest side of a right triangle, opposite the right angle.'},
-  {t:'Imaginary Number',d:'√(−1) = i. Used in complex numbers.'},
-  {t:'Improper Integral',d:'An integral with infinite limits or an unbounded integrand.'},
-  {t:'Indefinite Integral',d:'∫f(x)dx = F(x)+C — the antiderivative family.'},
-  {t:'Inflection Point',d:'Where a curve changes concavity (from up to down or vice versa).'},
-  {t:'Integer',d:'Whole numbers including negatives: …−2,−1,0,1,2…'},
-  {t:'Irrational Number',d:'Cannot be written as p/q. Examples: π, √2.'},
-  {t:'LCM',d:'Least Common Multiple: smallest number divisible by both.'},
-  {t:'Limit',d:'The value a function approaches as x approaches some value.'},
-  {t:'Linear Equation',d:'An equation whose graph is a straight line. Form: y=mx+b.'},
-  {t:'Logarithm',d:'log_b(x)=y means bʸ=x. The inverse of exponentiation.'},
-  {t:'Matrix',d:'A rectangular array of numbers. Used in linear algebra.'},
-  {t:'Numerator',d:'Top number of a fraction.'},
-  {t:'Polynomial',d:'Sum of terms with non-negative integer exponents. e.g. 3x²+2x−1.'},
-  {t:'Power Rule',d:'d/dx[xⁿ]=nxⁿ⁻¹. The main differentiation shortcut.'},
-  {t:'Prime Number',d:'A number greater than 1 with no factors besides 1 and itself.'},
-  {t:'Pythagorean Theorem',d:'a²+b²=c² for a right triangle. Relates legs to hypotenuse.'},
-  {t:'Quadratic',d:'A degree-2 polynomial. Form: ax²+bx+c. Graph: parabola.'},
-  {t:'Radian',d:'Unit of angle. π radians = 180°. Full circle = 2π radians.'},
-  {t:'Range',d:'All possible output values (y-values) of a function.'},
-  {t:'Rational Number',d:'Can be written as p/q where p,q are integers and q≠0.'},
-  {t:'Sequence',d:'An ordered list of numbers, each defined by a formula.'},
-  {t:'Series',d:'The sum of a sequence. ∑aₙ.'},
-  {t:'Slope',d:'Rise over run: (y₂−y₁)/(x₂−x₁). Rate of change of a line.'},
-  {t:'Taylor Series',d:'A function represented as an infinite polynomial at a point.'},
-  {t:'U-Substitution',d:'Integration technique: replace inner function with u to simplify.'},
-  {t:'Vector',d:'A quantity with both magnitude and direction. Written ⟨a,b,c⟩.'},
-  {t:'Vertex',d:'The turning point of a parabola. Max or min of a quadratic.'},
-  {t:'Zero of a Function',d:'A value of x where f(x)=0. Also called a root or x-intercept.'},
-];
-function buildGlossary(){ renderGlossItems(GLOSSARY); }
-function renderGlossItems(items){
-  document.getElementById('gloss-list').innerHTML=items.map(g=>
-    `<div class="gloss-item"><div class="gloss-term">${g.t}</div><div class="gloss-def">${g.d}</div></div>`
-  ).join('');
-}
-function filterGloss(q){
-  const f=q.toLowerCase().trim();
-  renderGlossItems(f?GLOSSARY.filter(g=>g.t.toLowerCase().includes(f)||g.d.toLowerCase().includes(f)):GLOSSARY);
-}
-function toggleGloss(){
-  document.getElementById('gloss-panel').classList.toggle('show');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SIDEBAR
-// ─────────────────────────────────────────────────────────────────────────────
-let currentLessonId=null, allLessonBtns=[];
 function buildSidebar(){
-  const nav=document.getElementById('sidebar-nav');
+  const nav = document.getElementById('sidebar-nav');
   nav.innerHTML='';
-  allLessonBtns=[];
-  const p=getProgress();
+  const progress = getProgress();
   CURRICULUM.forEach((lvl,li)=>{
-    const done=lvl.lessons.filter(l=>p[l.id]).length;
-    const pct=Math.round(done/lvl.lessons.length*100);
-    const group=document.createElement('div'); group.className='level-group';
-    const hdr=document.createElement('button');
-    hdr.className='level-header'+(li===0?' open':'');
-    hdr.innerHTML=`<span>${lvl.emoji} Level ${lvl.level} — ${lvl.name}</span><span class="lvl-pct${pct===100?' full':''}">${pct}%</span><span class="level-arrow">▶</span>`;
-    hdr.onclick=()=>{ const open=hdr.classList.toggle('open'); list.style.display=open?'flex':'none'; };
-    const list=document.createElement('div'); list.className='lesson-list';
+    const group = document.createElement('div'); group.className='level-group';
+    const header = document.createElement('button');
+    header.className='level-header'+(li===0?' open':'');
+    header.innerHTML=`<span>${lvl.emoji} Level ${lvl.level} — ${lvl.name}</span><span class="level-arrow">▶</span>`;
+    header.onclick=()=>{
+      const isOpen=header.classList.toggle('open');
+      list.style.display=isOpen?'flex':'none';
+    };
+    const list = document.createElement('div'); list.className='lesson-list';
     list.style.display=li===0?'flex':'none';
     lvl.lessons.forEach(lesson=>{
-      const btn=document.createElement('button'); btn.className='lesson-btn';
+      const btn = document.createElement('button'); btn.className='lesson-btn';
       btn.dataset.id=lesson.id;
-      if(p[lesson.id]) btn.classList.add('done');
+      const isDone=progress[lesson.id];
+      if(isDone) btn.classList.add('done');
       btn.innerHTML=`<div class="lb-dot"></div>${lesson.title}`;
       btn.onclick=()=>openLesson(lesson.id);
-      list.appendChild(btn); allLessonBtns.push(btn);
+      list.appendChild(btn);
+      allLessonBtns.push(btn);
     });
-    group.appendChild(hdr); group.appendChild(list); nav.appendChild(group);
+    group.appendChild(header); group.appendChild(list);
+    nav.appendChild(group);
   });
 }
-function filterLessons(q){
-  const f=q.toLowerCase().trim();
-  allLessonBtns.forEach(b=>{ b.style.display=(!f||b.textContent.toLowerCase().includes(f))?'':'none'; });
-  if(f) document.querySelectorAll('.level-header').forEach(h=>{h.classList.add('open');h.nextElementSibling.style.display='flex';});
+
+function filterLessons(query){
+  const q=query.toLowerCase().trim();
+  allLessonBtns.forEach(btn=>{
+    const match=!q||btn.textContent.toLowerCase().includes(q);
+    btn.style.display=match?'':'none';
+  });
+  if(q){
+    document.querySelectorAll('.level-header').forEach(h=>{h.classList.add('open');h.nextElementSibling.style.display='flex';});
+  }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LESSON TIMER
-// ─────────────────────────────────────────────────────────────────────────────
-let timerStart=0, timerInterval=null;
-function startTimer(){
-  timerStart=Date.now();
-  clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{
-    const el=document.getElementById('lesson-timer-val');
-    if(el){ const s=Math.floor((Date.now()-timerStart)/1000); el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
-  },1000);
-}
-function stopTimer(id){
-  clearInterval(timerInterval);
-  if(!id) return;
-  const s=Math.floor((Date.now()-timerStart)/1000);
-  const t=getTimeSpent(); t[id]=(t[id]||0)+s; LS.set('apexmath_time',t);
-}
-function totalTimeMin(){
-  const t=getTimeSpent(); return Math.round(Object.values(t).reduce((a,b)=>a+b,0)/60);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RENDER HOME
-// ─────────────────────────────────────────────────────────────────────────────
+// ── RENDER HOME ───────────────────────────────────────────────────────────────
 function renderHome(){
-  stopTimer(currentLessonId); currentLessonId=null;
-  document.getElementById('tb-bm').style.display='none';
-  const p=getProgress();
-  const totalDone=Object.keys(p).length;
-  const totalAll=CURRICULUM.reduce((a,l)=>a+l.lessons.length,0);
-  const pct=Math.round(totalDone/totalAll*100);
-  const last=getLastLesson();
-  let lastMeta=null;
-  if(last){ for(const lvl of CURRICULUM){ const l=lvl.lessons.find(x=>x.id===last); if(l){lastMeta={lesson:l,lvl};break;} } }
-  // Weak spots
-  const wrong=getWrong();
-  const weakIds=Object.entries(wrong).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);
-  const weakLessons=weakIds.map(id=>{
-    for(const lvl of CURRICULUM){ const l=lvl.lessons.find(x=>x.id===id); if(l) return l; } return null;
-  }).filter(Boolean);
-  // Bookmarks
-  const bms=getBookmarks();
-  const bmLessons=bms.map(id=>{
-    for(const lvl of CURRICULUM){ const l=lvl.lessons.find(x=>x.id===id); if(l) return l; } return null;
-  }).filter(Boolean);
-
+  currentLessonId=null;
+  const progress=getProgress();
   const main=document.getElementById('main-content');
   main.innerHTML='';
   const div=document.createElement('div'); div.className='home-screen';
+  const totalDone=Object.keys(progress).length;
+  const totalLessons=CURRICULUM.reduce((a,lvl)=>a+lvl.lessons.length,0);
   div.innerHTML=`
     <div class="home-eyebrow">ApexMath Lessons</div>
     <h1 class="home-h1">Learn the math.<br><em>All of it.</em></h1>
-    <p class="home-sub">94 lessons from Arithmetic to Calculus II+. Each has a concept explanation, worked examples, practice questions, and an instant check.</p>
-
-    <div class="stats-row">
-      <div class="stat-box"><div class="stat-val">${totalDone}</div><div class="stat-lbl">Lessons Done</div></div>
-      <div class="stat-box"><div class="stat-val">${pct}%</div><div class="stat-lbl">Complete</div></div>
-      <div class="stat-box"><div class="stat-val">${totalTimeMin()}</div><div class="stat-lbl">Minutes Spent</div></div>
-      <div class="stat-box"><div class="stat-val">${CURRICULUM.filter(l=>l.lessons.every(x=>p[x.id])).length}</div><div class="stat-lbl">Levels Done</div></div>
-    </div>
-
-    ${lastMeta?`<div class="continue-card" onclick="openLesson('${lastMeta.lesson.id}')">
-      <div class="cc-left">
-        <div class="cc-eye">Continue where you left off</div>
-        <div class="cc-title">${lastMeta.lesson.title}</div>
-        <div class="cc-sub">${lastMeta.lvl.name}</div>
-      </div>
-      <div style="font-size:1.5rem;color:var(--accent)">→</div>
-    </div>`:''}
-
-    ${bmLessons.length?`<div class="section-head">⭐ Bookmarks</div>
-    <div class="chip-row">${bmLessons.map(l=>`<div class="bm-chip" onclick="openLesson('${l.id}')"><span>⭐</span>${l.title}</div>`).join('')}</div>`:''}
-
-    ${weakLessons.length?`<div class="section-head">⚠️ Weak Spots — Review These</div>
-    <div class="chip-row">${weakLessons.map(l=>`<div class="weak-chip" onclick="openLesson('${l.id}')">${l.title}</div>`).join('')}</div>`:''}
-
-    <div class="section-head" style="margin-top:1.5rem">All Levels</div>
-    <div class="level-cards">
-      ${CURRICULUM.map(lvl=>{
-        const done=lvl.lessons.filter(l=>p[l.id]).length;
-        const pp=Math.round(done/lvl.lessons.length*100);
-        return`<div class="level-card" onclick="openFirstLesson(${lvl.level})">
-          <div class="lc-emoji">${lvl.emoji}</div>
-          <div class="lc-name">Level ${lvl.level}: ${lvl.name}</div>
-          <div class="lc-sub">${lvl.desc}</div>
-          <div class="lc-count">${lvl.lessons.length} lessons · ${done} done</div>
-          <div class="lc-prog"><div class="lc-prog-fill" style="width:${pp}%"></div></div>
-        </div>`;
-      }).join('')}
-    </div>
+    <p class="home-sub">93 lessons from Arithmetic to Calculus II. Each one has a clear explanation, worked examples, guided practice, and a quick check at the end.</p>
+    ${totalDone>0?`<div style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem">✓ ${totalDone}/${totalLessons} lessons completed</div>`:''}
+    <div class="level-cards">${CURRICULUM.map(lvl=>{
+      const done=lvl.lessons.filter(l=>progress[l.id]).length;
+      const pct=Math.round(done/lvl.lessons.length*100);
+      return`<div class="level-card" onclick="openFirstLesson(${lvl.level})">
+        <div class="lc-emoji">${lvl.emoji}</div>
+        <div class="lc-name">Level ${lvl.level}: ${lvl.name}</div>
+        <div class="lc-sub">${lvl.desc}</div>
+        <div class="lc-count">${lvl.lessons.length} lessons · ${done} done</div>
+        <div class="lc-prog"><div class="lc-prog-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('')}</div>
   `;
   main.appendChild(div);
-  main.scrollTo(0,0); window.scrollTo(0,0);
 }
-function openFirstLesson(n){ const lvl=CURRICULUM[n]; if(lvl&&lvl.lessons.length) openLesson(lvl.lessons[0].id); }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RENDER LESSON
-// ─────────────────────────────────────────────────────────────────────────────
-let checkAnswered={}, tryitAnswered=false;
-
-// KA search links per topic keyword
-const KA_LINKS={
-  '0':'https://www.khanacademy.org/math/arithmetic',
-  '1':'https://www.khanacademy.org/math/algebra',
-  '2':'https://www.khanacademy.org/math/algebra2',
-  '3':'https://www.khanacademy.org/math/trigonometry',
-  '4':'https://www.khanacademy.org/math/precalculus',
-  '5':'https://www.khanacademy.org/math/ap-calculus-ab',
-  '6':'https://www.khanacademy.org/math/ap-calculus-bc',
-};
-
-function getRelated(id, levelData){
-  const [lvlN, lesN]=id.split('-').map(Number);
-  const related=[];
-  const p=getProgress();
-  // Adjacent lessons in same level
-  levelData.lessons.forEach(l=>{
-    const [,n]=l.id.split('-').map(Number);
-    if(l.id!==id && Math.abs(n-lesN)<=2) related.push(l);
-  });
-  // One from prev/next level
-  if(CURRICULUM[lvlN-1]) related.push(CURRICULUM[lvlN-1].lessons.at(-1));
-  if(CURRICULUM[lvlN+1]) related.push(CURRICULUM[lvlN+1].lessons[0]);
-  return related.filter(Boolean).slice(0,4).map(l=>{
-    const done=p[l.id];
-    return`<div class="rel-btn" onclick="openLesson('${l.id}')">
-      <span>${done?'✓':'→'}</span>${l.title}${done?'<span class="rel-done">done</span>':''}
-    </div>`;
-  }).join('');
+function openFirstLesson(levelNum){
+  const lvl=CURRICULUM[levelNum];
+  if(lvl&&lvl.lessons.length) openLesson(lvl.lessons[0].id);
 }
+
+// ── RENDER LESSON ─────────────────────────────────────────────────────────────
+let checkAnswers={}, tryitAnswered=false, checkScores=[], hintShown=false;
 
 function openLesson(id){
-  stopTimer(currentLessonId);
-  currentLessonId=id; setLastLesson(id);
-  tryitAnswered=false; checkAnswered={};
-  // Sidebar sync
+  currentLessonId=id;
+  tryitAnswered=false; checkAnswers={}; checkScores=[];
+  // Update sidebar
   allLessonBtns.forEach(b=>{
     b.classList.toggle('active',b.dataset.id===id);
     if(b.dataset.id===id){
-      const list=b.closest('.lesson-list'), hdr=list?.previousElementSibling;
-      if(hdr&&!hdr.classList.contains('open')){hdr.classList.add('open');list.style.display='flex';}
+      // Open that level group
+      const list=b.closest('.lesson-list');
+      const header=list?.previousElementSibling;
+      if(header&&!header.classList.contains('open')){
+        header.classList.add('open'); list.style.display='flex';
+      }
       b.scrollIntoView({behavior:'smooth',block:'nearest'});
     }
   });
-  const data=LESSONS[id]||getDefaultLesson(id);
-  if(!data){renderHome();return;}
+  const data = LESSONS[id] || getDefaultLesson(id);
+  if(!data){ renderHome(); return; }
+  // Find lesson metadata
   let lessonMeta=null, levelData=null, lessonIdx=0;
-  for(const lvl of CURRICULUM){ const idx=lvl.lessons.findIndex(l=>l.id===id); if(idx>=0){lessonMeta=lvl.lessons[idx];levelData=lvl;lessonIdx=idx;break;} }
-  const allL=CURRICULUM.flatMap(l=>l.lessons);
-  const gi=allL.findIndex(l=>l.id===id);
-  const prev=gi>0?allL[gi-1]:null, next=gi<allL.length-1?allL[gi+1]:null;
-  const p=getProgress();
-  const doneInLvl=levelData.lessons.filter(l=>p[l.id]).length;
-  const pct=Math.round(doneInLvl/levelData.lessons.length*100);
-  const diff=getDiffs()[id]||0;
-  const notes=getNotes()[id]||'';
-  const kaUrl=KA_LINKS[String(levelData.level)]||'https://www.khanacademy.org/math';
+  for(const lvl of CURRICULUM){
+    const idx=lvl.lessons.findIndex(l=>l.id===id);
+    if(idx>=0){ lessonMeta=lvl.lessons[idx]; levelData=lvl; lessonIdx=idx; break; }
+  }
+  const allLessons=CURRICULUM.flatMap(l=>l.lessons);
+  const globalIdx=allLessons.findIndex(l=>l.id===id);
+  const prevLesson=globalIdx>0?allLessons[globalIdx-1]:null;
+  const nextLesson=globalIdx<allLessons.length-1?allLessons[globalIdx+1]:null;
+  const progress=getProgress();
+  const totalInLevel=levelData.lessons.length;
+  const doneInLevel=levelData.lessons.filter(l=>progress[l.id]).length;
+  const progPct=Math.round(doneInLevel/totalInLevel*100);
 
   const main=document.getElementById('main-content');
   main.innerHTML='';
   const inner=document.createElement('div'); inner.className='main-inner';
+
   inner.innerHTML=`
     <div class="lesson-nav">
-      <button class="lesson-nav-btn" onclick="${prev?`openLesson('${prev.id}')`:'renderHome()'}" ${!prev?'disabled':''}>← ${prev?prev.title.split(' ').slice(0,3).join(' ')+'…':'Home'}</button>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:.25rem">
-        <div class="lesson-crumb">Level ${levelData.level} · ${lessonIdx+1} / ${levelData.lessons.length}</div>
-        <div class="lesson-timer">⏱ <span id="lesson-timer-val">0:00</span></div>
-      </div>
-      <button class="lesson-nav-btn" onclick="${next?`openLesson('${next.id}')`:'renderHome()'}" ${!next?'disabled':''}>${next?next.title.split(' ').slice(0,3).join(' ')+'… →':'Home'}</button>
+      <button class="lesson-nav-btn" onclick="${prevLesson?`openLesson('${prevLesson.id}')`:'renderHome()'}" ${!prevLesson?'disabled':''}>
+        ← ${prevLesson?prevLesson.title.split(' ').slice(0,3).join(' ')+'…':'Home'}
+      </button>
+      <div class="lesson-crumb">Level ${levelData.level} · ${lessonIdx+1} / ${totalInLevel}</div>
+      <button class="lesson-nav-btn" onclick="${nextLesson?`openLesson('${nextLesson.id}')`:'renderHome()'}" ${!nextLesson?'disabled':''}>
+        ${nextLesson?nextLesson.title.split(' ').slice(0,3).join(' ')+'…':'Home'} →
+      </button>
     </div>
-    <div class="lesson-progress"><div class="lesson-progress-fill" style="width:${pct}%"></div></div>
+    <div class="lesson-progress"><div class="lesson-progress-fill" style="width:${progPct}%"></div></div>
     <div class="lesson-eyebrow">${levelData.emoji} Level ${levelData.level} — ${levelData.name}</div>
     <h1 class="lesson-title">${lessonMeta.title}</h1>
     <p class="lesson-tagline">${data.tagline}</p>
-    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem">
-      <span class="info-tag time">⏱ ~10 min</span>
-      <span class="info-tag">📖 Read → Practice</span>
-      ${p[id]?'<span class="info-tag time">✓ Completed</span>':''}
-      <a class="ka-link" href="${kaUrl}" target="_blank" rel="noopener">🎓 Khan Academy →</a>
-    </div>
-
-    <!-- DIFFICULTY RATING -->
-    <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-      <span class="diff-lbl" style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Difficulty:</span>
-      ${[1,2,3,4,5].map(n=>`<button class="diff-star${diff>=n?' on':''}" onclick="rateDiff('${id}',${n})" id="dstar-${n}">★</button>`).join('')}
-      <span id="diff-msg" style="font-size:.78rem;color:var(--text2)">${diff?['','Easy','Moderate','Hard','Very Hard','Expert'][diff]||'':''}</span>
-    </div>
+    <span class="info-tag time">⏱ ~10 min</span>
+    <span class="info-tag">📖 Read first, then practice</span>
 
     <!-- CONCEPT -->
     <div class="block">
@@ -4400,15 +3894,23 @@ function openLesson(id){
       <div class="block-label"><span class="block-label-icon">🔍</span> Worked Examples</div>
       ${data.examples.map((ex,ei)=>`
         <div class="example-card">
-          <div class="example-header"><span class="example-label">${ex.label}</span><span class="example-q">${ex.q}</span></div>
-          <div class="example-body"><div class="step-list">${ex.steps.map((s,si)=>`
-            <div class="step"><div class="step-num">${si+1}</div><div class="step-content"><strong>${s.t}</strong>${s.d?'<br>'+s.d:''}</div></div>
-          `).join('')}</div></div>
+          <div class="example-header">
+            <span class="example-label">${ex.label}</span>
+            <span class="example-q">${ex.q}</span>
+          </div>
+          <div class="example-body">
+            <div class="step-list">${ex.steps.map((s,si)=>`
+              <div class="step">
+                <div class="step-num">${si+1}</div>
+                <div class="step-content"><strong>${s.t}</strong>${s.d?'<br>'+s.d:''}</div>
+              </div>
+            `).join('')}</div>
+          </div>
         </div>
       `).join('')}
     </div>
 
-    <!-- MISTAKES -->
+    <!-- COMMON MISTAKES -->
     ${data.mistakes&&data.mistakes.length?`<div class="block">
       <div class="block-label"><span class="block-label-icon">⚠️</span> Common Mistakes</div>
       <div class="mistake-box">${data.mistakes.map(m=>`
@@ -4421,10 +3923,14 @@ function openLesson(id){
       <div class="block-label"><span class="block-label-icon">✏️</span> Try It Yourself</div>
       <div class="tryit-card" id="tryit-card">
         <div class="tryit-q">${data.tryit.q}</div>
-        ${data.tryit.hint?`<button class="tryit-hint-btn" id="tryit-hint-btn" onclick="showHint()">💡 Need a hint?</button>
+        ${data.tryit.hint?`<button class="tryit-hint-btn" id="tryit-hint-btn" onclick="showTryitHint()">💡 Need a hint?</button>
         <div class="tryit-hint" id="tryit-hint">${data.tryit.hint}</div>`:''}
         <div class="tryit-opts" id="tryit-opts">
-          ${data.tryit.opts.map((opt,oi)=>`<button class="tryit-opt" onclick="handleTryit(${oi},${data.tryit.ans})"><span class="tryit-letter">${['A','B','C','D'][oi]}</span>${opt}</button>`).join('')}
+          ${data.tryit.opts.map((opt,oi)=>`
+            <button class="tryit-opt" onclick="handleTryit(${oi},${data.tryit.ans})">
+              <span class="tryit-letter">${['A','B','C','D'][oi]}</span>${opt}
+            </button>
+          `).join('')}
         </div>
         <div class="tryit-feedback" id="tryit-fb"></div>
       </div>
@@ -4434,13 +3940,17 @@ function openLesson(id){
     <div class="block">
       <div class="block-label"><span class="block-label-icon">✅</span> Quick Check — 3 Questions</div>
       <div class="check-section">
-        <div class="check-header">Answer all 3 to see your score.</div>
+        <div class="check-header">Answer all 3 before seeing your score.</div>
         <div class="check-body" id="check-body">
           ${data.check.map((q,qi)=>`
             <div class="check-item" data-idx="${qi}">
               <div class="check-q">${qi+1}. ${q.q}</div>
               <div class="check-opts" id="check-opts-${qi}">
-                ${q.opts.map((opt,oi)=>`<div class="check-opt" onclick="handleCheck(${qi},${oi},${q.ans},'${encodeURIComponent(q.fb)}')"><span class="tryit-letter">${['A','B','C','D'][oi]}</span>${opt}</div>`).join('')}
+                ${q.opts.map((opt,oi)=>`
+                  <div class="check-opt" onclick="handleCheck(${qi},${oi},${q.ans},'${encodeURIComponent(q.fb)}')">
+                    <span class="tryit-letter">${['A','B','C','D'][oi]}</span>${opt}
+                  </div>
+                `).join('')}
               </div>
               <div class="check-fb" id="check-fb-${qi}"></div>
             </div>
@@ -4454,44 +3964,25 @@ function openLesson(id){
     <div class="lesson-done" id="lesson-done">
       <div class="lesson-done-icon">🎉</div>
       <div class="lesson-done-title">Lesson Complete!</div>
-      <div class="lesson-done-sub" id="lesson-done-sub">Great work. Keep going.</div>
-      ${next?`<button class="next-lesson-btn" onclick="openLesson('${next.id}')">Next: ${next.title} →</button>`:'<button class="next-lesson-btn" onclick="renderHome()">← Back to All Lessons</button>'}
-    </div>
-
-    <!-- RELATED -->
-    <div class="related-section">
-      <div class="block-label"><span class="block-label-icon">🔗</span> Related Lessons</div>
-      <div class="related-grid">${getRelated(id,levelData)}</div>
+      <div class="lesson-done-sub" id="lesson-done-sub">You've finished this lesson. The next one is waiting.</div>
+      ${nextLesson?`<button class="next-lesson-btn" onclick="openLesson('${nextLesson.id}')">Next: ${nextLesson.title} →</button>`:'<button class="next-lesson-btn" onclick="renderHome()">← Back to All Lessons</button>'}
     </div>
   `;
-
   main.appendChild(inner);
-  main.scrollTo(0,0); window.scrollTo(0,0);
-  startTimer();
-  updateBmBtn();
-  document.getElementById('tb-bm').style.display='flex';
-  updateNotesCtx();
-  if(document.getElementById('notes-panel').classList.contains('show')) updateNotesCtx();
-  // Keyboard nav
-  document.onkeydown=e=>{
-    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
-    if(e.key==='ArrowLeft'&&prev) openLesson(prev.id);
-    if(e.key==='ArrowRight'&&next) openLesson(next.id);
-  };
+  main.scrollTo(0,0);
+  window.scrollTo(0,0);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INTERACTIONS
-// ─────────────────────────────────────────────────────────────────────────────
-function showHint(){
+function showTryitHint(){
   document.getElementById('tryit-hint')?.classList.add('show');
-  document.getElementById('tryit-hint-btn')?.remove();
+  document.getElementById('tryit-hint-btn')?.style.setProperty('display','none');
 }
-function handleTryit(chosen,correct){
+
+function handleTryit(chosen, correct){
   if(tryitAnswered) return;
   tryitAnswered=true;
-  if(chosen!==correct) recordWrong(currentLessonId);
-  document.querySelectorAll('.tryit-opt').forEach((o,i)=>{
+  const opts=document.querySelectorAll('.tryit-opt');
+  opts.forEach((o,i)=>{
     o.classList.add('disabled');
     if(i===correct) o.classList.add('correct');
     if(i===chosen&&chosen!==correct) o.classList.add('wrong');
@@ -4499,77 +3990,49 @@ function handleTryit(chosen,correct){
   const fb=document.getElementById('tryit-fb');
   const data=LESSONS[currentLessonId]||getDefaultLesson(currentLessonId);
   fb.className='tryit-feedback '+(chosen===correct?'right':'wrong');
-  fb.innerHTML=(chosen===correct?'<strong>✓ Correct!</strong> ':'<strong>✗ Not quite.</strong> ')+data.tryit.feedback;
-  document.getElementById('tryit-card').className='tryit-card '+(chosen===correct?'answered-right':'answered-wrong');
+  fb.innerHTML=chosen===correct?`<strong>✓ Correct!</strong> ${data.tryit.feedback}`:`<strong>✗ Not quite.</strong> ${data.tryit.feedback}`;
+  const card=document.getElementById('tryit-card');
+  if(card) card.className='tryit-card '+(chosen===correct?'answered-right':'answered-wrong');
 }
-function handleCheck(qi,chosen,correct,fbEncoded){
+
+let checkAnswered={};
+function handleCheck(qi, chosen, correct, fbEncoded){
   if(checkAnswered[qi]) return;
   checkAnswered[qi]={chosen,correct};
-  if(chosen!==correct) recordWrong(currentLessonId);
-  document.querySelectorAll(`#check-opts-${qi} .check-opt`).forEach((o,i)=>{
+  const opts=document.querySelectorAll(`#check-opts-${qi} .check-opt`);
+  opts.forEach((o,i)=>{
     o.classList.add('disabled');
     if(i===correct) o.classList.add('correct');
     if(i===chosen&&chosen!==correct) o.classList.add('wrong');
   });
   const fb=document.getElementById(`check-fb-${qi}`);
-  fb.className='check-fb show '+(chosen===correct?'right':'wrong');
+  const isRight=chosen===correct;
+  fb.className='check-fb show '+(isRight?'right':'wrong');
   fb.textContent=decodeURIComponent(fbEncoded);
+  // Check if all answered
   const data=LESSONS[currentLessonId]||getDefaultLesson(currentLessonId);
   if(Object.keys(checkAnswered).length===data.check.length) showCheckScore(data);
 }
+
 function showCheckScore(data){
   const score=Object.values(checkAnswered).filter(a=>a.chosen===a.correct).length;
   const total=data.check.length;
-  const msgs=['Keep at it — review the examples above.','Getting there! Re-read the concept section.','Solid — you have the core idea.'];
-  const msg=score===total?'Perfect! 🎉':msgs[Math.min(score,msgs.length-1)];
-  const el=document.getElementById('check-score');
-  el.innerHTML=`<div class="check-score-num">${score}/${total}</div><div class="check-score-label">Quick Check Score</div><div class="check-score-msg">${msg}</div><button class="retake-btn" onclick="retakeCheck()">↺ Retake</button>`;
-  el.classList.add('show');
-  if(score>=Math.ceil(total*0.67)){
+  const scoreEl=document.getElementById('check-score');
+  const msgs=['Keep at it — review the examples above and try again!','Getting there! Re-read the concept section.','Solid! You\'ve got the core idea.'];
+  const msg=score===total?'Perfect! You nailed it. 🎉':msgs[Math.min(score,2)];
+  scoreEl.innerHTML=`<div class="check-score-num">${score}/${total}</div><div class="check-score-label">Quick Check Score</div><div class="check-score-msg">${msg}</div>`;
+  scoreEl.classList.add('show');
+  if(score===total||(score/total>=0.67)){
     markDone(currentLessonId);
-    buildSidebar();
     document.getElementById('lesson-done')?.classList.add('show');
-    toast('✓ Lesson marked complete!');
+    buildSidebar();
   }
 }
-function retakeCheck(){
-  checkAnswered={};
-  const data=LESSONS[currentLessonId]||getDefaultLesson(currentLessonId);
-  document.getElementById('check-score').classList.remove('show');
-  document.getElementById('check-score').innerHTML='';
-  document.getElementById('lesson-done')?.classList.remove('show');
-  data.check.forEach((q,qi)=>{
-    document.querySelectorAll(`#check-opts-${qi} .check-opt`).forEach(o=>{o.className='check-opt';});
-    const fb=document.getElementById(`check-fb-${qi}`);
-    if(fb) fb.className='check-fb';
-  });
-  toast('Check reset — try again!');
-}
-function rateDiff(id,n){
-  const d=getDiffs(); d[id]=n; LS.set('apexmath_diff',d);
-  document.querySelectorAll('.diff-star').forEach((s,i)=>s.classList.toggle('on',i<n));
-  const labels=['','Easy','Moderate','Hard','Very Hard','Expert'];
-  const msg=document.getElementById('diff-msg'); if(msg) msg.textContent=labels[n]||'';
-  toast('Difficulty rated: '+labels[n]);
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCROLL / BACK TO TOP
-// ─────────────────────────────────────────────────────────────────────────────
-window.addEventListener('scroll',()=>{
-  document.getElementById('btt').classList.toggle('show',window.scrollY>400);
-});
-document.getElementById('main-content').addEventListener('scroll',()=>{
-  document.getElementById('btt').classList.toggle('show',document.getElementById('main-content').scrollTop>400);
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────────────────────────────
-loadPrefs();
-buildGlossary();
+// ── INIT ─────────────────────────────────────────────────────────────────────
 buildSidebar();
 renderHome();
+// Check URL hash for direct lesson
 const hash=window.location.hash.slice(1);
 if(hash&&CURRICULUM.some(l=>l.lessons.some(ll=>ll.id===hash))) openLesson(hash);
 </script>
