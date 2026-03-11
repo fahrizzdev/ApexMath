@@ -248,199 +248,284 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .next-callout{font-size:.82rem;color:var(--text2);background:var(--bg);border-left:3px solid var(--accent);padding:.6rem .85rem;margin-bottom:.75rem}
 
 /* ──────────────────────────────────────
-   DASHBOARD
+   DASHBOARD — Scrollable, fun, no tabs
 ────────────────────────────────────── */
-#s-dashboard{background:var(--bg);min-height:100vh}
+/* ══════════════════════════════════════════════════════
+   DASHBOARD — redesigned with diverse shapes & interactivity
+══════════════════════════════════════════════════════ */
+#s-dashboard{background:var(--bg)}
 
 /* Top bar */
 .dash-topbar{
   position:sticky;top:0;z-index:150;
   background:var(--bg);border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:.65rem 2rem;gap:1rem;
+  padding:.75rem 2rem;
 }
-.dash-topbar-left{display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.dash-topbar-left{display:flex;align-items:center;gap:.75rem}
 .dash-level-chip{
   display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--accent);border:1.5px solid var(--accent-mid);background:var(--accent-light);
-  padding:.28rem .7rem;border-radius:99px;
+  padding:.28rem .7rem;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
 .dash-streak-chip{
   display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.06em;
   color:var(--text);border:1.5px solid var(--border);background:var(--surface);
-  padding:.28rem .7rem;border-radius:99px;font-weight:500;
+  padding:.28rem .7rem;font-weight:500;border-radius:3px;
 }
 .dash-streak-chip.on-fire{border-color:rgba(255,120,0,.35);background:rgba(255,120,0,.06);color:#d06000}
 
-/* LIVE TIMER in topbar */
-.dash-topbar-timer{display:flex;align-items:center;gap:.45rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.04em;color:var(--text2)}
-.dash-topbar-timer-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .18s}
-.dash-topbar-timer-btn:hover{border-color:var(--accent);color:var(--accent)}
-.dash-topbar-timer-btn.running{border-color:var(--red);color:var(--red);background:var(--red-light)}
-#tb-timer-display{min-width:48px;text-align:center}
-
 /* XP bar in topbar */
-.dash-topbar-xp{display:flex;align-items:center;gap:.55rem;flex:1;max-width:160px;margin:0 auto}
-.dash-topbar-xp-track{flex:1;height:4px;background:var(--bg2);border-radius:99px;overflow:hidden}
-.dash-topbar-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.8));border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
+.dash-topbar-xp{display:flex;align-items:center;gap:.6rem;flex:1;max-width:220px;margin:0 1rem}
+.dash-topbar-xp-track{flex:1;height:4px;background:var(--bg2);overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,4px 100%)}
+.dash-topbar-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.8));transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
 
-/* GREET SECTION */
-.dash-greet-section{
-  padding:2.25rem 2rem 1.5rem;
+/* HERO SECTION — replaces boring greet section */
+.dash-hero{
+  position:relative;overflow:hidden;
+  padding:2.5rem 2rem 0;
   max-width:1100px;margin:0 auto;width:100%;
 }
+.dash-hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 90% 50%, var(--accent-light) 0%, transparent 70%);
+  pointer-events:none;
+}
+.dash-hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;align-items:start;gap:2rem}
 .dash-greet-text{
   font-family:'DM Serif Display',serif;
-  font-size:clamp(1.8rem,4vw,2.8rem);
+  font-size:clamp(1.6rem,3.5vw,2.6rem);
   letter-spacing:-.03em;color:var(--text);line-height:1.1;
   margin-bottom:.35rem;
 }
-.dash-greet-sub{font-size:.93rem;color:var(--text2);line-height:1.65}
+.dash-greet-sub{font-size:.9rem;color:var(--text2);line-height:1.65;margin-bottom:1.5rem}
 
-/* WEEK STRIP */
+/* XP RING — visual interest in hero */
+.dash-xp-ring-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.dash-xp-ring{position:relative;width:80px;height:80px}
+.dash-xp-ring svg{transform:rotate(-90deg)}
+.dash-xp-ring-bg{fill:none;stroke:var(--bg2);stroke-width:6}
+.dash-xp-ring-fill{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1)}
+.dash-xp-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dash-xp-num{font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;color:var(--text);letter-spacing:-.02em}
+.dash-xp-sub{font-family:'DM Mono',monospace;font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.dash-xp-ring-title{font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+
+/* WEEK STRIP — redesigned as horizontal bar with diamond markers */
 .dash-week-strip{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.75rem 2rem 1.5rem;max-width:1100px;margin:0 auto;width:100%;
+  display:flex;align-items:center;gap:.4rem;
+  padding:1.25rem 2rem;max-width:1100px;margin:0 auto;width:100%;
   overflow-x:auto;
 }
-.week-pip{
-  display:flex;flex-direction:column;align-items:center;gap:.3rem;
-  min-width:44px;
-}
+.week-pip{display:flex;flex-direction:column;align-items:center;gap:.3rem;min-width:40px}
 .week-pip-circle{
-  width:36px;height:36px;border-radius:50%;
+  width:32px;height:32px;
   border:2px solid var(--border);background:var(--surface);
   display:flex;align-items:center;justify-content:center;
-  font-size:.85rem;transition:all .3s;
+  font-size:.75rem;transition:all .35s;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
 }
 .week-pip-circle.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-light)}
-.week-pip-circle.today{border-color:var(--accent);border-style:dashed}
-.week-pip-day{font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.week-pip-circle.today{border-color:var(--accent);clip-path:none;border-radius:50%}
+.week-pip-day{font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.week-connector{flex:1;height:1px;background:var(--border);min-width:8px;max-width:20px}
 
-/* TOOLS GRID — the main dashboard */
+/* ══════════════
+   MAIN GRID — Asymmetric Bento Layout
+══════════════ */
 .dash-grid{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:.85rem;
-  max-width:960px;margin:0 auto;
+  grid-template-columns:2fr 1fr 1fr;
+  grid-template-rows:auto auto auto;
+  gap:1rem;
+  max-width:1000px;margin:0 auto;
   padding:0 2rem 4rem;width:100%;
 }
-/* Quiz card always full width */
-.tool-card-quiz{grid-column:1/-1!important}
-/* Path card full width */
-.tool-card-path{grid-column:1/-1}
-/* Streak card — 1 col, Practice — 2 cols */
-.tool-card-practice{grid-column:span 2}
 
-/* Base tool card */
+/* Base card — no border-radius, shape variety via specific classes */
 .tool-card{
   background:var(--surface);
   border:1.5px solid var(--border);
-  border-radius:12px;
-  padding:1.5rem;
+  padding:1.4rem;
   cursor:pointer;
-  transition:all .22s cubic-bezier(.4,0,.2,1);
+  transition:transform .2s cubic-bezier(.4,0,.2,1), box-shadow .2s, border-color .2s;
   position:relative;overflow:hidden;
   text-align:left;
-  display:flex;flex-direction:column;gap:.6rem;
+  display:flex;flex-direction:column;gap:.55rem;
 }
-.tool-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+.tool-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.12)}
 .tool-card:active{transform:translateY(-1px)}
+/* Shape variants */
+.tc-shape-sharp{border-radius:0}
+.tc-shape-snip{border-radius:0;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)}
+.tc-shape-snip-bl{border-radius:0;clip-path:polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))}
+.tc-shape-round{border-radius:16px}
+.tc-shape-pill-top{border-radius:99px 99px 8px 8px}
+.tc-shape-diamond-cut{border-radius:0;clip-path:polygon(0 12px,12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)}
 
-/* QUIZ card — featured, full width */
+/* QUIZ card — hero position, col-span */
 .tool-card-quiz{
-  grid-column:1/-1;
-  background:linear-gradient(135deg,#0a1a0a,#0f2a0f);
-  border-color:rgba(45,90,39,.5);
+  grid-column:1/3;grid-row:1;
+  background:linear-gradient(145deg,#071507,#0e230e,#0a1a0a);
+  border-color:rgba(45,90,39,.4);
   color:#fff;
-  flex-direction:row;align-items:center;gap:1.75rem;
-  padding:2rem 2rem;
+  flex-direction:row;align-items:stretch;gap:0;
+  padding:0;
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);
 }
-.tool-card-quiz:hover{box-shadow:0 12px 40px rgba(45,90,39,.3);border-color:rgba(45,90,39,.8)}
-.quiz-card-emoji{font-size:3rem;flex-shrink:0;filter:drop-shadow(0 0 12px rgba(45,90,39,.5))}
-.quiz-card-body{flex:1}
-.quiz-card-title{font-family:'DM Serif Display',serif;font-size:1.4rem;letter-spacing:-.02em;color:#fff;margin-bottom:.3rem}
-.quiz-card-sub{font-size:.86rem;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:1rem}
+.tool-card-quiz:hover{box-shadow:0 16px 48px rgba(45,90,39,.35);border-color:rgba(45,90,39,.7)}
+.quiz-card-left{
+  background:rgba(45,90,39,.15);
+  width:72px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid rgba(45,90,39,.25);
+}
+.quiz-card-emoji{font-size:2.2rem;filter:drop-shadow(0 0 12px rgba(45,90,39,.7))}
+.quiz-card-body{flex:1;padding:1.75rem 1.75rem 1.5rem}
+.quiz-card-title{font-family:'DM Serif Display',serif;font-size:1.35rem;letter-spacing:-.02em;color:#fff;margin-bottom:.25rem}
+.quiz-card-sub{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:1rem}
 .quiz-card-btn{
   display:inline-flex;align-items:center;gap:.5rem;
-  padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;
-  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  cursor:pointer;border-radius:6px;transition:all .2s;position:relative;overflow:hidden;
+  padding:.7rem 1.4rem;background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:0;transition:all .2s;position:relative;overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%);
 }
-.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);transition:transform .55s}
 .quiz-card-btn:hover::after{transform:translateX(100%)}
-.quiz-card-btn:hover{box-shadow:0 0 20px rgba(45,90,39,.5);transform:translateY(-1px)}
-.quiz-card-btn:disabled{opacity:.35;cursor:default;transform:none}
-.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding:.35rem .75rem;border:1px solid rgba(45,90,39,.4);background:rgba(45,90,39,.15);border-radius:99px}
+.quiz-card-btn:hover{box-shadow:0 0 24px rgba(45,90,39,.6);transform:translateY(-1px)}
+.quiz-card-btn:disabled{opacity:.3;cursor:default;transform:none}
+.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#a8c5a0;padding:.3rem .7rem;border:1px solid rgba(45,90,39,.4);background:rgba(45,90,39,.2)}
 
-/* Tool card icon */
-.tc-icon{font-size:2rem;margin-bottom:.1rem}
-.tc-title{font-family:'DM Serif Display',serif;font-size:1.05rem;letter-spacing:-.01em;color:var(--text);line-height:1.2}
-.tc-sub{font-size:.8rem;color:var(--text2);line-height:1.6}
-.tc-cta{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.25rem}
+/* STREAK card — tall right column */
+.tool-card-streak{
+  grid-column:3;grid-row:1/3;
+  background:linear-gradient(175deg,#fff8f0,#fff3e5,#fff8f0);
+  border-color:rgba(200,100,0,.2);
+  justify-content:space-between;
+  padding:1.5rem;
+}
+[data-theme="ink"] .tool-card-streak{background:linear-gradient(175deg,#201c16,#252218,#201c16)}
+.streak-big{
+  font-family:'DM Serif Display',serif;
+  font-size:4.5rem;letter-spacing:-.05em;color:#c06000;line-height:1;
+  text-shadow:0 2px 20px rgba(200,100,0,.2);
+}
+.streak-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(192,96,0,.5);margin-top:.1rem}
+.streak-flame-row{display:flex;gap:.2rem;margin-top:.5rem}
+.streak-dot{width:8px;height:8px;background:rgba(200,100,0,.15);border-radius:50%;transition:background .3s}
+.streak-dot.lit{background:#c06000}
 
-/* practice card — different accent */
-.tool-card-practice{background:linear-gradient(135deg,#f5f2ed,#ece8e0);border-color:rgba(0,0,0,.1)}
-[data-theme="ink"] .tool-card-practice{background:linear-gradient(135deg,#1e1e22,#252528);border-color:rgba(255,255,255,.1)}
+/* PRACTICE card */
+.tool-card-practice{
+  grid-column:1;grid-row:2;
+  background:linear-gradient(135deg,var(--bg2),var(--surface));
+  border-color:var(--border);
+}
 
-/* streak card — orange tint */
-.tool-card-streak{background:linear-gradient(135deg,#fff8f0,#fff0e0);border-color:rgba(200,100,0,.15)}
-[data-theme="ink"] .tool-card-streak{background:linear-gradient(135deg,#1e1c18,#252218)}
+/* FLASHCARDS */
+.tool-card-flash{
+  grid-column:2;grid-row:2;
+}
 
-/* Streak big number */
-.streak-big{font-family:'DM Serif Display',serif;font-size:3.5rem;letter-spacing:-.04em;color:#c06000;line-height:1}
-.streak-label{font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(192,96,0,.55);margin-top:.15rem}
+/* FORMULA SHEET */
+.tool-card-formulas{
+  background:linear-gradient(135deg,var(--accent-light),var(--surface));
+  border-color:var(--accent-mid);
+}
 
-/* Formula card — green */
-.tool-card-formulas{background:linear-gradient(135deg,var(--accent-light),var(--bg));border-color:var(--accent-mid)}
+/* PATH — spans full width */
+.tool-card-path{
+  grid-column:1/4;
+  background:var(--surface);
+  flex-direction:row;align-items:center;gap:1.5rem;
+  padding:1.25rem 1.5rem;
+}
+.path-progress-track{
+  flex:1;height:8px;
+  background:var(--bg2);overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% 100%,8px 100%);
+}
+.path-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.7));transition:width 1.2s ease;position:relative}
+.path-progress-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:12px;background:rgba(255,255,255,.4);filter:blur(2px)}
+
+/* BOTTOM ROW — 3 col */
+.tool-card-weak{grid-column:1}
+.tool-card-timer{grid-column:2}
+.tool-card-notes{grid-column:3}
+.tool-card-lessons{grid-column:1}
+
+/* Icon and text styles */
+.tc-icon{font-size:1.75rem;margin-bottom:.05rem}
+.tc-icon-lg{font-size:2.5rem}
+.tc-tag{
+  font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text3);border:1px solid var(--border);padding:.15rem .5rem;
+  display:inline-block;margin-bottom:.25rem;
+}
+.tc-title{font-family:'DM Serif Display',serif;font-size:1rem;letter-spacing:-.01em;color:var(--text);line-height:1.2}
+.tc-sub{font-size:.78rem;color:var(--text2);line-height:1.6}
+.tc-cta{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.2rem}
+.tc-cta::after{content:'→';transition:transform .2s}
+.tool-card:hover .tc-cta::after{transform:translateX(3px)}
+
+/* Hover accent line */
+.tool-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--accent);transform:scaleY(0);transform-origin:bottom;
+  transition:transform .22s cubic-bezier(.4,0,.2,1);
+}
+.tool-card:hover::before{transform:scaleY(1)}
+.tool-card-quiz::before{display:none}
+.tool-card-streak::before{left:auto;right:0;background:rgba(200,100,0,.5)}
 
 /* BADGES SECTION */
-.dash-badges-section{max-width:900px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
-.dash-section-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem}
+.dash-badges-section{max-width:1000px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.dash-section-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.dash-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
 .badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
 .badge-pill{
   display:flex;align-items:center;gap:.4rem;
-  padding:.4rem .9rem;border-radius:99px;
+  padding:.35rem .85rem;
   border:1.5px solid var(--border);background:var(--bg2);
-  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);transition:all .25s;cursor:default;
+  font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);transition:all .25s;cursor:default;border-radius:2px;
 }
 .badge-pill.earned{
   border-color:var(--accent-mid);background:var(--accent-light);
   color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-light);
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
 .badge-pill.earned.new-badge{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
 .badge-emoji{font-size:.85rem}
 
-/* SLIDE-IN PANELS (replace modals) */
+/* MODAL OVERLAY for sub-screens inside dashboard */
 .dash-modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;
-  display:none;justify-content:flex-end;backdrop-filter:blur(3px);
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:none;align-items:flex-start;justify-content:center;
+  overflow-y:auto;padding:1.5rem;backdrop-filter:blur(6px);
 }
 .dash-modal.open{display:flex}
 .dash-modal-box{
-  background:var(--bg);border-left:1.5px solid var(--border);
-  width:520px;max-width:100%;
-  height:100vh;display:flex;flex-direction:column;
-  box-shadow:-8px 0 40px rgba(0,0,0,.15);
-  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
-  overflow:hidden;
+  background:var(--bg);border:1.5px solid var(--border);
+  width:100%;max-width:680px;border-radius:12px;
+  margin:auto;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
 }
-.dash-modal.open .dash-modal-box{transform:translateX(0)}
 .dmb-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);
-  background:var(--surface);flex-shrink:0;
+  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  background:var(--surface);
 }
-.dmb-title{font-family:'DM Serif Display',serif;font-size:1.2rem;letter-spacing:-.02em;color:var(--text)}
-.dmb-close{background:none;border:none;font-size:1.2rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
+.dmb-title{font-family:'DM Serif Display',serif;font-size:1.25rem;letter-spacing:-.02em;color:var(--text)}
+.dmb-close{background:none;border:none;font-size:1.25rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
 .dmb-close:hover{color:var(--text)}
-.dmb-body{padding:1.5rem;overflow-y:auto;flex:1}
+.dmb-body{padding:1.5rem}
 
 /* settings inside modal */
 .setting-row2{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid var(--border);gap:1rem}
@@ -536,21 +621,6 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ps-desc{font-size:.79rem;color:var(--text2);line-height:1.6}
 .ps-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border:1px solid var(--border);color:var(--text3);border-radius:3px;margin-right:.3rem;margin-top:.3rem}
 .ps-tag.here{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
-
-/* KA UNITS IN PATH */
-.ka-units-section{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
-.ka-units-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
-.ka-unit-list{display:flex;flex-direction:column;gap:.25rem}
-.ka-unit-row{display:flex;align-items:center;gap:.6rem;padding:.38rem .5rem;border-radius:5px;transition:background .15s;cursor:pointer}
-.ka-unit-row:hover{background:var(--bg2)}
-.ka-unit-check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.55rem;flex-shrink:0;transition:all .15s;cursor:pointer}
-.ka-unit-check.done{background:var(--accent);border-color:var(--accent);color:#fff}
-.ka-unit-name{font-size:.8rem;color:var(--text2);flex:1;line-height:1.4}
-.ka-unit-name.done{color:var(--text3);text-decoration:line-through}
-.ka-unit-link{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.06em;color:var(--accent);text-decoration:none;flex-shrink:0;opacity:0;transition:opacity .15s}
-.ka-unit-row:hover .ka-unit-link{opacity:1}
-.ka-pct-bar{height:3px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:.4rem;margin-bottom:.1rem}
-.ka-pct-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
 
 /* ── MOBILE ── */
 @media(max-width:680px){
@@ -823,118 +893,140 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
       <div class="dash-topbar-xp-label" id="tb-xp-label">0 XP</div>
       <div class="dash-topbar-xp-track"><div class="dash-topbar-xp-fill" id="tb-xp-fill" style="width:0%"></div></div>
     </div>
-    <div class="dash-topbar-timer">
-      <button class="dash-topbar-timer-btn" id="tb-timer-btn" onclick="tbTimerToggle()" title="Start study timer">▶</button>
-      <span id="tb-timer-display">0:00</span>
+    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️ Settings</button>
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="dash-hero">
+    <div class="dash-hero-bg"></div>
+    <div class="dash-hero-inner">
+      <div>
+        <div class="dash-greet-text" id="dash-greet">Hey — good morning! 👋</div>
+        <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
+        <!-- WEEK STRIP inline -->
+        <div class="dash-week-strip" id="dash-week-strip" style="padding:0;margin:0;max-width:none"></div>
+      </div>
+      <div class="dash-xp-ring-wrap">
+        <div class="dash-xp-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="dash-xp-ring-bg" cx="40" cy="40" r="35"/>
+            <circle class="dash-xp-ring-fill" id="xp-ring-fill" cx="40" cy="40" r="35"/>
+          </svg>
+          <div class="dash-xp-ring-label">
+            <div class="dash-xp-num" id="xp-ring-num">0</div>
+            <div class="dash-xp-sub">XP</div>
+          </div>
+        </div>
+        <div class="dash-xp-ring-title">Progress</div>
+      </div>
     </div>
-    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️</button>
   </div>
 
-  <!-- GREETING -->
-  <div class="dash-greet-section">
-    <div class="dash-greet-text" id="dash-greet">Hey — good morning! 👋</div>
-    <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
-  </div>
-
-  <!-- WEEK STRIP -->
-  <div class="dash-week-strip" id="dash-week-strip"></div>
-
-  <!-- MAIN TOOL GRID -->
+  <!-- MAIN BENTO GRID -->
   <div class="dash-grid">
 
-    <!-- DAILY QUIZ — full width featured card -->
-    <div class="tool-card tool-card-quiz" id="quiz-card-wrap">
-      <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
+    <!-- DAILY QUIZ — hero card, col 1-2 -->
+    <div class="tool-card tool-card-quiz tc-shape-snip" id="quiz-card-wrap">
+      <div class="quiz-card-left">
+        <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
+      </div>
       <div class="quiz-card-body">
         <div class="quiz-card-title" id="quiz-card-title">Today's Quiz</div>
-        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive. Every wrong answer shows you why — no more guessing.</div>
-        <button class="quiz-card-btn" id="quiz-start-btn" onclick="startDailyQuiz()">
-          Let's go →
-        </button>
+        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive.</div>
+        <button class="quiz-card-btn" id="quiz-start-btn" onclick="startDailyQuiz()">Let's go →</button>
       </div>
     </div>
 
-    <!-- PRACTICE — spans 2 cols -->
-    <div class="tool-card tool-card-practice" style="grid-column:span 2" onclick="openDashModal('modal-practice')">
+    <!-- STREAK card — tall right col, rows 1-2 -->
+    <div class="tool-card tool-card-streak tc-shape-sharp">
+      <div class="tc-tag">Day Streak</div>
+      <div class="streak-big" id="streak-big-num">0</div>
+      <div class="streak-label">🔥 days in a row</div>
+      <div class="streak-flame-row" id="streak-flame-row">
+        <div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div>
+        <div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div><div class="streak-dot"></div>
+      </div>
+      <div class="tc-sub" id="streak-card-sub" style="margin-top:.5rem;font-size:.75rem">Complete today's quiz!</div>
+    </div>
+
+    <!-- PRACTICE -->
+    <div class="tool-card tool-card-practice tc-shape-snip-bl" onclick="openDashModal('modal-practice')">
+      <div class="tc-tag">Drill</div>
       <div class="tc-icon">⚡</div>
       <div class="tc-title">Practice Mode</div>
-      <div class="tc-sub">Unlimited questions at your level. No streak pressure — just reps until it clicks.</div>
-      <div class="tc-cta">Start practicing →</div>
+      <div class="tc-sub">Unlimited reps. No streak pressure.</div>
+      <div class="tc-cta">Open Practice</div>
     </div>
 
-    <!-- STREAK card — 1 col -->
-    <div class="tool-card tool-card-streak">
-      <div class="tc-icon">🔥</div>
-      <div class="streak-big" id="streak-big-num">0</div>
-      <div class="streak-label">day streak</div>
-      <div class="tc-sub" id="streak-card-sub" style="margin-top:.4rem">Complete today's quiz to keep it going!</div>
-    </div>
-
-    <!-- FLASHCARDS — 1 col, opens full side panel -->
-    <div class="tool-card" onclick="openDashModal('modal-flashcards')">
+    <!-- FLASHCARDS -->
+    <div class="tool-card tool-card-flash tc-shape-diamond-cut" onclick="openDashModal('modal-flashcards')">
+      <div class="tc-tag">Memory</div>
       <div class="tc-icon">🃏</div>
       <div class="tc-title">Flashcards</div>
-      <div class="tc-sub">Flip through key concepts at your level. Rate what you know, skip what you don't.</div>
-      <div class="tc-cta">Open flashcards →</div>
+      <div class="tc-sub">Flip through key concepts. Rate what you know.</div>
+      <div class="tc-cta">Flip cards</div>
     </div>
 
-    <!-- FORMULA SHEET — 1 col -->
-    <div class="tool-card tool-card-formulas" onclick="openDashModal('modal-formulas')">
+    <!-- PATH — full width -->
+    <div class="tool-card tool-card-path tc-shape-sharp" style="grid-column:1/4" onclick="openDashModal('modal-path')">
+      <div class="tc-icon" style="font-size:1.4rem;flex-shrink:0">🗺️</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.5rem">
+          <div class="tc-title">Your Learning Path</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7</div>
+        </div>
+        <div class="path-progress-track">
+          <div id="path-mini-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),rgba(90,200,90,.7));width:0%;transition:width 1.2s ease"></div>
+        </div>
+      </div>
+      <div class="tc-cta" style="flex-shrink:0">View path</div>
+    </div>
+
+    <!-- FORMULA SHEET -->
+    <div class="tool-card tool-card-formulas tc-shape-snip" onclick="openDashModal('modal-formulas')">
+      <div class="tc-tag">Reference</div>
       <div class="tc-icon">📋</div>
       <div class="tc-title">Formula Sheet</div>
-      <div class="tc-sub">Every formula, searchable. Your reference for every session.</div>
-      <div class="tc-cta">Open sheet →</div>
+      <div class="tc-sub">Every formula, searchable by level.</div>
+      <div class="tc-cta">Open sheet</div>
     </div>
 
-    <!-- WEAK SPOTS — 1 col -->
-    <div class="tool-card" onclick="openDashModal('modal-weakspots')">
+    <!-- WEAK SPOTS -->
+    <div class="tool-card tool-card-weak tc-shape-sharp" onclick="openDashModal('modal-weakspots')">
+      <div class="tc-tag">Focus</div>
       <div class="tc-icon">🎯</div>
       <div class="tc-title">Weak Spots</div>
-      <div class="tc-sub" id="ws-card-sub">Topics you've missed. Fix these first.</div>
-      <div class="tc-cta">Review now →</div>
+      <div class="tc-sub" id="ws-card-sub">Topics you've missed.</div>
+      <div class="tc-cta">Fix these</div>
     </div>
 
-    <!-- MY PATH — full width -->
-    <div class="tool-card tool-card-path" onclick="openDashModal('modal-path')">
-      <div style="display:flex;align-items:center;gap:1rem">
-        <div class="tc-icon">🗺️</div>
-        <div style="flex:1">
-          <div class="tc-title">Your Learning Path</div>
-          <div class="tc-sub">Every level from here to Calculus II — with timelines and what's next.</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
-          <div style="font-family:'DM Mono',monospace;font-size:.46rem;color:var(--text3);margin-top:.2rem" id="path-ka-inline">KA: — units done</div>
-        </div>
-      </div>
-      <div style="margin-top:.75rem;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden">
-        <div id="path-mini-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
-      </div>
-    </div>
-
-    <!-- NOTES — 1 col -->
-    <div class="tool-card" onclick="openDashModal('modal-notes')">
-      <div class="tc-icon">📝</div>
-      <div class="tc-title">My Notes</div>
-      <div class="tc-sub">Your personal notebook. Auto-saves per level.</div>
-      <div class="tc-cta">Open notes →</div>
-    </div>
-
-    <!-- LESSONS — 1 col -->
-    <div class="tool-card" onclick="window.location.href='lessons.html'">
-      <div class="tc-icon">📚</div>
-      <div class="tc-title">Lessons</div>
-      <div class="tc-sub">94 step-by-step lessons from arithmetic to calculus. Worked examples, practice, checks.</div>
-      <div class="tc-cta">Open lessons →</div>
-    </div>
-
-    <!-- TIMER card — shows live session time -->
-    <div class="tool-card" id="timer-dash-card" onclick="openDashModal('modal-timer')">
+    <!-- TIMER -->
+    <div class="tool-card tool-card-timer tc-shape-snip-bl" onclick="openDashModal('modal-timer')">
+      <div class="tc-tag">Focus</div>
       <div class="tc-icon">⏱️</div>
       <div class="tc-title">Study Timer</div>
-      <div class="tc-sub">Track your sessions. <span id="timer-card-total" style="color:var(--accent);font-weight:500">0h 0m this week</span></div>
-      <div class="tc-cta">View sessions →</div>
+      <div class="tc-sub">Track sessions and weekly hours.</div>
+      <div class="tc-cta" id="timer-card-total">0h 0m this week</div>
     </div>
+
+    <!-- NOTES -->
+    <div class="tool-card tool-card-notes tc-shape-sharp" onclick="openDashModal('modal-notes')">
+      <div class="tc-tag">Personal</div>
+      <div class="tc-icon">📝</div>
+      <div class="tc-title">My Notes</div>
+      <div class="tc-sub">Personal notebook. Auto-saves per level.</div>
+      <div class="tc-cta">Open notes</div>
+    </div>
+
+    <!-- LESSONS — full width bottom -->
+    <div class="tool-card tool-card-lessons tc-shape-snip" style="grid-column:1/3" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
+      <div class="tc-tag">Learn</div>
+      <div class="tc-icon">📚</div>
+      <div class="tc-title">Lessons</div>
+      <div class="tc-sub">Step-by-step walkthroughs for every topic. Opens in a new tab with your current theme.</div>
+      <div class="tc-cta">Open lessons ↗</div>
+    </div>
+
 
   </div><!-- /dash-grid -->
 
@@ -1220,99 +1312,6 @@ const STAGES = [
   { name:'Calculus II & Beyond', desc:'Integration techniques, sequences & series, convergence, Taylor series, intro multivariable & linear algebra.', resources:[{type:'video',name:'Professor Leonard — Calc 2',url:'https://youtube.com/c/ProfessorLeonard'},{type:'course',name:'MIT OCW — Multivariable Calculus',url:'https://ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/'}]},
 ];
 const HOURS_TO_NEXT = [40,80,100,80,60,80,0];
-
-// Khan Academy curriculum mapped to each level
-const KA_UNITS = {
-  0:[
-    {name:'Intro to multiplication',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:mult-basics'},
-    {name:'1-digit multiplication',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:arith-review-multiply-divide'},
-    {name:'Intro to division',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:arith-review-multiply-divide'},
-    {name:'Understand fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
-    {name:'Place value through 1,000,000',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:place-value'},
-    {name:'Add and subtract through 1,000,000',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:add-sub-within-1000000'},
-    {name:'Multiply 1- and 2-digit numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
-    {name:'Divide with remainders',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
-    {name:'Add and subtract fractions (like denominators)',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
-    {name:'Multiply fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
-    {name:'Decimals and place value',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
-    {name:'Add and subtract decimals',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
-    {name:'Add and subtract fractions (unlike denominators)',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
-    {name:'Multiply and divide multi-digit numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
-    {name:'Divide fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
-    {name:'Multiply and divide decimals',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
-    {name:'Exponents and powers of ten',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:exponents-powers-of-ten'},
-    {name:'Add and subtract negative numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:negative-numbers'},
-    {name:'Multiply and divide negative numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:negative-numbers'},
-  ],
-  1:[
-    {name:'Variables and expressions',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:foundation-algebra'},
-    {name:'One-step equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
-    {name:'Two-step equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
-    {name:'Linear equations (general)',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-graphs'},
-    {name:'Slope and y-intercept',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-graphs'},
-    {name:'Systems of equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:systems-of-equations'},
-    {name:'Inequalities',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
-    {name:'Intro to functions',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:functions'},
-    {name:'Sequences',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:sequences'},
-    {name:'Absolute value equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:absolute-value-piecewise-functions'},
-    {name:'Intro to quadratics',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring'},
-    {name:'Factoring',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring'},
-  ],
-  2:[
-    {name:'Polynomials',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-arithmetic'},
-    {name:'Factoring polynomials',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-factor'},
-    {name:'Rational expressions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:rational'},
-    {name:'Radical expressions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:complex'},
-    {name:'Complex numbers',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:complex'},
-    {name:'Exponential functions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:exp'},
-    {name:'Logarithms',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:logs'},
-    {name:'Transformations of functions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:transformations'},
-    {name:'Sequences and series',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:sequences'},
-  ],
-  3:[
-    {name:'Angles and lines',url:'https://www.khanacademy.org/math/geometry/hs-geo-foundations'},
-    {name:'Triangles',url:'https://www.khanacademy.org/math/geometry/hs-geo-congruence'},
-    {name:'Similarity',url:'https://www.khanacademy.org/math/geometry/hs-geo-similarity'},
-    {name:'Right triangles and trig',url:'https://www.khanacademy.org/math/geometry/hs-geo-trig'},
-    {name:'Circles',url:'https://www.khanacademy.org/math/geometry/hs-geo-circles'},
-    {name:'Area and perimeter',url:'https://www.khanacademy.org/math/geometry/hs-geo-foundations'},
-    {name:'Volume and surface area',url:'https://www.khanacademy.org/math/geometry/hs-geo-solids'},
-    {name:'Coordinate geometry',url:'https://www.khanacademy.org/math/geometry/hs-geo-analytic-geometry'},
-    {name:'Proofs',url:'https://www.khanacademy.org/math/geometry/hs-geo-proofs'},
-  ],
-  4:[
-    {name:'Trig functions',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
-    {name:'Unit circle',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
-    {name:'Trig identities',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
-    {name:'Conic sections',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:conics'},
-    {name:'Matrices',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:matrices'},
-    {name:'Vectors',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors'},
-    {name:'Polar coordinates',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:polar-coordinates'},
-    {name:'Limits intro',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:limits-from-equations'},
-  ],
-  5:[
-    {name:'Limits and continuity',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-limits-new'},
-    {name:'Intro to derivatives',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new'},
-    {name:'Differentiation rules',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new'},
-    {name:'Chain rule',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-2-new'},
-    {name:'Implicit differentiation',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-2-new'},
-    {name:'Related rates',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-diff-contextual-applications-new'},
-    {name:'Optimization',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-diff-analytical-applications-new'},
-    {name:'Intro to integration',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new'},
-    {name:'Fundamental Theorem of Calculus',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new'},
-  ],
-  6:[
-    {name:'Integration techniques',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
-    {name:'Integration by parts',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
-    {name:'Trig substitution',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
-    {name:'Partial fractions',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
-    {name:'Sequences and series',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
-    {name:'Convergence tests',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
-    {name:'Taylor and Maclaurin series',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
-    {name:'Parametric equations',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new'},
-    {name:'Vectors and motion',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new'},
-  ],
-};
 
 // Formulas database
 const FORMULAS = {
@@ -1848,10 +1847,19 @@ async function showDashboard(){
     sc.textContent='🔥 '+streak+' day'+(streak!==1?'s':'');
     sc.className='dash-streak-chip'+(streak>=3?' on-fire':'');
 
-    // XP bar
+    // XP ring
     const xp=(totalQ*10+(streak*5))%100;
     document.getElementById('tb-xp-label').textContent=xp+' XP';
-    setTimeout(()=>{document.getElementById('tb-xp-fill').style.width=xp+'%';},300);
+    document.getElementById('xp-ring-num').textContent=xp;
+    setTimeout(()=>{
+      document.getElementById('tb-xp-fill').style.width=xp+'%';
+      const ring=document.getElementById('xp-ring-fill');
+      if(ring){const circumference=220;ring.style.strokeDashoffset=circumference-(circumference*(xp/100));}
+    },300);
+
+    // Streak flame dots
+    const flameDots=document.querySelectorAll('.streak-dot');
+    flameDots.forEach((d,i)=>d.classList.toggle('lit',i<Math.min(streak,7)));
 
     // Week strip
     renderWeekStrip(data.weekDays||[]);
@@ -1895,12 +1903,6 @@ async function showDashboard(){
     const pathPct=Math.round((user.level/(STAGES.length-1))*100);
     document.getElementById('path-mini-fill').style.width=pathPct+'%';
     document.getElementById('path-progress-inline').textContent='Level '+(user.level+1)+' of '+STAGES.length+' →';
-    // KA progress for current level
-    const kaDoneData=JSON.parse(localStorage.getItem('apexmath_ka_done')||'{}');
-    const kaUnitsAtLevel=KA_UNITS[user.level]||[];
-    const kaDoneCount=kaUnitsAtLevel.filter((_,j)=>kaDoneData[`${user.level}-${j}`]).length;
-    const kaEl=document.getElementById('path-ka-inline');
-    if(kaEl) kaEl.textContent=kaUnitsAtLevel.length?`KA: ${kaDoneCount}/${kaUnitsAtLevel.length} units done`:'';
 
     // Timer total
     renderTimerTotal2();
@@ -1948,6 +1950,7 @@ function renderWeekStrip(passedDays){
     label.textContent=dayLabels[d.getDay()];
     pip.appendChild(circle); pip.appendChild(label);
     wrap.appendChild(pip);
+    if(i>0){const conn=document.createElement('div');conn.className='week-connector';conn.style.marginBottom='16px';wrap.appendChild(conn);}
   }
 }
 
@@ -2103,30 +2106,15 @@ function renderWeakSpots2(){
 function renderWeakSpots(){ renderWeakSpots2(); }
 
 // ── PATH MODAL ────────────────────────────────────────────────────────────────
-function getKaDone(){ return JSON.parse(localStorage.getItem('apexmath_ka_done')||'{}'); }
-function toggleKaUnit(level,idx){
-  const done=getKaDone();
-  const key=`${level}-${idx}`;
-  done[key]=!done[key];
-  localStorage.setItem('apexmath_ka_done',JSON.stringify(done));
-  renderPathModal();
-}
-
 function renderPathModal(){
   const pct=Math.round((userLevel/(STAGES.length-1))*100);
   document.getElementById('path-modal-label').textContent='Level '+(userLevel+1)+' of '+STAGES.length;
   document.getElementById('path-modal-pct').textContent=pct+'%';
   setTimeout(()=>{document.getElementById('path-modal-fill').style.width=pct+'%';},100);
   const wrap=document.getElementById('path-modal-stages'); if(!wrap)return; wrap.innerHTML='';
-  const kaDone=getKaDone();
-
   STAGES.forEach((s,i)=>{
     const isCurrent=i===userLevel,isDone=i<userLevel;
-    const el=document.createElement('div'); el.className='ps-item'; el.style.flexDirection='column'; el.style.gap='.5rem';
-
-    // Header row
-    const headerRow=document.createElement('div');
-    headerRow.style.cssText='display:flex;align-items:flex-start;gap:1rem';
+    const el=document.createElement('div'); el.className='ps-item';
     const dot=document.createElement('div');
     dot.className='ps-dot'+(isDone?' done':isCurrent?' current':'');
     dot.textContent=isDone?'✓':'';
@@ -2136,71 +2124,20 @@ function renderPathModal(){
     if(i===userLevel+1) tags+=`<span class="ps-tag" style="color:var(--gold,#92700a);border-color:rgba(146,112,10,.25)">Up next</span>`;
     tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+Math.round(HOURS_TO_NEXT[i]/5)+' weeks'}</span>`;
     body.innerHTML=`<div class="ps-name${isCurrent?' current-level':''}">${s.name}</div><div style="margin-bottom:.3rem">${tags}</div><div class="ps-desc">${s.desc}</div>`;
-    headerRow.appendChild(dot); headerRow.appendChild(body);
-    el.appendChild(headerRow);
-
-    // KA Units section (show for current level and adjacent ones)
-    const units=KA_UNITS[i]||[];
-    if(units.length && (isCurrent || isDone || i===userLevel+1)){
-      const doneCount=units.filter((_,j)=>kaDone[`${i}-${j}`]).length;
-      const pctKa=Math.round(doneCount/units.length*100);
-      const kaSection=document.createElement('div');
-      kaSection.className='ka-units-section';
-      kaSection.style.marginLeft='2.5rem';
-      kaSection.innerHTML=`
-        <div class="ka-units-label">
-          <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 5L4.5 6.5L6.5 3.5" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
-          Khan Academy — ${doneCount}/${units.length} units
-          <a href="https://www.khanacademy.org/math/arithmetic" target="_blank" rel="noopener" style="margin-left:auto;font-size:.48rem;color:var(--accent);text-decoration:none">Open course ↗</a>
-        </div>
-        <div class="ka-pct-bar"><div class="ka-pct-fill" style="width:${pctKa}%"></div></div>
-        <div class="ka-unit-list">${units.map((u,j)=>{
-          const unitDone=!!kaDone[`${i}-${j}`];
-          return`<div class="ka-unit-row" onclick="toggleKaUnit(${i},${j})">
-            <div class="ka-unit-check${unitDone?' done':''}">${unitDone?'✓':''}</div>
-            <span class="ka-unit-name${unitDone?' done':''}">${u.name}</span>
-            <a class="ka-unit-link" href="${u.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Study →</a>
-          </div>`;
-        }).join('')}</div>
-      `;
-      el.appendChild(kaSection);
-    }
-
+    el.appendChild(dot); el.appendChild(body);
     wrap.appendChild(el);
   });
 }
 
 // ── TIMER MODAL ───────────────────────────────────────────────────────────────
 let t2Interval=null, t2StartTime=0, t2Elapsed=0, t2Running=false;
-
-// TOPBAR LIVE TIMER
-function tbTimerToggle(){
-  if(t2Running){ timerStop2(); }
-  else { timerStart2(); }
-  updateTopbarTimer();
-}
-function updateTopbarTimer(){
-  const btn=document.getElementById('tb-timer-btn');
-  if(!btn) return;
-  btn.textContent=t2Running?'⏸':'▶';
-  btn.className='dash-topbar-timer-btn'+(t2Running?' running':'');
-}
-function timerTickAll(){
-  t2Elapsed=Date.now()-t2StartTime;
-  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
-  const modal=document.getElementById('timer-digits2');
-  if(modal) modal.textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-  const tb=document.getElementById('tb-timer-display');
-  if(tb) tb.textContent=h>0?`${h}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`:`${m}:${String(s%60).padStart(2,'0')}`;
-}
 function timerStart2(){
   if(t2Running)return; t2Running=true; t2StartTime=Date.now()-t2Elapsed;
-  t2Interval=setInterval(timerTickAll,1000);
-  const s=document.getElementById('timer-btn-start2');if(s)s.disabled=true;
-  const st=document.getElementById('timer-btn-stop2');if(st)st.disabled=false;
-  const status=document.getElementById('timer-status2');if(status)status.textContent='running…';
-  const dig=document.getElementById('timer-digits2');if(dig)dig.classList.add('running');
-  updateTopbarTimer();
+  t2Interval=setInterval(timerTick2,1000);
+  document.getElementById('timer-btn-start2').disabled=true;
+  document.getElementById('timer-btn-stop2').disabled=false;
+  document.getElementById('timer-status2').textContent='running…';
+  document.getElementById('timer-digits2').classList.add('running');
 }
 function timerStop2(){
   if(!t2Running)return; t2Running=false; clearInterval(t2Interval);
@@ -2209,12 +2146,11 @@ function timerStop2(){
   sessions.push({date:new Date().toLocaleDateString(),dur:t2Elapsed});
   localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
   t2Elapsed=0;
-  const s=document.getElementById('timer-btn-start2');if(s)s.disabled=false;
-  const st=document.getElementById('timer-btn-stop2');if(st)st.disabled=true;
-  const status=document.getElementById('timer-status2');if(status)status.textContent='session saved ✓';
-  const dig=document.getElementById('timer-digits2');if(dig)dig.classList.remove('running');
-  const tb=document.getElementById('tb-timer-display');if(tb)tb.textContent='0:00';
-  renderTimerTotal2(); renderTimerLog2(); updateTopbarTimer();
+  document.getElementById('timer-btn-start2').disabled=false;
+  document.getElementById('timer-btn-stop2').disabled=true;
+  document.getElementById('timer-status2').textContent='session saved ✓';
+  document.getElementById('timer-digits2').classList.remove('running');
+  renderTimerTotal2(); renderTimerLog2();
 }
 function timerReset2(){
   t2Running=false; clearInterval(t2Interval); t2Elapsed=0;
@@ -2224,14 +2160,18 @@ function timerReset2(){
   document.getElementById('timer-status2').textContent='ready to start';
   document.getElementById('timer-digits2').classList.remove('running');
 }
-// timerTick2 replaced by timerTickAll above
+function timerTick2(){
+  t2Elapsed=Date.now()-t2StartTime;
+  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  document.getElementById('timer-digits2').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
 function renderTimerTotal2(){
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
   const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<7*24*3600*1000).reduce((a,s)=>a+s.dur,0);
   const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
   const txt=`${h}h ${m}m`;
   const el=document.getElementById('timer-total2');if(el)el.textContent=txt;
-  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week';
+  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week →';
 }
 function renderTimerLog2(){
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
