@@ -578,6 +578,309 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ps-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border:1px solid var(--border);color:var(--text3);border-radius:3px;margin-right:.3rem;margin-top:.3rem}
 .ps-tag.here{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
 
+/* ══════════════════════════════════════════════════
+   DAILY QUIZ — complete redesign
+══════════════════════════════════════════════════ */
+#s-daily{background:var(--bg);min-height:100vh}
+.daily-shell{
+  max-width:680px;margin:0 auto;
+  padding:2rem 2rem 5rem;
+}
+
+/* Top nav row */
+.dq-topnav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;
+}
+.dq-back-btn{
+  display:flex;align-items:center;gap:.4rem;
+  background:none;border:none;
+  font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);cursor:pointer;padding:0;transition:color .2s;
+}
+.dq-back-btn:hover{color:var(--accent)}
+.dq-progress-info{
+  font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text3);
+}
+
+/* Progress bar */
+.dq-progress-bar{
+  height:3px;background:var(--bg2);border-radius:2px;overflow:hidden;
+  margin-bottom:2.5rem;
+}
+.dq-progress-fill{
+  height:100%;background:var(--accent);border-radius:2px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Level pill */
+.dq-level-pill{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-mid);background:var(--accent-light);
+  padding:.22rem .65rem;border-radius:3px;margin-bottom:1.25rem;
+}
+
+/* Question text */
+.dq-question{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.25rem,3vw,1.7rem);
+  letter-spacing:-.02em;color:var(--text);line-height:1.4;
+  margin-bottom:1.75rem;
+}
+
+/* Answer options */
+.dq-options{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.dq-opt{
+  display:flex;align-items:center;gap:.85rem;
+  padding:.9rem 1.1rem;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;text-align:left;
+  transition:border-color .15s, background .15s, transform .1s;
+  width:100%;
+}
+.dq-opt:hover:not(.dq-disabled){
+  border-color:var(--accent);
+  background:var(--accent-light);
+  transform:translateX(2px);
+}
+.dq-opt.dq-correct{
+  border-color:var(--accent)!important;
+  background:var(--accent-light)!important;
+}
+.dq-opt.dq-wrong{
+  border-color:var(--red)!important;
+  background:var(--red-light)!important;
+}
+.dq-opt.dq-disabled{cursor:default;pointer-events:none}
+.dq-opt-letter{
+  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.04em;
+  color:var(--text3);flex-shrink:0;
+  width:22px;height:22px;border:1px solid var(--border);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.dq-opt:hover:not(.dq-disabled) .dq-opt-letter{border-color:var(--accent);color:var(--accent)}
+.dq-opt.dq-correct .dq-opt-letter{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.dq-opt.dq-wrong .dq-opt-letter{border-color:var(--red);color:var(--red)}
+.dq-opt-text{font-size:.9rem;color:var(--text);line-height:1.4;flex:1}
+
+/* Hint */
+.dq-hint-row{margin-bottom:1.25rem}
+.dq-hint-toggle{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:none;border:none;padding:0;
+  font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold,#92700a);cursor:pointer;transition:opacity .2s;
+}
+.dq-hint-toggle:hover{opacity:.7}
+.dq-hint-content{
+  display:none;
+  margin-top:.65rem;
+  background:rgba(146,112,10,.07);
+  border:1px solid rgba(146,112,10,.2);
+  border-left:3px solid var(--gold,#92700a);
+  border-radius:0 6px 6px 0;
+  padding:.85rem 1rem;
+  font-size:.86rem;color:var(--text2);line-height:1.7;
+  animation:fadeUp .25s ease;
+}
+.dq-hint-content.show{display:block}
+
+/* Solution panel */
+.dq-solution-panel{
+  display:none;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:1.25rem;
+  animation:fadeUp .3s ease;
+}
+.dq-solution-panel.show{display:block}
+.dq-solution-panel.dq-sol-wrong{border-color:rgba(192,57,43,.3)}
+
+.dq-sol-header{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.85rem 1.1rem;
+  border-bottom:1px solid var(--border);
+}
+.dq-sol-verdict{
+  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:500;
+}
+.dq-sol-verdict.right{color:var(--accent)}
+.dq-sol-verdict.wrong{color:var(--red)}
+
+.dq-sol-body{padding:1.1rem 1.1rem .85rem}
+.dq-sol-explanation{font-size:.88rem;color:var(--text2);line-height:1.8;margin-bottom:.85rem}
+.dq-sol-steps-wrap{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.75rem 1rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  margin-bottom:.85rem;
+}
+.dq-sol-step{
+  font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);line-height:1.55;
+  display:flex;align-items:baseline;gap:.6rem;
+}
+.dq-sol-step-num{
+  font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);flex-shrink:0;padding-top:.05rem;
+}
+
+/* Resources inside solution */
+.dq-resources{
+  border-top:1px solid var(--border);
+  padding:.85rem 1.1rem;
+  display:flex;flex-direction:column;gap:.5rem;
+}
+.dq-resources-label{
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:.3rem;
+}
+.dq-resource-link{
+  display:flex;align-items:center;gap:.6rem;
+  text-decoration:none;
+  padding:.5rem .75rem;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:var(--bg);
+  transition:border-color .15s, background .15s;
+}
+.dq-resource-link:hover{border-color:var(--accent);background:var(--accent-light)}
+.dq-resource-type{
+  font-family:'DM Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);border:1px solid var(--border);padding:.1rem .4rem;border-radius:2px;flex-shrink:0;
+}
+.dq-resource-name{font-size:.82rem;color:var(--text2);flex:1}
+.dq-resource-arrow{font-size:.7rem;color:var(--accent);flex-shrink:0}
+
+/* Next button */
+.dq-next-btn{
+  width:100%;padding:.85rem;
+  background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:8px;
+  transition:opacity .2s, transform .15s;
+}
+.dq-next-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ══════════════════════════════════════════════════
+   DAILY DONE — results screen
+══════════════════════════════════════════════════ */
+#s-daily-done{background:var(--bg);min-height:100vh}
+.done-shell{
+  max-width:600px;margin:0 auto;
+  padding:3rem 2rem 5rem;
+}
+.done-score-row{
+  display:flex;align-items:flex-end;gap:1rem;margin-bottom:.5rem;
+}
+.done-score-big{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(3rem,8vw,5rem);
+  letter-spacing:-.05em;color:var(--text);line-height:1;
+}
+.done-score-denom{
+  font-family:'DM Serif Display',serif;
+  font-size:1.75rem;color:var(--text3);letter-spacing:-.02em;
+  padding-bottom:.4rem;
+}
+.done-label{
+  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:.4rem;
+}
+.done-headline{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.5rem,3vw,2.2rem);
+  letter-spacing:-.03em;color:var(--text);line-height:1.15;
+  margin-bottom:.4rem;
+}
+.done-sub{font-size:.9rem;color:var(--text2);line-height:1.7;margin-bottom:1.75rem}
+
+/* Streak badge */
+.done-streak-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+  border:1.5px solid rgba(200,100,0,.3);background:rgba(200,100,0,.06);
+  color:#c06000;padding:.4rem .9rem;border-radius:4px;
+  margin-bottom:2rem;
+}
+
+/* Question breakdown dots */
+.done-breakdown{
+  display:flex;gap:.5rem;margin-bottom:2rem;
+}
+.done-q{
+  flex:1;height:6px;border-radius:3px;
+  background:var(--bg2);overflow:hidden;
+  position:relative;
+}
+.done-q::after{
+  content:'';position:absolute;inset:0;border-radius:3px;
+  transition:background .4s;
+}
+.done-q.passed::after{background:var(--accent)}
+.done-q.failed::after{background:var(--red)}
+
+/* Review list */
+.done-review{
+  display:flex;flex-direction:column;gap:.65rem;margin-bottom:2rem;
+}
+.done-review-item{
+  display:flex;align-items:flex-start;gap:.85rem;
+  padding:.85rem 1rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+}
+.done-review-num{
+  font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.06em;
+  color:var(--text3);flex-shrink:0;padding-top:.1rem;
+}
+.done-review-q{font-size:.84rem;color:var(--text);line-height:1.45;flex:1}
+.done-review-icon{font-size:.9rem;flex-shrink:0}
+
+/* Actions */
+.done-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.done-btn-primary{
+  padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:opacity .2s;
+}
+.done-btn-primary:hover{opacity:.85}
+.done-btn-ghost{
+  padding:.75rem 1.2rem;background:none;border:1.5px solid var(--border);
+  color:var(--text2);font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:all .2s;
+}
+.done-btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Resources section at bottom of done screen */
+.done-resources-section{margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border)}
+.done-resources-title{
+  font-family:'DM Serif Display',serif;font-size:1.1rem;letter-spacing:-.01em;
+  color:var(--text);margin-bottom:.35rem;
+}
+.done-resources-sub{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:1.25rem}
+.done-resource-grid{display:flex;flex-direction:column;gap:.6rem}
+.done-resource-card{
+  display:flex;align-items:center;gap:1rem;
+  padding:.85rem 1rem;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface);text-decoration:none;
+  transition:border-color .15s, transform .15s;
+}
+.done-resource-card:hover{border-color:var(--accent);transform:translateX(3px)}
+.done-resource-icon{font-size:1.25rem;flex-shrink:0}
+.done-resource-info{flex:1}
+.done-resource-name{font-size:.88rem;color:var(--text);font-weight:400;margin-bottom:.1rem}
+.done-resource-desc{font-size:.75rem;color:var(--text3)}
+.done-resource-cta{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);flex-shrink:0}
+
 /* ── MOBILE ── */
 @media(max-width:680px){
   nav{padding:.9rem 1.25rem}
@@ -1190,41 +1493,83 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
      DAILY QUIZ
 ══════════════════════════════════ -->
 <div class="screen" id="s-daily">
-  <div class="daily-wrap">
-    <div class="daily-prog-wrap">
-      <div class="daily-prog-top"><span class="dq-label" id="dq-label">Question 1 of 5</span><span class="dq-level-tag" id="dq-level-tag">Level 1</span></div>
-      <div class="dq-bar"><div class="dq-fill" id="dq-fill" style="width:0%"></div></div>
+  <div class="daily-shell">
+
+    <!-- TOP NAV -->
+    <div class="dq-topnav">
+      <button class="dq-back-btn" onclick="showDashboard()">← Dashboard</button>
+      <span class="dq-progress-info" id="dq-label">Question 1 of 5</span>
     </div>
-    <div class="dq-confidence">
-      <span class="dq-conf-label">Confidence:</span>
-      <button class="dq-conf-btn" id="conf-sure" onclick="setConfidence('sure')">Sure</button>
-      <button class="dq-conf-btn" id="conf-unsure" onclick="setConfidence('unsure')">Unsure</button>
+
+    <!-- PROGRESS BAR -->
+    <div class="dq-progress-bar">
+      <div class="dq-progress-fill" id="dq-fill" style="width:0%"></div>
     </div>
-    <div class="dq-text" id="dq-text"></div>
-    <button class="dq-hint-btn" id="dq-hint-btn" onclick="toggleDailyHint()">💡 <span>Show hint</span></button>
-    <div class="dq-hint-box" id="dq-hint-box"></div>
-    <div class="opts" id="dq-opts"></div>
-    <div class="dq-solution" id="dq-solution">
-      <div class="dq-sol-verdict" id="dq-sol-verdict"></div>
-      <div class="dq-sol-body" id="dq-sol-body"></div>
-      <div class="dq-sol-steps" id="dq-sol-steps"></div>
-      <button class="dq-next-btn" onclick="dqAdvance()">Next Question →</button>
+
+    <!-- LEVEL PILL -->
+    <div class="dq-level-pill" id="dq-level-tag">Early Algebra</div>
+
+    <!-- QUESTION -->
+    <div class="dq-question" id="dq-text"></div>
+
+    <!-- OPTIONS -->
+    <div class="dq-options" id="dq-opts"></div>
+
+    <!-- HINT -->
+    <div class="dq-hint-row">
+      <button class="dq-hint-toggle" id="dq-hint-btn" onclick="toggleDailyHint()">
+        💡 <span>Show hint</span>
+      </button>
+      <div class="dq-hint-content" id="dq-hint-box"></div>
     </div>
+
+    <!-- SOLUTION PANEL (shown after answering) -->
+    <div class="dq-solution-panel" id="dq-solution">
+      <div class="dq-sol-header">
+        <div class="dq-sol-verdict" id="dq-sol-verdict"></div>
+      </div>
+      <div class="dq-sol-body">
+        <div class="dq-sol-explanation" id="dq-sol-body"></div>
+        <div class="dq-sol-steps-wrap" id="dq-sol-steps" style="display:none"></div>
+      </div>
+      <div class="dq-resources" id="dq-resources" style="display:none"></div>
+      <div style="padding:.85rem 1.1rem">
+        <button class="dq-next-btn" onclick="dqAdvance()" id="dq-next-btn">Next Question →</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- DAILY DONE -->
 <div class="screen" id="s-daily-done">
-  <div class="done-wrap">
-    <span class="done-icon" id="done-icon">✓</span>
-    <div class="done-title" id="done-title">Nice work.</div>
-    <div class="done-sub" id="done-sub">You passed today's quiz.</div>
-    <div class="done-streak-badge" id="done-streak">🔥 0 day streak</div>
-    <div class="done-breakdown" id="done-breakdown"></div>
-    <div class="done-actions">
-      <button class="action-btn" style="padding:.75rem 1.5rem;font-size:.62rem" onclick="showDashboard()">Back to Dashboard</button>
-      <button class="setting-btn" onclick="switchDTab('practice',document.querySelector('[data-tab=practice]'));showDashboard()">Practice More →</button>
+  <div class="done-shell">
+
+    <div class="done-label">Today's Quiz</div>
+    <div class="done-score-row">
+      <div class="done-score-big" id="done-score-big">0</div>
+      <div class="done-score-denom">/5</div>
     </div>
+    <div class="done-headline" id="done-title">Nice work.</div>
+    <div class="done-sub" id="done-sub">You passed today's quiz.</div>
+
+    <div class="done-streak-badge" id="done-streak" style="display:none">🔥 0 day streak</div>
+
+    <!-- Breakdown bars -->
+    <div class="done-breakdown" id="done-breakdown"></div>
+
+    <!-- Per-question review -->
+    <div class="done-review" id="done-review"></div>
+
+    <!-- Actions -->
+    <div class="done-actions">
+      <button class="done-btn-primary" onclick="showDashboard()">Back to Dashboard</button>
+      <button class="done-btn-ghost" onclick="openDashModal('modal-practice');showDashboard()">Practice More →</button>
+    </div>
+
+    <!-- Recommended resources based on level -->
+    <div class="done-resources-section" id="done-resources-section"></div>
+
   </div>
 </div>
 
@@ -2198,16 +2543,14 @@ function renderDailyQuestion(){
   document.getElementById('dq-hint-box').textContent=hint;
   document.getElementById('dq-hint-box').classList.remove('show');
   dailyHintOpen=false;
-  // Reset confidence
-  document.getElementById('conf-sure').classList.remove('selected');
-  document.getElementById('conf-unsure').classList.remove('selected');
-  // Reset solution
-  document.getElementById('dq-solution').classList.remove('show','wrong');
-  // Options
+  // Hide solution
+  const sol=document.getElementById('dq-solution');
+  sol.classList.remove('show','dq-sol-wrong');
+  // Build options
   const optsEl=document.getElementById('dq-opts'); optsEl.innerHTML='';
   ['A','B','C','D'].forEach((l,i)=>{
-    const btn=document.createElement('button'); btn.className='opt';
-    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    const btn=document.createElement('button'); btn.className='dq-opt';
+    btn.innerHTML=`<span class="dq-opt-letter">${l}</span><span class="dq-opt-text">${q.opts[i]}</span>`;
     btn.onclick=()=>handleDailyAnswer(i,q.ans,optsEl,q);
     optsEl.appendChild(btn);
   });
@@ -2221,24 +2564,42 @@ function handleDailyAnswer(chosen,correct_ans,optsEl,q){
     const topic=q.topic||STAGES[currentDailyLevel]?.name||'General';
     trackWrongAnswer(topic);
   }
-  dailyResults.push({isCorrect,chosen,correct_ans});
-  optsEl.querySelectorAll('.opt').forEach((b,i)=>{
-    b.classList.add('disabled');
-    if(i===correct_ans)b.classList.add('correct');
-    if(i===chosen&&!isCorrect)b.classList.add('wrong');
+  dailyResults.push({isCorrect,chosen,correct_ans,q});
+  optsEl.querySelectorAll('.dq-opt').forEach((b,i)=>{
+    b.classList.add('dq-disabled');
+    if(i===correct_ans)b.classList.add('dq-correct');
+    if(i===chosen&&!isCorrect)b.classList.add('dq-wrong');
   });
-  // Show solution immediately
+  // Show solution panel
   const sol=document.getElementById('dq-solution');
   sol.classList.add('show');
-  if(!isCorrect)sol.classList.add('wrong');
-  document.getElementById('dq-sol-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
-  document.getElementById('dq-sol-verdict').className='dq-sol-verdict '+(isCorrect?'right':'wrong');
-  document.getElementById('dq-sol-body').textContent=q.explanation||`Correct answer: ${['A','B','C','D'][correct_ans]}. ${q.opts[correct_ans]}.`;
+  if(!isCorrect)sol.classList.add('dq-sol-wrong');
+  const verdict=document.getElementById('dq-sol-verdict');
+  verdict.textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
+  verdict.className='dq-sol-verdict '+(isCorrect?'right':'wrong');
+  document.getElementById('dq-sol-body').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  // Steps
   const stepsEl=document.getElementById('dq-sol-steps');
   if(q.steps&&q.steps.length){
     stepsEl.style.display='flex';
-    stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="dq-sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');
+    stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="dq-sol-step"><span class="dq-sol-step-num">step ${i+1}</span>${s}</div>`).join('');
   }else stepsEl.style.display='none';
+  // Inline resources (on wrong answers especially)
+  const resEl=document.getElementById('dq-resources');
+  const resources=(STAGES[currentDailyLevel]?.resources)||[];
+  if(!isCorrect&&resources.length){
+    resEl.style.display='flex';
+    const typeIcons={'video':'▶','course':'📖','book':'📚','tool':'🛠','notes':'📝'};
+    resEl.innerHTML=`<div class="dq-resources-label">Review this topic</div>`+
+      resources.map(r=>`<a class="dq-resource-link" href="${r.url}" target="_blank" rel="noopener">
+        <span class="dq-resource-type">${r.type}</span>
+        <span class="dq-resource-name">${r.name}</span>
+        <span class="dq-resource-arrow">↗</span>
+      </a>`).join('');
+  }else resEl.style.display='none';
+  // Change next button text on last question
+  const nextBtn=document.getElementById('dq-next-btn');
+  if(nextBtn)nextBtn.textContent=dailyIndex>=4?'See Results →':'Next Question →';
 }
 
 function dqAdvance(){
@@ -2250,6 +2611,8 @@ function dqAdvance(){
 function toggleDailyHint(){
   dailyHintOpen=!dailyHintOpen;
   document.getElementById('dq-hint-box').classList.toggle('show',dailyHintOpen);
+  const btn=document.getElementById('dq-hint-btn');
+  if(btn)btn.querySelector('span').textContent=dailyHintOpen?'Hide hint':'Show hint';
 }
 
 async function finishDailyQuiz(){
@@ -2261,31 +2624,66 @@ async function finishDailyQuiz(){
   }catch(e){}
   showScreen('s-daily-done');
   document.getElementById('dq-fill').style.width='100%';
-  if(passed){
-    document.getElementById('done-icon').textContent='✓';
-    document.getElementById('done-title').textContent=dailyCorrect===5?'Perfect! 5/5 🌟':`${dailyCorrect}/5 — Nice work.`;
-    document.getElementById('done-sub').textContent=dailyCorrect===5?'A perfect score. You\'re locked in.':'Keep showing up and the level will follow.';
-    document.getElementById('done-streak').textContent=`🔥 ${streak} day streak`;
-    document.getElementById('done-streak').style.cssText='';
-    if(dailyCorrect===5){const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');if(!b.includes('perfect_quiz')){b.push('perfect_quiz');localStorage.setItem('apexmath_badges',JSON.stringify(b));}}
-  }else{
-    document.getElementById('done-icon').textContent='○';
-    document.getElementById('done-title').textContent=`${dailyCorrect}/5 — Not quite.`;
-    document.getElementById('done-sub').textContent='You need 3 or more to keep your streak. Review the solutions and come back tomorrow.';
-    document.getElementById('done-streak').textContent='Streak not counted';
-    document.getElementById('done-streak').style.cssText='border-color:var(--border);background:var(--bg2);color:var(--text3)';
-  }
-  // Breakdown
+
+  // Score + headline
+  document.getElementById('done-score-big').textContent=dailyCorrect;
+  let headline, sub;
+  if(dailyCorrect===5){headline='Perfect score.';sub='A flawless quiz. Your streak is locked in.';}
+  else if(passed){headline='Nice work.';sub=`${dailyCorrect}/5 — streak locked in. Come back tomorrow.`;}
+  else{headline='Not quite.';sub='You need 3 or more to keep your streak. Review the explanations below and try again tomorrow.';}
+  document.getElementById('done-title').textContent=headline;
+  document.getElementById('done-sub').textContent=sub;
+
+  // Streak badge
+  const streakBadge=document.getElementById('done-streak');
+  if(passed&&streak>0){
+    streakBadge.style.display='inline-flex';
+    streakBadge.textContent=`🔥 ${streak} day streak`;
+  }else streakBadge.style.display='none';
+
+  // Breakdown bars
   const bd=document.getElementById('done-breakdown'); bd.innerHTML='';
-  dailyResults.forEach((r,i)=>{
+  dailyResults.forEach(r=>{
     const el=document.createElement('div');
     el.className='done-q'+(r.isCorrect?' passed':' failed');
-    el.innerHTML=`<span>${i+1}</span><span>${r.isCorrect?'✓':'✗'}</span>`;
     bd.appendChild(el);
   });
-  // Badge for first quiz
+
+  // Per-question review
+  const rev=document.getElementById('done-review'); rev.innerHTML='';
+  dailyResults.forEach((r,i)=>{
+    const el=document.createElement('div'); el.className='done-review-item';
+    el.innerHTML=`<div class="done-review-num">Q${i+1}</div>
+      <div class="done-review-q">${r.q?.q||''}</div>
+      <div class="done-review-icon">${r.isCorrect?'✓':'✗'}</div>`;
+    rev.appendChild(el);
+  });
+
+  // Resources section at bottom
+  const resources=(STAGES[currentDailyLevel]?.resources)||[];
+  const resSection=document.getElementById('done-resources-section');
+  if(resources.length){
+    const typeIcons={'video':'▶️','course':'📖','book':'📚','tool':'🛠️','notes':'📝'};
+    const typeDescs={'video':'Watch & learn','course':'Full course','book':'Textbook','tool':'Interactive','notes':'Reference notes'};
+    resSection.innerHTML=`
+      <div class="done-resources-title">Keep going — study resources</div>
+      <div class="done-resources-sub">Handpicked for your current level: <strong>${STAGES[currentDailyLevel]?.name}</strong></div>
+      <div class="done-resource-grid">${resources.map(r=>`
+        <a class="done-resource-card" href="${r.url}" target="_blank" rel="noopener">
+          <div class="done-resource-icon">${typeIcons[r.type]||'🔗'}</div>
+          <div class="done-resource-info">
+            <div class="done-resource-name">${r.name}</div>
+            <div class="done-resource-desc">${typeDescs[r.type]||'Resource'}</div>
+          </div>
+          <div class="done-resource-cta">Open ↗</div>
+        </a>`).join('')}
+      </div>`;
+  }else resSection.innerHTML='';
+
+  // Badges
   const badges=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');
   if(!badges.includes('first_quiz')){badges.push('first_quiz');localStorage.setItem('apexmath_badges',JSON.stringify(badges));}
+  if(dailyCorrect===5&&!badges.includes('perfect_quiz')){badges.push('perfect_quiz');localStorage.setItem('apexmath_badges',JSON.stringify(badges));}
 }
 
 // ── PRACTICE MODE ─────────────────────────────────────────────────────────────
