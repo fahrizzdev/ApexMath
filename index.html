@@ -537,6 +537,21 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ps-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.46rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border:1px solid var(--border);color:var(--text3);border-radius:3px;margin-right:.3rem;margin-top:.3rem}
 .ps-tag.here{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
 
+/* KA UNITS IN PATH */
+.ka-units-section{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.ka-units-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.ka-unit-list{display:flex;flex-direction:column;gap:.25rem}
+.ka-unit-row{display:flex;align-items:center;gap:.6rem;padding:.38rem .5rem;border-radius:5px;transition:background .15s;cursor:pointer}
+.ka-unit-row:hover{background:var(--bg2)}
+.ka-unit-check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.55rem;flex-shrink:0;transition:all .15s;cursor:pointer}
+.ka-unit-check.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.ka-unit-name{font-size:.8rem;color:var(--text2);flex:1;line-height:1.4}
+.ka-unit-name.done{color:var(--text3);text-decoration:line-through}
+.ka-unit-link{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.06em;color:var(--accent);text-decoration:none;flex-shrink:0;opacity:0;transition:opacity .15s}
+.ka-unit-row:hover .ka-unit-link{opacity:1}
+.ka-pct-bar{height:3px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:.4rem;margin-bottom:.1rem}
+.ka-pct-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
+
 /* ── MOBILE ── */
 @media(max-width:680px){
   nav{padding:.9rem 1.25rem}
@@ -887,7 +902,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
           <div class="tc-title">Your Learning Path</div>
           <div class="tc-sub">Every level from here to Calculus II — with timelines and what's next.</div>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
+        <div style="text-align:right">
+          <div style="font-family:'DM Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.46rem;color:var(--text3);margin-top:.2rem" id="path-ka-inline">KA: — units done</div>
+        </div>
       </div>
       <div style="margin-top:.75rem;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden">
         <div id="path-mini-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
@@ -1202,6 +1220,99 @@ const STAGES = [
   { name:'Calculus II & Beyond', desc:'Integration techniques, sequences & series, convergence, Taylor series, intro multivariable & linear algebra.', resources:[{type:'video',name:'Professor Leonard — Calc 2',url:'https://youtube.com/c/ProfessorLeonard'},{type:'course',name:'MIT OCW — Multivariable Calculus',url:'https://ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/'}]},
 ];
 const HOURS_TO_NEXT = [40,80,100,80,60,80,0];
+
+// Khan Academy curriculum mapped to each level
+const KA_UNITS = {
+  0:[
+    {name:'Intro to multiplication',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:mult-basics'},
+    {name:'1-digit multiplication',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:arith-review-multiply-divide'},
+    {name:'Intro to division',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:arith-review-multiply-divide'},
+    {name:'Understand fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
+    {name:'Place value through 1,000,000',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:place-value'},
+    {name:'Add and subtract through 1,000,000',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:add-sub-within-1000000'},
+    {name:'Multiply 1- and 2-digit numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
+    {name:'Divide with remainders',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
+    {name:'Add and subtract fractions (like denominators)',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
+    {name:'Multiply fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
+    {name:'Decimals and place value',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
+    {name:'Add and subtract decimals',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
+    {name:'Add and subtract fractions (unlike denominators)',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
+    {name:'Multiply and divide multi-digit numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-divide'},
+    {name:'Divide fractions',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:fractions'},
+    {name:'Multiply and divide decimals',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:decimals'},
+    {name:'Exponents and powers of ten',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:exponents-powers-of-ten'},
+    {name:'Add and subtract negative numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:negative-numbers'},
+    {name:'Multiply and divide negative numbers',url:'https://www.khanacademy.org/math/arithmetic/x18ca194a:negative-numbers'},
+  ],
+  1:[
+    {name:'Variables and expressions',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:foundation-algebra'},
+    {name:'One-step equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
+    {name:'Two-step equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
+    {name:'Linear equations (general)',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-graphs'},
+    {name:'Slope and y-intercept',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-graphs'},
+    {name:'Systems of equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:systems-of-equations'},
+    {name:'Inequalities',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:solve-equations-inequalities'},
+    {name:'Intro to functions',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:functions'},
+    {name:'Sequences',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:sequences'},
+    {name:'Absolute value equations',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:absolute-value-piecewise-functions'},
+    {name:'Intro to quadratics',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring'},
+    {name:'Factoring',url:'https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratics-multiplying-factoring'},
+  ],
+  2:[
+    {name:'Polynomials',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-arithmetic'},
+    {name:'Factoring polynomials',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:poly-factor'},
+    {name:'Rational expressions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:rational'},
+    {name:'Radical expressions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:complex'},
+    {name:'Complex numbers',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:complex'},
+    {name:'Exponential functions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:exp'},
+    {name:'Logarithms',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:logs'},
+    {name:'Transformations of functions',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:transformations'},
+    {name:'Sequences and series',url:'https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:sequences'},
+  ],
+  3:[
+    {name:'Angles and lines',url:'https://www.khanacademy.org/math/geometry/hs-geo-foundations'},
+    {name:'Triangles',url:'https://www.khanacademy.org/math/geometry/hs-geo-congruence'},
+    {name:'Similarity',url:'https://www.khanacademy.org/math/geometry/hs-geo-similarity'},
+    {name:'Right triangles and trig',url:'https://www.khanacademy.org/math/geometry/hs-geo-trig'},
+    {name:'Circles',url:'https://www.khanacademy.org/math/geometry/hs-geo-circles'},
+    {name:'Area and perimeter',url:'https://www.khanacademy.org/math/geometry/hs-geo-foundations'},
+    {name:'Volume and surface area',url:'https://www.khanacademy.org/math/geometry/hs-geo-solids'},
+    {name:'Coordinate geometry',url:'https://www.khanacademy.org/math/geometry/hs-geo-analytic-geometry'},
+    {name:'Proofs',url:'https://www.khanacademy.org/math/geometry/hs-geo-proofs'},
+  ],
+  4:[
+    {name:'Trig functions',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
+    {name:'Unit circle',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
+    {name:'Trig identities',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:trig'},
+    {name:'Conic sections',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:conics'},
+    {name:'Matrices',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:matrices'},
+    {name:'Vectors',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors'},
+    {name:'Polar coordinates',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:polar-coordinates'},
+    {name:'Limits intro',url:'https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:limits-from-equations'},
+  ],
+  5:[
+    {name:'Limits and continuity',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-limits-new'},
+    {name:'Intro to derivatives',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new'},
+    {name:'Differentiation rules',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new'},
+    {name:'Chain rule',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-2-new'},
+    {name:'Implicit differentiation',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-2-new'},
+    {name:'Related rates',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-diff-contextual-applications-new'},
+    {name:'Optimization',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-diff-analytical-applications-new'},
+    {name:'Intro to integration',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new'},
+    {name:'Fundamental Theorem of Calculus',url:'https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new'},
+  ],
+  6:[
+    {name:'Integration techniques',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
+    {name:'Integration by parts',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
+    {name:'Trig substitution',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
+    {name:'Partial fractions',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-integration-new'},
+    {name:'Sequences and series',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
+    {name:'Convergence tests',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
+    {name:'Taylor and Maclaurin series',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-series-new'},
+    {name:'Parametric equations',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new'},
+    {name:'Vectors and motion',url:'https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new'},
+  ],
+};
 
 // Formulas database
 const FORMULAS = {
@@ -1784,6 +1895,12 @@ async function showDashboard(){
     const pathPct=Math.round((user.level/(STAGES.length-1))*100);
     document.getElementById('path-mini-fill').style.width=pathPct+'%';
     document.getElementById('path-progress-inline').textContent='Level '+(user.level+1)+' of '+STAGES.length+' →';
+    // KA progress for current level
+    const kaDoneData=JSON.parse(localStorage.getItem('apexmath_ka_done')||'{}');
+    const kaUnitsAtLevel=KA_UNITS[user.level]||[];
+    const kaDoneCount=kaUnitsAtLevel.filter((_,j)=>kaDoneData[`${user.level}-${j}`]).length;
+    const kaEl=document.getElementById('path-ka-inline');
+    if(kaEl) kaEl.textContent=kaUnitsAtLevel.length?`KA: ${kaDoneCount}/${kaUnitsAtLevel.length} units done`:'';
 
     // Timer total
     renderTimerTotal2();
@@ -1986,15 +2103,30 @@ function renderWeakSpots2(){
 function renderWeakSpots(){ renderWeakSpots2(); }
 
 // ── PATH MODAL ────────────────────────────────────────────────────────────────
+function getKaDone(){ return JSON.parse(localStorage.getItem('apexmath_ka_done')||'{}'); }
+function toggleKaUnit(level,idx){
+  const done=getKaDone();
+  const key=`${level}-${idx}`;
+  done[key]=!done[key];
+  localStorage.setItem('apexmath_ka_done',JSON.stringify(done));
+  renderPathModal();
+}
+
 function renderPathModal(){
   const pct=Math.round((userLevel/(STAGES.length-1))*100);
   document.getElementById('path-modal-label').textContent='Level '+(userLevel+1)+' of '+STAGES.length;
   document.getElementById('path-modal-pct').textContent=pct+'%';
   setTimeout(()=>{document.getElementById('path-modal-fill').style.width=pct+'%';},100);
   const wrap=document.getElementById('path-modal-stages'); if(!wrap)return; wrap.innerHTML='';
+  const kaDone=getKaDone();
+
   STAGES.forEach((s,i)=>{
     const isCurrent=i===userLevel,isDone=i<userLevel;
-    const el=document.createElement('div'); el.className='ps-item';
+    const el=document.createElement('div'); el.className='ps-item'; el.style.flexDirection='column'; el.style.gap='.5rem';
+
+    // Header row
+    const headerRow=document.createElement('div');
+    headerRow.style.cssText='display:flex;align-items:flex-start;gap:1rem';
     const dot=document.createElement('div');
     dot.className='ps-dot'+(isDone?' done':isCurrent?' current':'');
     dot.textContent=isDone?'✓':'';
@@ -2004,7 +2136,36 @@ function renderPathModal(){
     if(i===userLevel+1) tags+=`<span class="ps-tag" style="color:var(--gold,#92700a);border-color:rgba(146,112,10,.25)">Up next</span>`;
     tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+Math.round(HOURS_TO_NEXT[i]/5)+' weeks'}</span>`;
     body.innerHTML=`<div class="ps-name${isCurrent?' current-level':''}">${s.name}</div><div style="margin-bottom:.3rem">${tags}</div><div class="ps-desc">${s.desc}</div>`;
-    el.appendChild(dot); el.appendChild(body);
+    headerRow.appendChild(dot); headerRow.appendChild(body);
+    el.appendChild(headerRow);
+
+    // KA Units section (show for current level and adjacent ones)
+    const units=KA_UNITS[i]||[];
+    if(units.length && (isCurrent || isDone || i===userLevel+1)){
+      const doneCount=units.filter((_,j)=>kaDone[`${i}-${j}`]).length;
+      const pctKa=Math.round(doneCount/units.length*100);
+      const kaSection=document.createElement('div');
+      kaSection.className='ka-units-section';
+      kaSection.style.marginLeft='2.5rem';
+      kaSection.innerHTML=`
+        <div class="ka-units-label">
+          <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 5L4.5 6.5L6.5 3.5" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+          Khan Academy — ${doneCount}/${units.length} units
+          <a href="https://www.khanacademy.org/math/arithmetic" target="_blank" rel="noopener" style="margin-left:auto;font-size:.48rem;color:var(--accent);text-decoration:none">Open course ↗</a>
+        </div>
+        <div class="ka-pct-bar"><div class="ka-pct-fill" style="width:${pctKa}%"></div></div>
+        <div class="ka-unit-list">${units.map((u,j)=>{
+          const unitDone=!!kaDone[`${i}-${j}`];
+          return`<div class="ka-unit-row" onclick="toggleKaUnit(${i},${j})">
+            <div class="ka-unit-check${unitDone?' done':''}">${unitDone?'✓':''}</div>
+            <span class="ka-unit-name${unitDone?' done':''}">${u.name}</span>
+            <a class="ka-unit-link" href="${u.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Study →</a>
+          </div>`;
+        }).join('')}</div>
+      `;
+      el.appendChild(kaSection);
+    }
+
     wrap.appendChild(el);
   });
 }
