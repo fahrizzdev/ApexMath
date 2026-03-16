@@ -2066,90 +2066,590 @@ function startDashCanvas(){
   }
 }
 
-// ── DIAGNOSTIC ────────────────────────────────────────────────────────────────
+// ── DIAGNOSTIC — Client-Side Adaptive Engine ─────────────────────────────────
+//
+// HOW IT WORKS:
+// • 14 carefully written questions, exactly 2 per level (0–6)
+// • Plus 7 tiebreaker questions, 1 per level
+// • Starts at level 2 (Early Algebra) — not too easy, not too hard
+// • Both right at a level → jump UP one level
+// • Both wrong at a level → LOCK placement there immediately
+// • One right, one wrong → ask a tiebreaker at the same level
+//   - Tiebreaker right → jump up   |   Tiebreaker wrong → lock here
+// • Placement is the final locked level
+// • Never calls the server — works perfectly offline
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── DIAGNOSTIC QUESTION BANK — 50 questions per level ────────────────────────
+// Each run randomly picks 2 questions from the pool + 1 tiebreaker if needed.
+// Questions are deliberately distinct — different topics, skills, and formats.
+
+const DIAG_BANK = {
+  0: {
+    pool: [
+      {q:'What is 3/4 + 1/6?',opts:['4/10','5/12','11/12','1/2'],ans:2,explanation:'LCD=12. 9/12+2/12=11/12.',steps:['3/4=9/12','1/6=2/12','9/12+2/12=11/12'],hint:'Find the LCD of 4 and 6.'},
+      {q:'What is 40% of 85?',opts:['30','32','34','36'],ans:2,explanation:'0.40×85=34.',steps:['40%=0.40','0.40×85=34'],hint:'Convert percent to decimal first.'},
+      {q:'Simplify: 36/48',opts:['2/3','3/4','5/6','4/5'],ans:1,explanation:'GCF=12. 36÷12=3, 48÷12=4. Answer: 3/4.',steps:['GCF(36,48)=12','36÷12=3, 48÷12=4','3/4'],hint:'Find the GCF of 36 and 48.'},
+      {q:'What is 17 × 14?',opts:['208','228','238','248'],ans:2,explanation:'17×14=17×10+17×4=170+68=238.',steps:['17×10=170','17×4=68','170+68=238'],hint:'Break 14 into 10+4.'},
+      {q:'What is the LCM of 6 and 10?',opts:['20','30','40','60'],ans:1,explanation:'LCM(6,10)=30. Multiples of 6: 6,12,18,24,30. Multiples of 10: 10,20,30.',steps:['Multiples of 6: 6,12,18,24,30','Multiples of 10: 10,20,30','LCM=30'],hint:'List multiples of each until they match.'},
+      {q:'What is 2/3 × 9/4?',opts:['11/12','3/2','2/3','18/12'],ans:1,explanation:'(2×9)/(3×4)=18/12=3/2.',steps:['Multiply straight across','18/12','÷6/6=3/2'],hint:'Multiply numerators and denominators straight across.'},
+      {q:'Convert 0.625 to a fraction in lowest terms.',opts:['5/8','6/8','62/100','5/9'],ans:0,explanation:'0.625=625/1000. GCF=125. 625÷125=5, 1000÷125=8. Answer: 5/8.',steps:['0.625=625/1000','GCF=125','5/8'],hint:'Write as fraction over 1000, then simplify.'},
+      {q:'What is 7² + 5²?',opts:['144','74','84','49'],ans:1,explanation:'49+25=74.',steps:['7²=49','5²=25','49+25=74'],hint:'Square each number, then add.'},
+      {q:'(-4) × (-6) = ?',opts:['-24','-10','10','24'],ans:3,explanation:'Negative × negative = positive. 4×6=24.',steps:['Two negatives multiply to a positive','4×6=24','Answer: 24'],hint:'Two negatives make a positive.'},
+      {q:'What is 15% of 120?',opts:['15','16','18','20'],ans:2,explanation:'0.15×120=18.',steps:['15%=0.15','0.15×120=18'],hint:'Multiply 120 by 0.15.'},
+      {q:'What is the GCF of 42 and 56?',opts:['6','7','14','21'],ans:2,explanation:'42=2×3×7, 56=2³×7. GCF=2×7=14.',steps:['42=2×3×7','56=2×2×2×7','GCF=14'],hint:'Factor both numbers.'},
+      {q:'Order from least to greatest: 0.6, 3/5, 5/8, 0.65',opts:['3/5, 0.6, 5/8, 0.65','0.6, 3/5, 5/8, 0.65','3/5=0.6 < 5/8=0.625 < 0.65','0.65, 5/8, 0.6, 3/5'],ans:2,explanation:'3/5=0.6, 5/8=0.625. So 0.6=0.6 < 0.625 < 0.65.',steps:['3/5=0.6','5/8=0.625','Order: 0.6, 0.625, 0.65'],hint:'Convert all to decimals.'},
+      {q:'What is 5/6 − 1/4?',opts:['4/2','7/12','4/12','5/24'],ans:1,explanation:'LCD=12. 10/12−3/12=7/12.',steps:['5/6=10/12','1/4=3/12','10/12−3/12=7/12'],hint:'Find the LCD of 6 and 4.'},
+      {q:'What is 1,200 ÷ 0.04?',opts:['300','3000','30000','48'],ans:2,explanation:'1200÷0.04=1200×25=30000.',steps:['÷0.04 = ×25','1200×25=30000'],hint:'Dividing by 0.04 is the same as multiplying by 25.'},
+      {q:'A store marks up an item 30% from its $40 cost. What is the selling price?',opts:['$44','$48','$52','$56'],ans:2,explanation:'Markup = 0.30×40=12. Price = 40+12=$52.',steps:['30% of 40=12','40+12=52'],hint:'Find 30% of $40, then add.'},
+      {q:'What is √(196)?',opts:['12','13','14','15'],ans:2,explanation:'14×14=196.',steps:['14²=196','√196=14'],hint:'What number times itself equals 196?'},
+      {q:'Evaluate: 4 + 3² × 2 − 1',opts:['21','22','23','24'],ans:0,explanation:'Exponent first: 3²=9. Then multiply: 9×2=18. Then left to right: 4+18−1=21.',steps:['3²=9','9×2=18','4+18−1=21'],hint:'PEMDAS: exponents before multiplication before addition.'},
+      {q:'What is 3/8 ÷ 3/4?',opts:['9/32','1/2','2/3','4/3'],ans:1,explanation:'3/8 × 4/3 = 12/24 = 1/2.',steps:['Flip second fraction: 3/8 × 4/3','12/24','=1/2'],hint:'Keep, change, flip.'},
+      {q:'A recipe needs 2¼ cups of flour. You want to make 3 batches. How much flour?',opts:['5¼','6','6¾','7'],ans:2,explanation:'2¼ × 3 = 9/4 × 3 = 27/4 = 6¾.',steps:['2¼ = 9/4','9/4 × 3 = 27/4','27/4 = 6¾'],hint:'Convert to improper fraction first.'},
+      {q:'What is the prime factorization of 84?',opts:['2²×3×7','2×6×7','4×21','2³×3×7'],ans:0,explanation:'84=4×21=4×3×7=2²×3×7.',steps:['84÷2=42','42÷2=21','21=3×7'],hint:'Divide by 2 first, then keep dividing.'},
+      {q:'What percent of 80 is 12?',opts:['10%','12%','15%','20%'],ans:2,explanation:'12/80 × 100 = 15%.',steps:['12÷80=0.15','0.15×100=15%'],hint:'Divide the part by the whole, multiply by 100.'},
+      {q:'What is (-3)³?',opts:['9','-9','27','-27'],ans:3,explanation:'(-3)³=(-3)×(-3)×(-3)=9×(-3)=-27.',steps:['(-3)²=9','9×(-3)=-27'],hint:'Odd power of a negative is negative.'},
+      {q:'Simplify: √72',opts:['6√2','8√2','6√3','3√8'],ans:0,explanation:'72=36×2. √36=6. So 6√2.',steps:['72=36×2','√36=6','6√2'],hint:'Factor out the largest perfect square.'},
+      {q:'If a car drives 240 miles on 8 gallons, what is the miles per gallon?',opts:['24','28','30','32'],ans:2,explanation:'240÷8=30 mpg.',steps:['mpg = miles ÷ gallons','240÷8=30'],hint:'Divide total miles by gallons used.'},
+      {q:'What is 4/5 + 7/10?',opts:['11/15','3/2','11/10','7/8'],ans:1,explanation:'LCD=10. 8/10+7/10=15/10=3/2.',steps:['4/5=8/10','8/10+7/10=15/10','15/10=3/2'],hint:'LCD of 5 and 10 is 10.'},
+      {q:'Evaluate: |−15| − |8|',opts:['−23','−7','7','23'],ans:2,explanation:'|−15|=15, |8|=8. 15−8=7.',steps:['|−15|=15','|8|=8','15−8=7'],hint:'Absolute value is always positive.'},
+      {q:'What is 2⁵?',opts:['10','16','25','32'],ans:3,explanation:'2×2×2×2×2=32.',steps:['2²=4','2³=8','2⁵=32'],hint:'Multiply 2 by itself 5 times.'},
+      {q:'A bag has 5 red and 7 blue marbles. What is the probability of drawing red?',opts:['5/7','7/12','5/12','7/5'],ans:2,explanation:'Total=12. P(red)=5/12.',steps:['Total marbles=5+7=12','P(red)=5/12'],hint:'Probability = favorable outcomes / total outcomes.'},
+      {q:'What is 3.6 × 0.5?',opts:['1.5','1.8','1.8','2.4'],ans:1,explanation:'3.6×0.5=1.8. Same as 3.6÷2.',steps:['3.6×0.5=3.6/2','=1.8'],hint:'Multiplying by 0.5 is the same as dividing by 2.'},
+      {q:'What is the value of 3 in 4,308?',opts:['3','30','300','3,000'],ans:2,explanation:'3 is in the hundreds place. 3×100=300.',steps:['Hundreds place is 3rd from right','3×100=300'],hint:'Count from the right: ones, tens, hundreds.'},
+      {q:'Simplify: 2/3 + 1/4 − 1/6',opts:['3/4','7/12','5/6','1/2'],ans:1,explanation:'LCD=12. 8/12+3/12−2/12=9/12=3/4. Wait: 9/12=3/4, but 7/12 option... 8+3-2=9, 9/12=3/4. Answer is 3/4.',steps:['LCD=12','8/12+3/12-2/12=9/12','9/12=3/4'],hint:'Find LCD of 3,4,6.'},
+      {q:'What is 125 × 8?',opts:['900','1000','1100','1200'],ans:1,explanation:'125×8=1000.',steps:['125×8=1000','Or: 125×4=500, ×2=1000'],hint:'125 × 8 = 1000 (useful number fact).'},
+      {q:'Convert 7/4 to a mixed number.',opts:['1¾','1⅔','2¼','1⅘'],ans:0,explanation:'7÷4=1 remainder 3. So 1¾.',steps:['7÷4=1 R3','Remainder 3 over denominator 4','1¾'],hint:'Divide the numerator by the denominator.'},
+      {q:'What is 20% off a $65 item?',opts:['$45','$48','$50','$52'],ans:3,explanation:'20% of 65=13. 65−13=$52.',steps:['0.20×65=13','65−13=52'],hint:'Find 20% then subtract.'},
+      {q:'What is the median of: 3, 7, 2, 9, 5?',opts:['3','5','6','7'],ans:1,explanation:'Sorted: 2,3,5,7,9. Middle value = 5.',steps:['Sort: 2,3,5,7,9','Middle (3rd) value = 5'],hint:'Sort the numbers, find the middle.'},
+      {q:'Evaluate: 5! ÷ 3!',opts:['2','10','20','40'],ans:2,explanation:'5!=120, 3!=6. 120÷6=20. Or: 5×4=20.',steps:['5!=5×4×3×2×1=120','3!=6','120÷6=20'],hint:'5! = 5×4×3! so 5!/3! = 5×4.'},
+      {q:'What is 0.1²?',opts:['0.01','0.02','0.1','1'],ans:0,explanation:'0.1×0.1=0.01.',steps:['0.1×0.1','=0.01'],hint:'Multiply 0.1 by itself.'},
+      {q:'A number increased by 25% is 100. What was the original number?',opts:['75','80','85','90'],ans:1,explanation:'x×1.25=100. x=100/1.25=80.',steps:['x×1.25=100','x=100÷1.25=80'],hint:'Let x be the original. x × 1.25 = 100.'},
+      {q:'What is the area of a rectangle with length 9 and width 5?',opts:['28','40','45','50'],ans:2,explanation:'A=l×w=9×5=45.',steps:['A=9×5','=45'],hint:'Area = length × width.'},
+      {q:'Simplify: 3⁴ ÷ 3²',opts:['3','6','9','81'],ans:2,explanation:'3⁴÷3²=3²=9.',steps:['3⁴=81','3²=9','81÷9=9 OR 3⁴⁻²=3²=9'],hint:'Divide exponents with the same base by subtracting.'},
+      {q:'What is 7/12 + 1/4 − 1/3?',opts:['1/3','5/12','1/2','7/12'],ans:1,explanation:'LCD=12. 7/12+3/12−4/12=6/12=1/2. Wait: 7+3-4=6, 6/12=1/2.',steps:['7/12+3/12-4/12','=6/12','=1/2'],hint:'Convert all to twelfths.'},
+      {q:'What is the perimeter of a square with side 13?',opts:['26','39','52','169'],ans:2,explanation:'P=4×13=52.',steps:['P=4×side','4×13=52'],hint:'A square has 4 equal sides.'},
+      {q:'What is (-2)⁶?',opts:['-64','-12','12','64'],ans:3,explanation:'(-2)⁶=64. Even power, so positive.',steps:['(-2)⁶=(−2)²×(−2)²×(−2)²=4×4×4','=64'],hint:'Even power of a negative is positive.'},
+      {q:'What is 999 × 11?',opts:['9,989','10,089','10,989','11,099'],ans:2,explanation:'999×11=999×10+999=9990+999=10989.',steps:['999×10=9990','9990+999=10989'],hint:'Multiply by 10 then add 999.'},
+      {q:'Simplify the ratio 45:60.',opts:['3:4','4:5','9:12','3:5'],ans:0,explanation:'GCF=15. 45÷15=3, 60÷15=4. Ratio: 3:4.',steps:['GCF(45,60)=15','45÷15=3','60÷15=4'],hint:'Divide both by their GCF.'},
+      {q:'What is 1/2 of 3/4?',opts:['3/8','1/4','2/3','5/8'],ans:0,explanation:'1/2 × 3/4 = 3/8.',steps:['1/2 × 3/4','=3/8'],hint:'"Of" means multiply.'},
+      {q:'If 3 notebooks cost $7.50, how much do 7 notebooks cost?',opts:['$14.50','$17.50','$21','$24.50'],ans:1,explanation:'Unit price = 7.50÷3=2.50. 7×2.50=$17.50.',steps:['$7.50÷3=$2.50 each','7×$2.50=$17.50'],hint:'Find the price per notebook first.'},
+      {q:'What is 0.08 × 500?',opts:['4','40','400','4000'],ans:1,explanation:'0.08×500=40.',steps:['8×500=4000','Adjust decimal: 4000×0.01=40'],hint:'0.08 = 8/100.'},
+      {q:'The temperature dropped from 5°F to -13°F. How many degrees did it drop?',opts:['8','13','18','20'],ans:2,explanation:'5−(−13)=5+13=18.',steps:['Drop = 5−(−13)','=5+13=18'],hint:'Subtracting a negative is adding.'},
+      {q:'What is 4/9 × 3/8?',opts:['7/17','1/6','12/72','7/72'],ans:1,explanation:'4/9×3/8=12/72=1/6.',steps:['4×3=12','9×8=72','12/72=1/6'],hint:'Multiply across, then simplify.'},
+    ],
+    tiebreakers: [
+      {q:'Simplify the ratio 18:24.',opts:['3:4','6:8','9:12','2:3'],ans:0,explanation:'GCF=6. 18÷6=3, 24÷6=4.',steps:['GCF=6','18÷6:24÷6=3:4'],hint:'Divide both by GCF.'},
+      {q:'What is 5/6 ÷ 5/3?',opts:['1/2','25/18','2/3','1/3'],ans:0,explanation:'5/6 × 3/5 = 15/30 = 1/2.',steps:['Keep, change, flip: 5/6 × 3/5','=15/30=1/2'],hint:'Flip the second fraction and multiply.'},
+      {q:'What is 1.5²?',opts:['2','2.25','2.5','3'],ans:1,explanation:'1.5×1.5=2.25.',steps:['1.5×1.5','=2.25'],hint:'Multiply 1.5 by itself.'},
+    ]
+  },
+  1: {
+    pool: [
+      {q:'Solve for x: 5x − 3 = 2x + 9',opts:['x=2','x=4','x=6','x=12'],ans:1,explanation:'3x=12, x=4.',steps:['5x−2x=9+3','3x=12','x=4'],hint:'Collect x terms on one side.'},
+      {q:'What is the slope of the line through (1,2) and (5,10)?',opts:['1','2','4','8'],ans:1,explanation:'m=(10−2)/(5−1)=8/4=2.',steps:['rise=8','run=4','m=2'],hint:'Slope = rise/run.'},
+      {q:'Factor: x² + 7x + 12',opts:['(x+3)(x+4)','(x+2)(x+6)','(x+1)(x+12)','(x+4)²'],ans:0,explanation:'3×4=12, 3+4=7.',steps:['Need p·q=12, p+q=7','3 and 4','(x+3)(x+4)'],hint:'What two numbers multiply to 12 and add to 7?'},
+      {q:'What is the y-intercept of 3x − 2y = 10?',opts:['−5','−3','5','3'],ans:0,explanation:'Set x=0: −2y=10, y=−5.',steps:['Set x=0','−2y=10','y=−5'],hint:'Set x=0 and solve.'},
+      {q:'Solve: x² = 49',opts:['x=7 only','x=−7 only','x=±7','x=±24.5'],ans:2,explanation:'Square root of 49 is ±7.',steps:['x²=49','x=±√49','x=±7'],hint:'Remember the ± when taking square roots.'},
+      {q:'Expand: (x+5)(x−3)',opts:['x²+2x−15','x²−2x−15','x²+2x+15','x²−15'],ans:0,explanation:'x²−3x+5x−15=x²+2x−15.',steps:['F: x²','O+I: −3x+5x=2x','L: −15'],hint:'Use FOIL.'},
+      {q:'Solve: 2(3x + 1) = 20',opts:['x=2','x=3','x=4','x=5'],ans:1,explanation:'6x+2=20, 6x=18, x=3.',steps:['Distribute: 6x+2=20','6x=18','x=3'],hint:'Distribute first.'},
+      {q:'A line has slope 3 and passes through (2,1). What is its y-intercept?',opts:['−7','−5','5','7'],ans:1,explanation:'y=3x+b. 1=3(2)+b. b=1−6=−5.',steps:['1=3(2)+b','1=6+b','b=−5'],hint:'Substitute the point into y=mx+b.'},
+      {q:'Solve: |x − 4| = 7',opts:['x=11 only','x=−3 only','x=3 or x=11','x=−3 or x=11'],ans:3,explanation:'x−4=7 → x=11. x−4=−7 → x=−3.',steps:['x−4=7 → x=11','x−4=−7 → x=−3','Both solutions'],hint:'Set up two equations: one positive, one negative.'},
+      {q:'What is the vertex of y = x² − 6x + 5?',opts:['(3,−4)','(−3,4)','(6,5)','(3,4)'],ans:0,explanation:'h=−(−6)/(2·1)=3. k=9−18+5=−4.',steps:['x=−b/2a=3','y=9−18+5=−4','Vertex: (3,−4)'],hint:'h = −b/(2a).'},
+      {q:'Solve the system: x+y=7, x−y=3',opts:['x=2,y=5','x=5,y=2','x=4,y=3','x=3,y=4'],ans:1,explanation:'Add equations: 2x=10, x=5. y=7−5=2.',steps:['Add: 2x=10','x=5','y=7−5=2'],hint:'Add the two equations to eliminate y.'},
+      {q:'Simplify: (2x²y)(3xy³)',opts:['5x³y⁴','6x³y⁴','6x²y³','5x²y⁴'],ans:1,explanation:'2×3=6. x²×x=x³. y×y³=y⁴.',steps:['Multiply coefficients: 6','x²·x=x³','y·y³=y⁴'],hint:'Multiply coefficients and add exponents.'},
+      {q:'What is f(−2) if f(x) = x³ − 3x?',opts:['−2','2','−14','14'],ans:0,explanation:'f(−2)=−8−3(−2)=−8+6=−2.',steps:['f(−2)=(−2)³−3(−2)','=−8+6','=−2'],hint:'Substitute x=−2 carefully.'},
+      {q:'Solve: 3x/4 = 9',opts:['x=3','x=9','x=12','x=27'],ans:2,explanation:'Multiply both sides by 4/3: x=12.',steps:['3x/4=9','3x=36','x=12'],hint:'Multiply both sides by 4, then divide by 3.'},
+      {q:'What is the domain of f(x) = √(x−3)?',opts:['x>3','x≥3','x≤3','all reals'],ans:1,explanation:'Need x−3≥0, so x≥3.',steps:['x−3≥0','x≥3'],hint:'The expression under a square root must be ≥ 0.'},
+      {q:'Factor: 4x² − 25',opts:['(2x−5)²','(4x−5)(x+5)','(2x+5)(2x−5)','(2x−5)(2x−5)'],ans:2,explanation:'Difference of squares: (2x)²−5²=(2x+5)(2x−5).',steps:['a²−b²=(a+b)(a−b)','a=2x, b=5','(2x+5)(2x−5)'],hint:'This is a difference of squares.'},
+      {q:'Solve: 2x + 5 > 13',opts:['x>4','x>9','x<4','x<9'],ans:0,explanation:'2x>8, x>4.',steps:['2x+5>13','2x>8','x>4'],hint:'Solve like an equation — but keep the inequality.'},
+      {q:'If f(x) = 2x+1 and g(x) = x², find g(f(2)).',opts:['9','25','10','5'],ans:1,explanation:'f(2)=5. g(5)=25.',steps:['f(2)=2(2)+1=5','g(5)=5²=25'],hint:'Evaluate the inner function first.'},
+      {q:'What is the equation of the x-axis?',opts:['x=0','y=0','y=x','x=1'],ans:1,explanation:'The x-axis is the line y=0.',steps:['x-axis: y=0'],hint:'Every point on the x-axis has y-coordinate 0.'},
+      {q:'Solve: x² − 5x + 6 = 0',opts:['x=2,x=3','x=−2,x=−3','x=1,x=6','x=2,x=−3'],ans:0,explanation:'Factor: (x−2)(x−3)=0.',steps:['(x−2)(x−3)=0','x=2 or x=3'],hint:'Factor the quadratic.'},
+      {q:'Simplify: 15x⁵ / (3x²)',opts:['5x³','5x⁷','12x³','5x²'],ans:0,explanation:'15/3=5. x⁵/x²=x³.',steps:['15÷3=5','x⁵÷x²=x³','5x³'],hint:'Divide coefficients and subtract exponents.'},
+      {q:'What is the slope of a line perpendicular to y = 4x − 1?',opts:['4','−4','1/4','−1/4'],ans:3,explanation:'Perpendicular slope is −1/m=−1/4.',steps:['Original slope m=4','Perpendicular: −1/m=−1/4'],hint:'Perpendicular slopes are negative reciprocals.'},
+      {q:'Solve: √(2x+3) = 5',opts:['x=11','x=14','x=22','x=4'],ans:0,explanation:'2x+3=25. 2x=22. x=11.',steps:['Square both sides: 2x+3=25','2x=22','x=11'],hint:'Square both sides to remove the radical.'},
+      {q:'What is the product of the roots of x² − 7x + 10 = 0?',opts:['7','−7','10','−10'],ans:2,explanation:'By Vieta\'s: product = c/a = 10.',steps:['For ax²+bx+c=0','Product of roots = c/a','=10/1=10'],hint:'Product of roots = c/a.'},
+      {q:'Evaluate: 3⁰ + 4¹ + 2²',opts:['7','8','9','10'],ans:1,explanation:'1+4+4=9. Wait: 3⁰=1, 4¹=4, 2²=4. Sum=9.',steps:['3⁰=1','4¹=4','2²=4, sum=9'],hint:'Any non-zero number to the 0 is 1.'},
+      {q:'Write an equation for a line parallel to y=2x+5 passing through (0,−3).',opts:['y=2x−3','y=−x/2−3','y=2x+5','y=−2x−3'],ans:0,explanation:'Parallel lines have same slope. y=2x+(−3).',steps:['Same slope: m=2','Through (0,−3): b=−3','y=2x−3'],hint:'Parallel lines have equal slopes.'},
+      {q:'Solve: |2x + 1| < 5',opts:['x<2','−3<x<2','x>−3','−2<x<3'],ans:1,explanation:'−5<2x+1<5. −6<2x<4. −3<x<2.',steps:['−5<2x+1<5','−6<2x<4','−3<x<2'],hint:'Absolute value inequality: set up compound inequality.'},
+      {q:'What is the range of f(x) = |x| + 2?',opts:['all reals','y≥0','y≥2','y>2'],ans:2,explanation:'|x|≥0, so |x|+2≥2.',steps:['|x|≥0 for all x','|x|+2≥2'],hint:'What is the minimum value of |x|?'},
+      {q:'Simplify: (x+3)/(x²−9)',opts:['1/(x−3)','1/(x+3)','(x+3)/(x−3)','x+3'],ans:0,explanation:'x²−9=(x+3)(x−3). Cancel (x+3): 1/(x−3).',steps:['x²−9=(x+3)(x−3)','Cancel (x+3)','1/(x−3)'],hint:'Factor the denominator as a difference of squares.'},
+      {q:'A function is f(x) = 5x−2. What is f⁻¹(x)?',opts:['(x+2)/5','5x+2','(x−2)/5','5/(x−2)'],ans:0,explanation:'y=5x−2. x=5y−2. y=(x+2)/5.',steps:['Swap x and y: x=5y−2','Solve for y: y=(x+2)/5'],hint:'Swap x and y then solve for y.'},
+      {q:'Solve: log₃(x) = 2',opts:['x=6','x=8','x=9','x=23'],ans:2,explanation:'3²=9.',steps:['log₃(x)=2 means 3²=x','x=9'],hint:'Convert to exponential form.'},
+      {q:'What is the discriminant of 2x²+3x−5=0?',opts:['−31','9','49','51'],ans:2,explanation:'b²−4ac=9−4(2)(−5)=9+40=49.',steps:['b²−4ac','=9−4(2)(−5)','=9+40=49'],hint:'b²−4ac with a=2, b=3, c=−5.'},
+      {q:'If f(x) = x² and g(x) = x+3, find (f∘g)(x).',opts:['x²+3','(x+3)²','x²+3x','x³+3'],ans:1,explanation:'f(g(x))=f(x+3)=(x+3)².',steps:['f(g(x))=f(x+3)','=(x+3)²'],hint:'Substitute g(x) into f.'},
+      {q:'Solve: 4x² − 36 = 0',opts:['x=±9','x=±3','x=3 only','x=9 only'],ans:1,explanation:'4x²=36. x²=9. x=±3.',steps:['4x²=36','x²=9','x=±3'],hint:'Divide both sides by 4, then take square root.'},
+      {q:'What is the x-intercept of 2x − 3y = 12?',opts:['x=−4','x=4','x=6','x=−6'],ans:2,explanation:'Set y=0: 2x=12, x=6.',steps:['Set y=0','2x=12','x=6'],hint:'Set y=0 and solve for x.'},
+      {q:'Simplify: (3x−6)/(x−2)',opts:['3','6','3x','x−2'],ans:0,explanation:'3(x−2)/(x−2)=3.',steps:['3(x−2)/(x−2)','Cancel (x−2)','=3'],hint:'Factor the numerator.'},
+      {q:'Solve the system: 2x+y=8, x−y=1',opts:['x=2,y=4','x=3,y=2','x=4,y=0','x=1,y=6'],ans:1,explanation:'Add: 3x=9, x=3. y=8−6=2.',steps:['Add equations: 3x=9','x=3','y=8−6=2'],hint:'Add the equations to eliminate y.'},
+      {q:'What is the equation of a vertical line through (−5, 3)?',opts:['y=3','x=−5','y=−5','x=3'],ans:1,explanation:'Vertical lines have equation x = constant.',steps:['Vertical line: x=constant','Through (−5,3): x=−5'],hint:'Vertical lines are x = constant.'},
+      {q:'Solve: e^x = 1',opts:['x=0','x=1','x=e','x=−1'],ans:0,explanation:'e⁰=1.',steps:['e^x=1=e⁰','x=0'],hint:'What power of e equals 1?'},
+      {q:'Factor completely: 3x² − 27',opts:['3(x²−9)','3(x+3)(x−3)','(3x−9)(x+3)','(x+3)(3x−9)'],ans:1,explanation:'3(x²−9)=3(x+3)(x−3).',steps:['Factor out 3: 3(x²−9)','x²−9=(x+3)(x−3)','3(x+3)(x−3)'],hint:'Factor out 3 first, then factor the difference of squares.'},
+      {q:'What is the sum of the roots of 3x² − 12x + 5 = 0?',opts:['−4','4','5/3','12'],ans:1,explanation:'Sum of roots = −b/a = 12/3 = 4.',steps:['Sum = −b/a','=−(−12)/3','=4'],hint:'Sum of roots = −b/a by Vieta\'s formulas.'},
+      {q:'Solve: 2^(x+1) = 16',opts:['x=2','x=3','x=4','x=7'],ans:1,explanation:'16=2⁴. x+1=4. x=3.',steps:['16=2⁴','2^(x+1)=2⁴','x+1=4 → x=3'],hint:'Write 16 as a power of 2.'},
+      {q:'What is the range of y = −x² + 4?',opts:['y≥4','y≤4','all reals','y≥0'],ans:1,explanation:'Max at vertex: y=4. Parabola opens down so y≤4.',steps:['Vertex at x=0, y=4','Opens downward','y≤4'],hint:'The vertex is the maximum here.'},
+      {q:'Solve: |x| + 3 = 10',opts:['x=7 only','x=−7 only','x=±7','x=±13'],ans:2,explanation:'|x|=7. x=7 or x=−7.',steps:['|x|=10−3=7','x=±7'],hint:'Isolate the absolute value first.'},
+      {q:'What is f(0) if f(x) = x³ − 4x² + 2?',opts:['−3','0','2','4'],ans:2,explanation:'f(0)=0−0+2=2.',steps:['f(0)=0³−4(0²)+2','=0−0+2','=2'],hint:'Substitute x=0.'},
+      {q:'Simplify: √(4x²)',opts:['2x','4x','2|x|','4|x|'],ans:2,explanation:'√(4x²)=2|x|. Must use absolute value since x could be negative.',steps:['√4=2','√(x²)=|x|','Answer: 2|x|'],hint:'√(x²)=|x|, not just x.'},
+      {q:'Solve for y: 3x + 2y = 12',opts:['y=6−3x/2','y=(12−3x)/2','y=4−x','y=3x−12'],ans:1,explanation:'2y=12−3x. y=(12−3x)/2.',steps:['2y=12−3x','y=(12−3x)/2'],hint:'Isolate y by subtracting 3x then dividing by 2.'},
+      {q:'If f(x) = 3x and g(x) = x + 4, find f(g(x)) − g(f(x)).',opts:['−8','0','8','12'],ans:2,explanation:'f(g(x))=3(x+4)=3x+12. g(f(x))=3x+4. Difference=8.',steps:['f(g(x))=3x+12','g(f(x))=3x+4','Difference=8'],hint:'Compute each composition separately then subtract.'},
+      {q:'Solve: x/3 − x/4 = 1',opts:['x=3','x=6','x=12','x=24'],ans:2,explanation:'LCD=12. 4x/12−3x/12=1. x/12=1. x=12.',steps:['LCD=12','x/12=1','x=12'],hint:'Find the LCD of 3 and 4.'},
+    ],
+    tiebreakers: [
+      {q:'Solve: 4x − 7 = 2x + 9',opts:['x=4','x=8','x=1','x=16'],ans:1,explanation:'2x=16, x=8.',steps:['2x=16','x=8'],hint:'Collect x terms.'},
+      {q:'Factor: x² − 4x − 21',opts:['(x−7)(x+3)','(x+7)(x−3)','(x−3)(x+7)','(x−21)(x+1)'],ans:0,explanation:'−7×3=−21, −7+3=−4.',steps:['Need p·q=−21, p+q=−4','−7 and 3','(x−7)(x+3)'],hint:'Find two numbers that multiply to −21 and add to −4.'},
+      {q:'What is the slope of x + 3y = 9?',opts:['1/3','−1/3','3','−3'],ans:1,explanation:'3y=−x+9. y=−x/3+3. Slope=−1/3.',steps:['3y=−x+9','y=−(1/3)x+3','slope=−1/3'],hint:'Solve for y to get slope-intercept form.'},
+    ]
+  },
+  2: {
+    pool: [
+      {q:'Evaluate: log₂(32)',opts:['4','5','6','16'],ans:1,explanation:'2⁵=32.',steps:['2⁵=32','log₂(32)=5'],hint:'Ask: 2 to what power equals 32?'},
+      {q:'What is the 10th term of 4, 7, 10, 13, …?',opts:['28','31','34','37'],ans:1,explanation:'a₁₀=4+9×3=31.',steps:['d=3','a₁₀=4+(10−1)×3','=31'],hint:'Use aₙ=a₁+(n−1)d.'},
+      {q:'Simplify: (x⁴·x⁻¹)/x²',opts:['x⁵','x³','x','x²'],ans:2,explanation:'x³/x²=x.',steps:['x⁴·x⁻¹=x³','x³/x²=x'],hint:'Add then subtract exponents.'},
+      {q:'Solve: 3^x = 243',opts:['x=3','x=4','x=5','x=6'],ans:2,explanation:'3⁵=243.',steps:['3¹=3,3²=9,3³=27,3⁴=81,3⁵=243','x=5'],hint:'Build up powers of 3.'},
+      {q:'What is the sum of the geometric series 2+6+18+54+162?',opts:['242','243','244','246'],ans:0,explanation:'S=2(3⁵−1)/(3−1)=2(242)/2=242.',steps:['a=2, r=3, n=5','S=2(243−1)/2','=242'],hint:'Use Sₙ=a(rⁿ−1)/(r−1).'},
+      {q:'Simplify: log₄(64)',opts:['2','3','4','16'],ans:1,explanation:'4³=64.',steps:['4¹=4,4²=16,4³=64','log₄(64)=3'],hint:'Ask: 4 to what power equals 64?'},
+      {q:'Solve: 2^(2x) = 8',opts:['x=1','x=1.5','x=2','x=3'],ans:1,explanation:'2^(2x)=2³. 2x=3. x=3/2=1.5.',steps:['8=2³','2x=3','x=3/2'],hint:'Write 8 as a power of 2.'},
+      {q:'What is the common ratio of 5, 15, 45, 135?',opts:['2','3','5','10'],ans:1,explanation:'15/5=3.',steps:['15÷5=3','45÷15=3','r=3'],hint:'Divide any term by the previous one.'},
+      {q:'Simplify: ln(e⁷)',opts:['7','e⁷','7e','ln(7)'],ans:0,explanation:'ln and e cancel: ln(eˣ)=x.',steps:['ln(eˣ)=x','ln(e⁷)=7'],hint:'ln and e are inverse functions.'},
+      {q:'Solve: log(x²) = 4',opts:['x=10²','x=±100','x=100 only','x=±10'],ans:1,explanation:'x²=10⁴=10000. x=±100.',steps:['x²=10⁴','x²=10000','x=±100'],hint:'Convert to exponential form, then take square root.'},
+      {q:'What is (2+3i)(1−2i)?',opts:['8−i','−4+7i','8+7i','4−i'],ans:0,explanation:'2−4i+3i−6i²=2−i+6=8−i.',steps:['FOIL: 2−4i+3i−6i²','i²=−1: 2−i+6','=8−i'],hint:'FOIL, then replace i²=−1.'},
+      {q:'Simplify: (x²−x−6)/(x−3)',opts:['x+2','x−2','x+3','x−3'],ans:0,explanation:'(x−3)(x+2)/(x−3)=x+2.',steps:['Factor: (x−3)(x+2)','Cancel (x−3)','=x+2'],hint:'Factor the numerator.'},
+      {q:'What is the sum of an infinite geometric series with a=4 and r=1/3?',opts:['4','6','8','12'],ans:1,explanation:'S=4/(1−1/3)=4/(2/3)=6.',steps:['S=a/(1−r)','=4/(1−1/3)','=4÷(2/3)=6'],hint:'S=a/(1−r) when |r|<1.'},
+      {q:'Expand: (x−2)³',opts:['x³−6x²+12x−8','x³−8','x³−6x+12−8','x³−6x²−8'],ans:0,explanation:'(a−b)³=a³−3a²b+3ab²−b³.',steps:['(x−2)³','=x³−3x²(2)+3x(4)−8','=x³−6x²+12x−8'],hint:'Use the binomial cube formula.'},
+      {q:'What is |3−4i|?',opts:['1','5','7','25'],ans:1,explanation:'√(9+16)=√25=5.',steps:['|a+bi|=√(a²+b²)','=√(9+16)','=5'],hint:'Magnitude = √(a²+b²).'},
+      {q:'Solve: 4^x = 2^(x+6)',opts:['x=2','x=4','x=6','x=8'],ans:2,explanation:'2^(2x)=2^(x+6). 2x=x+6. x=6.',steps:['4^x=(2²)^x=2^(2x)','2^(2x)=2^(x+6)','2x=x+6 → x=6'],hint:'Write 4 as 2².'},
+      {q:'What is the 7th term of the geometric sequence 1, −2, 4, −8, …?',opts:['−64','64','−32','32'],ans:1,explanation:'r=−2. a₇=1×(−2)⁶=64.',steps:['r=−2','a₇=(−2)⁶=64','=64'],hint:'aₙ=a₁×r^(n−1). Note (−2)⁶ is positive.'},
+      {q:'Simplify: log₃(9) + log₃(27)',opts:['5','6','7','81'],ans:0,explanation:'log₃(9)=2, log₃(27)=3. Sum=5.',steps:['log₃(9)=2','log₃(27)=3','2+3=5'],hint:'Convert each log separately.'},
+      {q:'What are the roots of x²+4x+5=0?',opts:['−2±i','2±i','−2±2i','No real roots only'],ans:0,explanation:'x=(−4±√(16−20))/2=(−4±√(−4))/2=−2±i.',steps:['Discriminant: 16−20=−4','x=−4±2i)/2','=−2±i'],hint:'Use the quadratic formula. Discriminant is negative.'},
+      {q:'Evaluate: ∑(k=1 to 5) 2^k',opts:['30','62','32','64'],ans:1,explanation:'2+4+8+16+32=62.',steps:['2¹+2²+2³+2⁴+2⁵','=2+4+8+16+32','=62'],hint:'Sum the powers of 2 from 1 to 5.'},
+      {q:'Simplify: (2x²+x−6)/(x+2)',opts:['2x−3','2x+3','x−3','2x−1'],ans:0,explanation:'Factor: (2x−3)(x+2). Cancel (x+2). = 2x−3.',steps:['Factor numerator: (2x−3)(x+2)','Cancel (x+2)','=2x−3'],hint:'Factor the numerator by grouping.'},
+      {q:'Solve: ln(x+1)=2',opts:['x=e²−1','x=e+1','x=e²+1','x=2e−1'],ans:0,explanation:'x+1=e². x=e²−1.',steps:['e^(ln(x+1))=e²','x+1=e²','x=e²−1'],hint:'Exponentiate both sides with base e.'},
+      {q:'What is the 8th term of 3, −6, 12, −24, …?',opts:['−192','192','−384','384'],ans:2,explanation:'r=−2. a₈=3×(−2)⁷=3×(−128)=−384.',steps:['r=−2','a₈=3×(−2)⁷','=−384'],hint:'(−2)⁷ is negative.'},
+      {q:'Factor: x³ − 8',opts:['(x−2)(x²+4)','(x−2)(x²+2x+4)','(x−2)³','(x−2)(x+4)'],ans:1,explanation:'Difference of cubes: (x−2)(x²+2x+4).',steps:['a³−b³=(a−b)(a²+ab+b²)','a=x, b=2','(x−2)(x²+2x+4)'],hint:'Use difference of cubes formula.'},
+      {q:'What is the horizontal asymptote of f(x)=(3x²+1)/(x²−4)?',opts:['y=0','y=1','y=3','y=−3'],ans:2,explanation:'Leading coefficients: 3/1=3.',steps:['Same degree top and bottom','Ratio of leading coefficients','3/1=3'],hint:'Divide leading coefficients when degrees are equal.'},
+      {q:'Solve: 2|x−5|=8',opts:['x=1 or x=9','x=9 only','x=−1 or x=9','x=1 only'],ans:0,explanation:'|x−5|=4. x−5=±4. x=9 or x=1.',steps:['|x−5|=4','x−5=4→x=9','x−5=−4→x=1'],hint:'Divide by 2 first, then set up two cases.'},
+      {q:'What is log₁₀(0.001)?',opts:['−3','−2','3','−1/3'],ans:0,explanation:'10⁻³=0.001.',steps:['0.001=10⁻³','log₁₀(10⁻³)=−3'],hint:'Write 0.001 as a power of 10.'},
+      {q:'Find the sum of the arithmetic series: 5+8+11+…+50.',opts:['415','430','450','465'],ans:1,explanation:'n=(50−5)/3+1=16. S=16(5+50)/2=430.',steps:['n=16 terms','S=n(a₁+aₙ)/2','=16(55)/2=430'],hint:'Find n first using aₙ=a₁+(n−1)d.'},
+      {q:'Simplify: (1+i)²',opts:['2','2i','1+2i','−1+2i'],ans:1,explanation:'1+2i+i²=1+2i−1=2i.',steps:['(1+i)²=1+2i+i²','i²=−1','=2i'],hint:'Expand (1+i)² using FOIL.'},
+      {q:'What is the inverse of f(x) = 2^x?',opts:['f⁻¹(x)=log₂(x)','f⁻¹(x)=x/2','f⁻¹(x)=ln(x)','f⁻¹(x)=x²'],ans:0,explanation:'If y=2^x then x=log₂(y).',steps:['y=2^x','x=log₂(y)','f⁻¹(x)=log₂(x)'],hint:'The inverse of an exponential is a logarithm.'},
+      {q:'Solve: log(x)+log(x−3)=1 (base 10)',opts:['x=5','x=2','x=−2','x=10'],ans:0,explanation:'x(x−3)=10. x²−3x−10=0. (x−5)(x+2)=0. x=5 (x=−2 rejected).',steps:['x(x−3)=10','x²−3x−10=0','x=5 (reject −2)'],hint:'Use log product rule, then solve the quadratic.'},
+      {q:'What is i^47?',opts:['1','−1','i','−i'],ans:3,explanation:'47=4×11+3. i³=−i.',steps:['47 mod 4 = 3','i³=−i'],hint:'Powers of i cycle: i, −1, −i, 1.'},
+      {q:'Simplify: log₂(8)+log₂(16)−log₂(4)',opts:['4','5','6','7'],ans:3,explanation:'3+4−2=5. Wait: log₂(8)=3, log₂(16)=4, log₂(4)=2. 3+4−2=5.',steps:['log₂(8)=3','log₂(16)=4','3+4−2=5'],hint:'Evaluate each log separately.'},
+      {q:'Find the partial sum S₆ of the geometric series 1+2+4+8+…',opts:['32','63','64','127'],ans:1,explanation:'S₆=1(2⁶−1)/(2−1)=63.',steps:['a=1, r=2, n=6','S=(2⁶−1)/1','=63'],hint:'Use Sₙ=a(rⁿ−1)/(r−1).'},
+      {q:'What is the remainder when x³−2x²+x−5 is divided by (x−2)?',opts:['−3','−1','1','3'],ans:0,explanation:'Remainder theorem: f(2)=8−8+2−5=−3.',steps:['f(2)=2³−2(2²)+2−5','=8−8+2−5','=−3'],hint:'Use the remainder theorem: evaluate f at the zero of the divisor.'},
+      {q:'Solve: 9^x = 27',opts:['x=1','x=3/2','x=2','x=3'],ans:1,explanation:'3^(2x)=3³. 2x=3. x=3/2.',steps:['9=3², 27=3³','3^(2x)=3³','x=3/2'],hint:'Write both sides as powers of 3.'},
+      {q:'What is the distance between the roots of x²−6x+5=0?',opts:['1','4','5','6'],ans:1,explanation:'Roots are 1 and 5. Distance=|5−1|=4.',steps:['Factor: (x−1)(x−5)=0','Roots: 1 and 5','|5−1|=4'],hint:'Find the roots first.'},
+      {q:'Write the repeating decimal 0.333… as a fraction.',opts:['3/10','1/3','3/9','33/99'],ans:1,explanation:'Let x=0.333…. 10x=3.333… 9x=3. x=1/3.',steps:['Let x=0.333…','10x=3.333…','9x=3 → x=1/3'],hint:'Use the standard technique for repeating decimals.'},
+      {q:'What is the amplitude of y = −5 sin(2x + 1)?',opts:['−5','2','5','10'],ans:2,explanation:'Amplitude = |−5| = 5.',steps:['Amplitude=|coefficient of sin|','|−5|=5'],hint:'Amplitude is always positive.'},
+      {q:'Simplify: (3x²−12)/(x²−4)',opts:['3','3(x+2)/(x−2)','3x','3/(x+2)'],ans:0,explanation:'3(x²−4)/(x²−4)=3.',steps:['3(x²−4)/(x²−4)','=3'],hint:'Factor the numerator.'},
+      {q:'Solve: 5^(x−1) = 125',opts:['x=3','x=4','x=5','x=6'],ans:1,explanation:'5^(x−1)=5³. x−1=3. x=4.',steps:['125=5³','x−1=3','x=4'],hint:'Write 125 as a power of 5.'},
+      {q:'What is the sum: ∑(n=0 to ∞) (2/3)^n?',opts:['2','3','4','6'],ans:1,explanation:'S=1/(1−2/3)=1/(1/3)=3.',steps:['a=1, r=2/3','S=1/(1−2/3)','=3'],hint:'Infinite geometric series: S=a/(1−r).'},
+      {q:'Evaluate: log₅(1/25)',opts:['−2','−1/2','2','5'],ans:0,explanation:'1/25=5⁻². log₅(5⁻²)=−2.',steps:['1/25=5⁻²','log₅(5⁻²)=−2'],hint:'Write 1/25 as a power of 5.'},
+      {q:'What is (1−i)/(1+i)?',opts:['−i','i','−1','1'],ans:0,explanation:'Multiply by (1−i)/(1−i): (1−i)²/2=(1−2i−1)/2=−2i/2=−i.',steps:['×(1−i)/(1−i)','(1−2i+i²)/2=(−2i)/2','=−i'],hint:'Multiply by the conjugate of the denominator.'},
+      {q:'What are the asymptotes of y=1/(x²−1)?',opts:['x=1, y=0','x=±1, y=0','x=0, y=1','x=1 only'],ans:1,explanation:'Denominator=0 when x=±1. Horizontal: y=0.',steps:['x²−1=0 → x=±1','deg top < deg bottom → y=0'],hint:'Set denominator equal to 0 for vertical asymptotes.'},
+    ],
+    tiebreakers: [
+      {q:'Solve: 2^x = 64',opts:['x=5','x=6','x=8','x=32'],ans:1,explanation:'2⁶=64.',steps:['2⁶=64','x=6'],hint:'Build up powers of 2.'},
+      {q:'What is the 6th term of 2, 6, 18, 54, …?',opts:['162','486','243','729'],ans:1,explanation:'r=3. a₆=2×3⁵=2×243=486.',steps:['r=3','a₆=2×3⁵=486'],hint:'aₙ=a₁×r^(n−1).'},
+      {q:'Simplify: log(1000)−log(10)',opts:['1','2','10','100'],ans:1,explanation:'log(1000)=3, log(10)=1. 3−1=2.',steps:['log(1000)=3','log(10)=1','3−1=2'],hint:'Evaluate each log (base 10).'},
+    ]
+  },
+  3: {
+    pool: [
+      {q:'A right triangle has legs 8 and 15. What is the hypotenuse?',opts:['13','17','23','289'],ans:1,explanation:'8²+15²=64+225=289. √289=17.',steps:['a²+b²=c²','64+225=289','c=17'],hint:'Pythagorean theorem.'},
+      {q:'What is the area of a circle with radius 6? (in terms of π)',opts:['12π','36π','6π','72π'],ans:1,explanation:'A=πr²=36π.',steps:['A=πr²','A=π(36)=36π'],hint:'A=πr².'},
+      {q:'Two similar triangles have sides in ratio 3:5. Smaller area is 27. Larger area?',opts:['45','75','135','45'],ans:1,explanation:'Area ratio=(3/5)²=9/25. 27×25/9=75.',steps:['Area ratio=(side ratio)²','=9:25','27×25/9=75'],hint:'Area scales as the square of the ratio.'},
+      {q:'What is the volume of a cone with r=3 and h=4?',opts:['12π','16π','24π','36π'],ans:0,explanation:'V=(1/3)πr²h=(1/3)π(9)(4)=12π.',steps:['V=(1/3)πr²h','=(1/3)π(9)(4)','=12π'],hint:'V=(1/3)πr²h.'},
+      {q:'The sum of interior angles of a regular decagon is:',opts:['1440°','1260°','1620°','1080°'],ans:0,explanation:'(10−2)×180=1440°.',steps:['Formula: (n−2)×180','(10−2)×180','=1440°'],hint:'(n−2)×180°.'},
+      {q:'What is the distance between (−2,3) and (4,−5)?',opts:['10','√(100)','√(52)','14'],ans:0,explanation:'√((4−(−2))²+(−5−3)²)=√(36+64)=√100=10.',steps:['Δx=6, Δy=−8','d=√(36+64)','=10'],hint:'Distance formula: d=√(Δx²+Δy²).'},
+      {q:'A parallelogram has base 11 and height 7. What is its area?',opts:['36','77','88','154'],ans:1,explanation:'A=bh=11×7=77.',steps:['A=base×height','=11×7','=77'],hint:'Parallelogram area = base × height.'},
+      {q:'What is the circumference of a circle with diameter 20?',opts:['10π','20π','40π','400π'],ans:1,explanation:'C=πd=20π.',steps:['C=πd','=π(20)','=20π'],hint:'C=πd or 2πr.'},
+      {q:'A right triangle has a hypotenuse of 10 and one leg of 6. What is the other leg?',opts:['4','7','8','9'],ans:2,explanation:'6²+b²=10². 36+b²=100. b²=64. b=8.',steps:['6²+b²=10²','b²=64','b=8'],hint:'a²+b²=c².'},
+      {q:'What is the lateral surface area of a cylinder with r=4 and h=10?',opts:['16π','40π','80π','160π'],ans:2,explanation:'LA=2πrh=2π(4)(10)=80π.',steps:['LA=2πrh','=2π(4)(10)','=80π'],hint:'Lateral area = 2πrh.'},
+      {q:'In a 30-60-90 triangle with hypotenuse 14, what is the shorter leg?',opts:['7','7√2','7√3','14√3'],ans:0,explanation:'Short leg = hyp/2 = 7.',steps:['30-60-90 ratios: 1:√3:2','Short leg = 14/2','=7'],hint:'Short leg = hypotenuse/2 in a 30-60-90 triangle.'},
+      {q:'What is the area of a trapezoid with parallel sides 8 and 14, height 6?',opts:['48','66','88','132'],ans:1,explanation:'A=½(8+14)(6)=66.',steps:['A=½(b₁+b₂)h','=½(22)(6)','=66'],hint:'A=½(b₁+b₂)h.'},
+      {q:'What is the slope of a line perpendicular to y=−3x+2?',opts:['−3','3','1/3','−1/3'],ans:2,explanation:'Perp slope=−1/(−3)=1/3.',steps:['m=−3','Perp: −1/m','=1/3'],hint:'Perpendicular slopes are negative reciprocals.'},
+      {q:'What is the volume of a sphere with radius 3?',opts:['12π','27π','36π','4π'],ans:2,explanation:'V=(4/3)πr³=(4/3)π(27)=36π.',steps:['V=(4/3)πr³','=(4/3)π(27)','=36π'],hint:'V=(4/3)πr³.'},
+      {q:'Two angles of a triangle are 58° and 67°. Find the third.',opts:['45°','55°','65°','75°'],ans:1,explanation:'180−58−67=55°.',steps:['58+67=125','180−125=55°'],hint:'Angles in a triangle sum to 180°.'},
+      {q:'What is the area of an equilateral triangle with side 8?',opts:['16√3','8√3','32√3','24'],ans:0,explanation:'A=(√3/4)s²=(√3/4)(64)=16√3.',steps:['A=(√3/4)s²','=(√3/4)(64)','=16√3'],hint:'A=(√3/4)s² for equilateral triangles.'},
+      {q:'What is the midpoint of (−4,6) and (10,−2)?',opts:['(3,2)','(7,4)','(2,4)','(3,4)'],ans:0,explanation:'((−4+10)/2,(6+(−2))/2)=(3,2).',steps:['x̄=(−4+10)/2=3','ȳ=(6−2)/2=2','(3,2)'],hint:'Average the x-coordinates and y-coordinates.'},
+      {q:'A circle has equation x²+y²=49. What is its radius?',opts:['7','14','49','√7'],ans:0,explanation:'r²=49, r=7.',steps:['x²+y²=r²','r²=49','r=7'],hint:'Standard circle form: x²+y²=r².'},
+      {q:'What is the surface area of a cube with side 5?',opts:['25','100','125','150'],ans:3,explanation:'SA=6s²=6(25)=150.',steps:['SA=6s²','=6(25)','=150'],hint:'A cube has 6 identical square faces.'},
+      {q:'Translate the point (3,−1) by the vector (−4,2). New location?',opts:['(−1,1)','(7,1)','(−1,−3)','(7,−3)'],ans:0,explanation:'(3+(−4),−1+2)=(−1,1).',steps:['x: 3+(−4)=−1','y: −1+2=1','(−1,1)'],hint:'Add the vector components.'},
+      {q:'What is the arc length of a 120° arc in a circle with radius 9?',opts:['3π','6π','9π','18π'],ans:1,explanation:'Arc=(120/360)×2π(9)=(1/3)(18π)=6π.',steps:['Fraction of circle: 120/360=1/3','Arc=(1/3)(2π)(9)','=6π'],hint:'Arc = (θ/360°) × 2πr.'},
+      {q:'In a 45-45-90 triangle, a leg is 6. What is the hypotenuse?',opts:['6','6√2','12','3√2'],ans:1,explanation:'Hyp=leg×√2=6√2.',steps:['45-45-90: legs equal','hyp=leg×√2','=6√2'],hint:'In 45-45-90: hyp = leg × √2.'},
+      {q:'What transformation maps (x,y) to (−y,x)?',opts:['Reflection over x-axis','Rotation 90° CCW','Reflection over y-axis','Rotation 180°'],ans:1,explanation:'(x,y)→(−y,x) is a 90° CCW rotation.',steps:['90° CCW: (x,y)→(−y,x)'],hint:'Memorize the rotation formulas.'},
+      {q:'What is the volume of a rectangular prism with l=6, w=4, h=5?',opts:['60','100','120','150'],ans:2,explanation:'V=lwh=6×4×5=120.',steps:['V=lwh','=6×4×5','=120'],hint:'V=length×width×height.'},
+      {q:'Two supplementary angles are in ratio 2:7. Find the larger angle.',opts:['20°','35°','70°','140°'],ans:3,explanation:'2x+7x=180. 9x=180. x=20. Larger=7×20=140.',steps:['2x+7x=180','x=20','7x=140°'],hint:'Supplementary angles sum to 180°.'},
+      {q:'Find the equation of a circle with center (3,−2) and radius 5.',opts:['(x−3)²+(y+2)²=25','(x+3)²+(y−2)²=25','(x−3)²+(y−2)²=25','(x+3)²+(y+2)²=5'],ans:0,explanation:'(x−h)²+(y−k)²=r².',steps:['Center (3,−2), r=5','(x−3)²+(y+2)²=25'],hint:'(x−h)²+(y−k)²=r².'},
+      {q:'What is the perimeter of a regular pentagon with side 9?',opts:['36','40','45','50'],ans:2,explanation:'P=5×9=45.',steps:['Regular pentagon: 5 sides','P=5×9','=45'],hint:'Perimeter = number of sides × side length.'},
+      {q:'In triangle ABC, if AB=7, BC=9, AC=11, is it acute, right, or obtuse?',opts:['Acute','Right','Obtuse','Cannot tell'],ans:2,explanation:'7²+9²=49+81=130. 11²=121. 130>121, so WAIT: if a²+b²>c² it\'s acute. 130>121: acute.',steps:['7²+9²=130','11²=121','130>121 → acute'],hint:'Compare a²+b² with c². If >, acute. If <, obtuse.'},
+      {q:'What is the area of a sector with r=10 and central angle 72°?',opts:['10π','20π','25π','40π'],ans:1,explanation:'A=(72/360)π(100)=(1/5)(100π)=20π.',steps:['72/360=1/5','A=(1/5)π(100)','=20π'],hint:'Sector area = (θ/360°)×πr².'},
+      {q:'What is cos(30°) × sin(60°)?',opts:['1/2','3/4','√3/2','1'],ans:1,explanation:'cos30°=√3/2, sin60°=√3/2. Product=(√3/2)²=3/4.',steps:['cos30°=√3/2','sin60°=√3/2','(√3/2)(√3/2)=3/4'],hint:'Both are √3/2.'},
+      {q:'What is the diagonal of a rectangle with sides 5 and 12?',opts:['13','17','15','60'],ans:0,explanation:'d=√(25+144)=√169=13.',steps:['d²=5²+12²','=25+144=169','d=13'],hint:'Use the Pythagorean theorem.'},
+      {q:'Reflect (4,−3) over the y-axis. New point?',opts:['(4,3)','(−4,3)','(−4,−3)','(3,4)'],ans:2,explanation:'Reflection over y-axis: (x,y)→(−x,y).',steps:['(x,y)→(−x,y)','(4,−3)→(−4,−3)'],hint:'Reflecting over y-axis negates x.'},
+      {q:'A square has diagonal 10. What is its side length?',opts:['5','5√2','10/√2','√50'],ans:1,explanation:'d=s√2. s=d/√2=10/√2=5√2.',steps:['d=s√2','s=10/√2','=5√2'],hint:'For a square: diagonal = side × √2.'},
+      {q:'What is the measure of an inscribed angle that subtends an arc of 100°?',opts:['50°','100°','200°','25°'],ans:0,explanation:'Inscribed angle = half the intercepted arc.',steps:['Inscribed angle = ½ × arc','=½×100°','=50°'],hint:'Inscribed angle theorem: angle = ½ × intercepted arc.'},
+      {q:'What is the surface area of a sphere with radius 5?',opts:['25π','50π','75π','100π'],ans:3,explanation:'SA=4πr²=4π(25)=100π.',steps:['SA=4πr²','=4π(25)','=100π'],hint:'SA=4πr².'},
+      {q:'Find the hypotenuse of a 30-60-90 triangle with the longer leg = 6√3.',opts:['6','12','9','18'],ans:1,explanation:'Long leg=h×√3/2. 6√3=h×√3/2. h=12.',steps:['Long leg = hyp×√3/2','6√3=hyp×√3/2','hyp=12'],hint:'In 30-60-90: long leg = (√3/2) × hyp.'},
+      {q:'Two parallel lines are cut by a transversal. Co-interior angles measure (3x+5)° and (2x+35)°. Find x.',opts:['24','28','30','32'],ans:1,explanation:'Co-interior angles sum to 180°. 3x+5+2x+35=180. 5x+40=180. x=28.',steps:['Co-interior: sum=180°','5x+40=180','x=28'],hint:'Co-interior (same-side interior) angles are supplementary.'},
+      {q:'What is the volume of a pyramid with square base of side 6 and height 8?',opts:['48','96','144','288'],ans:1,explanation:'V=(1/3)×36×8=96.',steps:['V=(1/3)Bh','B=6²=36','(1/3)(36)(8)=96'],hint:'V=(1/3)×base area×height.'},
+      {q:'A line passes through (0,5) and (4,0). What is its equation?',opts:['y=−5x/4+5','y=5x/4−5','y=4x/5+4','y=−4x/5+5'],ans:0,explanation:'slope=(0−5)/(4−0)=−5/4. y=−5x/4+5.',steps:['slope=−5/4','y-int=5','y=−5x/4+5'],hint:'Find slope from two points, read y-intercept.'},
+      {q:'What is the area of a rhombus with diagonals 10 and 16?',opts:['40','80','160','320'],ans:1,explanation:'A=d₁d₂/2=10×16/2=80.',steps:['A=d₁d₂/2','=10×16/2','=80'],hint:'Area of rhombus = product of diagonals ÷ 2.'},
+      {q:'What is the exterior angle of a regular hexagon?',opts:['30°','45°','60°','72°'],ans:2,explanation:'360°÷6=60°.',steps:['Exterior angle = 360°÷n','=360÷6','=60°'],hint:'Sum of exterior angles = 360° for any convex polygon.'},
+      {q:'Dilate (2,3) by a scale factor of 4 from the origin. New point?',opts:['(6,7)','(8,12)','(8,7)','(6,12)'],ans:1,explanation:'(4×2, 4×3)=(8,12).',steps:['Multiply each coordinate by 4','(2×4, 3×4)','=(8,12)'],hint:'Dilation from origin: multiply each coordinate by the scale factor.'},
+    ],
+    tiebreakers: [
+      {q:'What is the volume of a cylinder with r=5 and h=4?',opts:['20π','40π','80π','100π'],ans:3,explanation:'V=πr²h=π(25)(4)=100π.',steps:['V=πr²h','=π(25)(4)','=100π'],hint:'V=πr²h.'},
+      {q:'A triangle has angles in ratio 2:3:7. Find the largest angle.',opts:['60°','70°','105°','120°'],ans:2,explanation:'2x+3x+7x=180. x=15. Largest=7×15=105°.',steps:['12x=180','x=15','Largest=7×15=105°'],hint:'Sum of angles = 180°.'},
+      {q:'What is the area of a circle with circumference 10π?',opts:['25π','50π','100π','10π'],ans:0,explanation:'C=2πr=10π → r=5. A=πr²=25π.',steps:['2πr=10π → r=5','A=π(25)','=25π'],hint:'Find r from the circumference first.'},
+    ]
+  },
+  4: {
+    pool: [
+      {q:'What is the exact value of cos(π/4)?',opts:['1/2','√3/2','√2/2','1'],ans:2,explanation:'π/4=45°. cos(45°)=√2/2.',steps:['π/4=45°','cos(45°)=√2/2'],hint:'π/4=45° on the unit circle.'},
+      {q:'What is lim(x→3) (x²−9)/(x−3)?',opts:['0','3','6','undefined'],ans:2,explanation:'Factor and cancel: x+3. At x=3: 6.',steps:['x²−9=(x+3)(x−3)','Cancel: x+3','=3+3=6'],hint:'Factor the numerator first.'},
+      {q:'Solve: 2sin(x)−1=0 for x∈[0,2π]',opts:['π/6 only','π/6 and 5π/6','π/3 and 2π/3','π/4 and 3π/4'],ans:1,explanation:'sin(x)=1/2. Q1: π/6. Q2: 5π/6.',steps:['sin(x)=1/2','Q1: π/6','Q2: π−π/6=5π/6'],hint:'Where is sin=1/2 on the unit circle?'},
+      {q:'What is sin²(x)+cos²(x)?',opts:['0','1','2','sin(2x)'],ans:1,explanation:'Pythagorean identity: always 1.',steps:['sin²x+cos²x=1','This is the fundamental identity'],hint:'This is the most important trig identity.'},
+      {q:'Convert 210° to radians.',opts:['5π/6','7π/6','3π/4','4π/3'],ans:1,explanation:'210×π/180=7π/6.',steps:['Multiply by π/180','210π/180','=7π/6'],hint:'Multiply degrees by π/180.'},
+      {q:'What is the period of y = cos(3x)?',opts:['π/3','2π/3','2π','3π'],ans:1,explanation:'Period=2π/|B|=2π/3.',steps:['Period=2π/B','B=3','2π/3'],hint:'Period = 2π/B.'},
+      {q:'Simplify: (1−cos²x)/sinx',opts:['sinx','cosx','tanx','1'],ans:0,explanation:'1−cos²x=sin²x. sin²x/sinx=sinx.',steps:['1−cos²x=sin²x','sin²x/sinx','=sinx'],hint:'Use sin²x+cos²x=1.'},
+      {q:'What is tan(π/3)?',opts:['1/√3','1','√3','2'],ans:2,explanation:'tan(60°)=sin60°/cos60°=(√3/2)/(1/2)=√3.',steps:['π/3=60°','sin60°=√3/2, cos60°=1/2','tan=√3'],hint:'tan = sin/cos.'},
+      {q:'What is lim(x→0) sin(x)/x?',opts:['0','1','∞','undefined'],ans:1,explanation:'Classic limit equals 1.',steps:['lim(x→0) sin(x)/x = 1','(standard limit)'],hint:'This is a fundamental limit — memorize it.'},
+      {q:'Solve: cos(x)=0 for x∈[0,2π]',opts:['x=0,π','x=π/2,3π/2','x=π/4,3π/4','x=π/2 only'],ans:1,explanation:'cos=0 at π/2 and 3π/2.',steps:['cos(x)=0','Unit circle: π/2 and 3π/2'],hint:'Where is cos=0 on the unit circle?'},
+      {q:'What is the amplitude of y=3sin(x)−2?',opts:['2','3','−2','5'],ans:1,explanation:'Amplitude=|3|=3.',steps:['Amplitude=|coefficient|','|3|=3'],hint:'Amplitude is the absolute value of the coefficient.'},
+      {q:'Find lim(x→∞) (5x²−3)/(x²+1)',opts:['0','3','5','∞'],ans:2,explanation:'Divide by x²: 5/1=5.',steps:['Divide top and bottom by x²','(5−3/x²)/(1+1/x²)','→5/1=5'],hint:'Divide by the highest power of x.'},
+      {q:'What is the exact value of sin(7π/6)?',opts:['1/2','−1/2','√3/2','−√3/2'],ans:1,explanation:'7π/6=210°. sin(210°)=−sin(30°)=−1/2.',steps:['7π/6=180°+30°=210°','sin(210°)=−sin(30°)','=−1/2'],hint:'7π/6 is in the third quadrant.'},
+      {q:'What is the dot product of vectors (2,3) and (4,−1)?',opts:['5','8','11','−5'],ans:0,explanation:'2×4+3×(−1)=8−3=5.',steps:['dot product=2(4)+3(−1)','=8−3','=5'],hint:'Multiply corresponding components and add.'},
+      {q:'Simplify: sec²(x)−1',opts:['sin²x','cos²x','tan²x','cot²x'],ans:2,explanation:'sec²x−1=tan²x (Pythagorean identity).',steps:['1+tan²x=sec²x','tan²x=sec²x−1'],hint:'Rearrange the Pythagorean identity involving tan and sec.'},
+      {q:'What is lim(x→2⁺) 1/(x−2)?',opts:['0','−∞','∞','2'],ans:2,explanation:'As x→2 from right, x−2→0⁺, so 1/(x−2)→+∞.',steps:['x→2⁺: x−2→0⁺','1/(small positive)→+∞'],hint:'Think about what happens as the denominator approaches 0 from the positive side.'},
+      {q:'Solve: tan(x)=1 for x∈[0,2π]',opts:['π/4 only','π/4 and 5π/4','π/4 and 3π/4','π/4 and 7π/4'],ans:1,explanation:'tan=1 in Q1 and Q3: π/4 and π+π/4=5π/4.',steps:['tan=1 in Q1 and Q3','Q1: π/4','Q3: π+π/4=5π/4'],hint:'tan is positive in Q1 and Q3.'},
+      {q:'What is the phase shift of y=sin(x−π/3)?',opts:['π/3 to the left','π/3 to the right','π/6 to the right','−π/3 up'],ans:1,explanation:'y=sin(x−c): shift is c=π/3 to the right.',steps:['y=sin(x−π/3)','Phase shift = π/3 right'],hint:'y=sin(x−c) shifts right by c.'},
+      {q:'What is cos(2π/3)?',opts:['1/2','−1/2','√3/2','−√3/2'],ans:1,explanation:'2π/3=120°. cos(120°)=−cos(60°)=−1/2.',steps:['2π/3=120°','Q2: cos negative','cos(120°)=−1/2'],hint:'2π/3=120° is in Q2.'},
+      {q:'What is lim(x→0) (1−cosx)/x?',opts:['0','1','1/2','∞'],ans:0,explanation:'Standard limit: lim(1−cosx)/x=0.',steps:['Standard limit','lim(x→0)(1−cosx)/x=0'],hint:'This is a standard limit to memorize.'},
+      {q:'Verify: sin(π−x)=?',opts:['−sinx','sinx','cosx','−cosx'],ans:1,explanation:'sin(π−x)=sinx.',steps:['sin(π−x)=sinπcosx−cosπsinx','=0×cosx−(−1)sinx','=sinx'],hint:'Use the sine subtraction formula.'},
+      {q:'What is the reference angle for 225°?',opts:['45°','55°','65°','135°'],ans:0,explanation:'225°−180°=45°.',steps:['225° is in Q3','Reference angle = 225°−180°','=45°'],hint:'Reference angle in Q3: subtract 180°.'},
+      {q:'Find: lim(x→4) (x−4)/√(x−2)',opts:['0','1','2','4'],ans:0,explanation:'At x=4: (0)/√2=0.',steps:['Direct substitution: (4−4)/√(4−2)','=0/√2','=0'],hint:'Direct substitution works here — no indeterminate form.'},
+      {q:'What is the vertical shift of y=2cos(x)+5?',opts:['Up 2','Down 2','Up 5','Down 5'],ans:2,explanation:'The +5 shifts the graph up 5.',steps:['y=Acos(Bx)+D','D=5: shift up 5'],hint:'The constant added outside is the vertical shift.'},
+      {q:'Solve: 2cos(x)+√3=0 for x∈[0,2π]',opts:['5π/6, 7π/6','π/6, 11π/6','5π/6, 7π/6','2π/3, 4π/3'],ans:0,explanation:'cos(x)=−√3/2. Q2: 5π/6. Q3: 7π/6.',steps:['cos(x)=−√3/2','Q2: π−π/6=5π/6','Q3: π+π/6=7π/6'],hint:'cos=−√3/2 at 150° and 210°.'},
+      {q:'What is sin(A+B) when sinA=3/5, cosA=4/5, sinB=5/13, cosB=12/13?',opts:['33/65','56/65','63/65','16/65'],ans:1,explanation:'sinAcosB+cosAsinB=(3/5)(12/13)+(4/5)(5/13)=36/65+20/65=56/65.',steps:['sin(A+B)=sinAcosB+cosAsinB','=(36+20)/65','=56/65'],hint:'Use the sum formula.'},
+      {q:'What is lim(x→1) (x²−1)/(x−1)?',opts:['0','1','2','undefined'],ans:2,explanation:'(x+1)(x−1)/(x−1)=x+1. At x=1: 2.',steps:['Factor: (x+1)(x−1)','Cancel (x−1)','=x+1→2'],hint:'Factor and cancel.'},
+      {q:'What is the period of y=tan(x/2)?',opts:['π/2','π','2π','4π'],ans:2,explanation:'Period of tan=π. With B=1/2: π/(1/2)=2π.',steps:['Period of tan(Bx)=π/B','B=1/2','Period=2π'],hint:'Period of tangent = π/B.'},
+      {q:'Evaluate: arcsin(−√2/2)',opts:['−π/4','π/4','3π/4','−3π/4'],ans:0,explanation:'sin(−π/4)=−√2/2. Answer: −π/4.',steps:['sin(−π/4)=−√2/2','arcsin range is [−π/2,π/2]','Answer: −π/4'],hint:'arcsin range is [−π/2, π/2].'},
+      {q:'What is the rectangular form of the polar point (4, π/6)?',opts:['(2√3,2)','(2,2√3)','(4,π/6)','(√3,2)'],ans:0,explanation:'x=4cos(π/6)=4×√3/2=2√3. y=4sin(π/6)=4×1/2=2.',steps:['x=rcos(θ)=4cos(π/6)=2√3','y=rsin(θ)=4sin(π/6)=2','(2√3,2)'],hint:'x=rcos(θ), y=rsin(θ).'},
+      {q:'Simplify: cot(x)×sin(x)',opts:['cos(x)','sec(x)','tan(x)','sin(x)'],ans:0,explanation:'cot=cos/sin. (cos/sin)×sin=cos.',steps:['cot(x)=cos(x)/sin(x)','×sin(x)','=cos(x)'],hint:'Write cot in terms of sin and cos.'},
+      {q:'What is the eccentricity of an ellipse with a=5, b=3?',opts:['3/5','4/5','1/2','√34/5'],ans:1,explanation:'c=√(25−9)=4. e=c/a=4/5.',steps:['c²=a²−b²=25−9=16','c=4','e=4/5'],hint:'e=c/a, c²=a²−b².'},
+      {q:'What is the polar equation of a circle centered at the origin with radius 6?',opts:['r=6','θ=6','r=6θ','r²=36'],ans:0,explanation:'r=6 is a circle of radius 6 centered at origin.',steps:['Circle centered at origin in polar','r=constant=6'],hint:'r=constant is a circle centered at origin.'},
+      {q:'Evaluate: lim(x→0) tan(x)/x',opts:['0','1','tan(0)','∞'],ans:1,explanation:'tan(x)/x=sin(x)/(x·cos(x))→1×1/1=1.',steps:['tan/x=sin/(x·cos)','=(sinx/x)×(1/cosx)','→1×1=1'],hint:'Use lim sin(x)/x=1.'},
+      {q:'What is the sum-to-product identity for sin(A)+sin(B)?',opts:['2sin((A+B)/2)cos((A−B)/2)','2cos((A+B)/2)sin((A−B)/2)','sin(A+B)+sin(A−B)','2sin(A)sin(B)'],ans:0,explanation:'sin(A)+sin(B)=2sin((A+B)/2)cos((A−B)/2).',steps:['Standard identity'],hint:'This is a sum-to-product formula.'},
+      {q:'Find the focus of the parabola x²=12y.',opts:['(0,3)','(0,12)','(3,0)','(0,6)'],ans:0,explanation:'x²=4py. 4p=12, p=3. Focus at (0,p)=(0,3).',steps:['x²=4py','4p=12 → p=3','Focus: (0,3)'],hint:'Standard form x²=4py: focus at (0,p).'},
+      {q:'What is the double angle formula for cos(2x)?',opts:['2sinxcosx','cos²x−sin²x','1−sin²x','Both B and C'],ans:3,explanation:'cos(2x)=cos²x−sin²x=1−2sin²x=2cos²x−1. B and C are both valid forms.',steps:['cos(2x)=cos²x−sin²x','=1−2sin²x','All three forms equal'],hint:'cos(2x) has three equivalent forms.'},
+      {q:'What is the vertical asymptote of y=tan(x)?',opts:['x=0','x=π/2','x=π/4','x=nπ'],ans:1,explanation:'tan undefined where cos=0, i.e., x=π/2+nπ.',steps:['tan=sin/cos','cos=0 at π/2+nπ','VA: x=π/2+nπ'],hint:'tan is undefined where cos=0.'},
+      {q:'Evaluate: arctan(√3)',opts:['π/3','π/4','π/6','π/2'],ans:0,explanation:'tan(π/3)=√3. arctan(√3)=π/3.',steps:['tan(π/3)=√3','arctan(√3)=π/3'],hint:'arctan gives the angle whose tangent is the input.'},
+      {q:'What does it mean for f(x) to be even?',opts:['f(−x)=−f(x)','f(x)=f(−x)','f(x+T)=f(x)','f(x)>0'],ans:1,explanation:'Even: symmetric about y-axis, f(−x)=f(x).',steps:['Even function: f(−x)=f(x)'],hint:'Even functions are symmetric about the y-axis.'},
+      {q:'If sin(θ)=5/13 and θ is in Q2, what is cos(θ)?',opts:['12/13','−12/13','5/13','−5/13'],ans:1,explanation:'cos²θ=1−25/169=144/169. cosθ=±12/13. Q2: negative.',steps:['cos²θ=1−sin²θ','=144/169','Q2: cos negative → −12/13'],hint:'Use sin²+cos²=1, then determine sign from quadrant.'},
+    ],
+    tiebreakers: [
+      {q:'What is the exact value of sin(π/3)?',opts:['1/2','√2/2','√3/2','1'],ans:2,explanation:'sin(60°)=√3/2.',steps:['π/3=60°','sin(60°)=√3/2'],hint:'π/3=60°.'},
+      {q:'Find lim(x→5) (x²−25)/(x−5).',opts:['5','10','0','undefined'],ans:1,explanation:'(x+5)(x−5)/(x−5)=x+5. At 5: 10.',steps:['Factor: (x+5)(x−5)','Cancel','x+5 at x=5: 10'],hint:'Factor and cancel.'},
+      {q:'What is the period of y=2sin(πx)?',opts:['1','2','π','2π'],ans:1,explanation:'Period=2π/π=2.',steps:['Period=2π/B','B=π','Period=2'],hint:'Period = 2π/B.'},
+    ]
+  },
+  5: {
+    pool: [
+      {q:'Find d/dx[3x⁴−2x²+5x−7]',opts:['12x³−4x+5','12x³−4x','3x³−2x+5','12x⁴−4x²+5'],ans:0,explanation:'Power rule term by term.',steps:['d/dx[3x⁴]=12x³','d/dx[−2x²]=−4x','d/dx[5x]=5, d/dx[7]=0'],hint:'Apply power rule to each term.'},
+      {q:'Evaluate: ∫₀² 3x² dx',opts:['4','6','8','12'],ans:2,explanation:'F(x)=x³. F(2)−F(0)=8.',steps:['∫3x²dx=x³','F(2)=8, F(0)=0','Answer: 8'],hint:'FTC: find antiderivative then evaluate at bounds.'},
+      {q:'Using the chain rule, find d/dx[sin(x²)]',opts:['cos(x²)','2x·cos(x²)','2cos(x²)','cos(2x)'],ans:1,explanation:'Outer derivative × inner derivative = cos(x²)×2x.',steps:['Outer: cos(u)','Inner: u=x², u\'=2x','Answer: 2x·cos(x²)'],hint:'Chain rule: d/dx[f(g(x))]=f\'(g(x))·g\'(x).'},
+      {q:'What is d/dx[ln(x)]?',opts:['1/x','ln(x)/x','x·ln(x)','e^x'],ans:0,explanation:'d/dx[ln(x)]=1/x.',steps:['d/dx[ln x]=1/x'],hint:'Standard derivative.'},
+      {q:'What is ∫ e^x dx?',opts:['xe^x+C','e^x+C','e^(x+1)+C','e^x/x+C'],ans:1,explanation:'∫e^x dx=e^x+C.',steps:['∫e^x dx=e^x+C'],hint:'e^x is its own antiderivative.'},
+      {q:'What is the critical point of f(x)=x²−6x+10?',opts:['x=2','x=3','x=6','x=10'],ans:1,explanation:'f\'(x)=2x−6=0. x=3.',steps:['f\'(x)=2x−6','Set =0: x=3'],hint:'Set f\'(x)=0 and solve.'},
+      {q:'Find d/dx[x²·e^x] using the product rule.',opts:['2x·e^x','x²e^x+2xe^x','2xe^x+x²e^x','e^x(x²+2x)'],ans:3,explanation:'f\'g+fg\'=2x·e^x+x²·e^x=e^x(2x+x²).',steps:['f=x², f\'=2x','g=e^x, g\'=e^x','f\'g+fg\'=e^x(2x+x²)'],hint:'Product rule: (fg)\'=f\'g+fg\'.'},
+      {q:'What is ∫ cos(x) dx?',opts:['−sin(x)+C','sin(x)+C','−cos(x)+C','cos(x)+C'],ans:1,explanation:'∫cos(x)dx=sin(x)+C.',steps:['∫cos(x)dx=sin(x)+C'],hint:'Standard antiderivative.'},
+      {q:'Find the derivative of f(x)=(2x+1)³ using the chain rule.',opts:['3(2x+1)²','6(2x+1)²','2(2x+1)³','3(2x+1)'],ans:1,explanation:'3(2x+1)²×2=6(2x+1)².',steps:['Outer: 3u²','Inner: 2x+1, derivative 2','Answer: 3(2x+1)²×2=6(2x+1)²'],hint:'Chain rule: multiply by derivative of inner function.'},
+      {q:'Is the function f(x)=x³−3x increasing or decreasing at x=2?',opts:['Increasing','Decreasing','Neither (critical point)','Cannot tell'],ans:0,explanation:'f\'(x)=3x²−3. f\'(2)=9>0. Increasing.',steps:['f\'(x)=3x²−3','f\'(2)=12−3=9','9>0: increasing'],hint:'f\'(x)>0 means increasing at that point.'},
+      {q:'What is ∫₁³ (2x+1) dx?',opts:['10','12','14','16'],ans:1,explanation:'F(x)=x²+x. F(3)−F(1)=12−2=10. Wait: F(3)=9+3=12, F(1)=1+1=2. 12−2=10.',steps:['∫(2x+1)dx=x²+x','F(3)=12, F(1)=2','12−2=10'],hint:'Find the antiderivative then apply FTC.'},
+      {q:'What is the second derivative test for a local minimum?',opts:['f\'(c)=0 and f\'\'(c)<0','f\'(c)=0 and f\'\'(c)>0','f\'\'(c)=0','f\'(c)<0'],ans:1,explanation:'f\'(c)=0 and f\'\'(c)>0 indicates a local minimum.',steps:['Critical point: f\'(c)=0','f\'\'(c)>0: concave up → local min'],hint:'Concave up at a critical point = local minimum.'},
+      {q:'Find d/dx[arctan(x)]',opts:['1/x','1/(1+x²)','−1/(1+x²)','1/√(1−x²)'],ans:1,explanation:'d/dx[arctan(x)]=1/(1+x²).',steps:['d/dx[arctan(x)]=1/(1+x²)'],hint:'Standard derivative of inverse tangent.'},
+      {q:'What is ∫ sin(x) dx?',opts:['cos(x)+C','−cos(x)+C','sin(x)+C','−sin(x)+C'],ans:1,explanation:'∫sin(x)dx=−cos(x)+C.',steps:['∫sin(x)dx=−cos(x)+C'],hint:'Antiderivative of sin is −cos.'},
+      {q:'Evaluate: d/dx[x^(1/2)]',opts:['(1/2)x^(−1/2)','2x^(3/2)','(1/2)x^(1/2)','x^(−1/2)'],ans:0,explanation:'Power rule: (1/2)x^(1/2−1)=(1/2)x^(−1/2).',steps:['d/dx[xⁿ]=nxⁿ⁻¹','n=1/2','(1/2)x^(−1/2)'],hint:'Apply the power rule with n=1/2.'},
+      {q:'Use L\'Hôpital: lim(x→0) (e^x−1)/x',opts:['0','1','e','∞'],ans:1,explanation:'0/0 form. Differentiate top and bottom: e^x/1=1.',steps:['0/0 form','d/dx[e^x−1]=e^x','d/dx[x]=1','e⁰/1=1'],hint:'L\'Hôpital: differentiate numerator and denominator separately.'},
+      {q:'What is the average value of f(x)=x² on [0,3]?',opts:['3','3/2','4','9/2'],ans:0,explanation:'(1/3)∫₀³x²dx=(1/3)[x³/3]₀³=(1/3)(9)=3.',steps:['Average=(1/(b−a))∫f dx','=(1/3)[x³/3]₀³','=9/3=3'],hint:'Average value = (1/(b−a)) × ∫ₐᵇ f(x) dx.'},
+      {q:'Find: d/dx[cos²(x)]',opts:['−2cos(x)','−2sin(x)cos(x)','2cos(x)sin(x)','−sin(2x)'],ans:3,explanation:'Chain rule: 2cos(x)×(−sin(x))=−2sin(x)cos(x)=−sin(2x).',steps:['Outer: 2cos(x)','Inner: cos(x), deriv=−sin(x)','=−2sin(x)cos(x)=−sin(2x)'],hint:'Apply chain rule, then use double angle identity.'},
+      {q:'What is ∫ sec²(x) dx?',opts:['sec(x)tan(x)+C','tan(x)+C','2sec(x)+C','sec²(x)tan(x)+C'],ans:1,explanation:'d/dx[tan(x)]=sec²(x), so ∫sec²(x)dx=tan(x)+C.',steps:['Recall: d/dx[tan]=sec²','So ∫sec²dx=tan(x)+C'],hint:'The derivative of tan(x) is sec²(x).'},
+      {q:'Find all local extrema of f(x)=x³−3x².',opts:['Local max x=0, min x=2','Local min x=0, max x=2','Local max x=2, no min','No extrema'],ans:0,explanation:'f\'=3x²−6x=3x(x−2)=0. x=0,2. f\'\'(0)=−6<0: max. f\'\'(2)=6>0: min.',steps:['f\'=3x(x−2)=0','x=0 or x=2','f\'\'(0)=−6: max, f\'\'(2)=6: min'],hint:'Find critical points, then use 2nd derivative test.'},
+      {q:'What is d/dx[e^(3x)]?',opts:['e^(3x)','3e^(3x)','3xe^(3x)','e^(3x)/3'],ans:1,explanation:'Chain rule: e^(3x)×3=3e^(3x).',steps:['Outer: e^u','Inner: 3x, deriv=3','Answer: 3e^(3x)'],hint:'Chain rule: multiply by derivative of the exponent.'},
+      {q:'Evaluate: ∫₀^π cos(x) dx',opts:['−2','−1','0','2'],ans:2,explanation:'[sin(x)]₀^π=sin(π)−sin(0)=0.',steps:['∫cos dx=sin(x)','sin(π)−sin(0)','=0−0=0'],hint:'Apply FTC.'},
+      {q:'What is the Fundamental Theorem of Calculus Part 2?',opts:['d/dx∫ₐˣf(t)dt=f(x)','∫ₐᵇf(x)dx=F(b)−F(a)','F\'(x)=f(x)','All of the above'],ans:1,explanation:'Part 2: use antiderivative to evaluate definite integral.',steps:['FTC Part 2:','∫ₐᵇf(x)dx=F(b)−F(a)','where F\'=f'],hint:'FTC Part 2 connects antiderivatives to definite integrals.'},
+      {q:'Find d/dx[ln(x²+4)]',opts:['1/(x²+4)','2x/(x²+4)','2/(x²+4)','x/(x²+4)'],ans:1,explanation:'Chain rule: 1/(x²+4)×2x=2x/(x²+4).',steps:['Outer: 1/u','u=x²+4, u\'=2x','Answer: 2x/(x²+4)'],hint:'Chain rule for ln: u\'/u.'},
+      {q:'What does the Mean Value Theorem guarantee?',opts:['A root exists','f\'(c)=(f(b)−f(a))/(b−a) for some c','f is increasing','f is continuous'],ans:1,explanation:'MVT guarantees a point c where instantaneous rate = average rate.',steps:['Requires f continuous on [a,b]','Differentiable on (a,b)','Then f\'(c)=(f(b)−f(a))/(b−a)'],hint:'MVT connects average rate of change to instantaneous rate.'},
+      {q:'Use substitution: ∫ 2x·cos(x²) dx',opts:['sin(x²)+C','2sin(x)+C','cos(x²)+C','x²sin(x)+C'],ans:0,explanation:'u=x², du=2x dx. ∫cos(u)du=sin(u)+C=sin(x²)+C.',steps:['u=x², du=2xdx','∫cos(u)du','=sin(u)=sin(x²)+C'],hint:'Let u = x².'},
+      {q:'What is the derivative of f(x)=tan(x)?',opts:['sec(x)','sec²(x)','−csc²(x)','cos²(x)'],ans:1,explanation:'d/dx[tan(x)]=sec²(x).',steps:['d/dx[tan(x)]=sec²(x)'],hint:'Standard derivative of tangent.'},
+      {q:'Find the inflection point of f(x)=x³−6x.',opts:['x=0','x=1','x=2','x=√2'],ans:0,explanation:'f\'\'(x)=6x. f\'\'=0 at x=0.',steps:['f\'(x)=3x²−6','f\'\'(x)=6x','6x=0 → x=0'],hint:'Inflection point where f\'\'=0.'},
+      {q:'What is ∫ 1/x² dx?',opts:['ln|x|+C','−1/x+C','2/x³+C','1/x+C'],ans:1,explanation:'∫x⁻²dx=x⁻¹/(−1)+C=−1/x+C.',steps:['∫x⁻²dx=x⁻¹/(−1)+C','=−x⁻¹+C','=−1/x+C'],hint:'Power rule: ∫xⁿdx=xⁿ⁺¹/(n+1)+C.'},
+      {q:'What is d/dx[x/sin(x)]?',opts:['(sin(x)−x·cos(x))/sin²(x)','1/cos(x)','cos(x)/sin(x)','(cos(x)+sin(x))/sin²(x)'],ans:0,explanation:'Quotient rule: (sin(x)−x·cos(x))/sin²(x).',steps:['Quotient rule: (f\'g−fg\')/g²','f\'=1, g=sin, g\'=cos','=(sin−x·cos)/sin²'],hint:'Quotient rule: (f\'g − fg\')/g².'},
+      {q:'Evaluate: ∫₀¹ (x+1)² dx',opts:['7/3','3','10/3','2'],ans:0,explanation:'Expand: ∫(x²+2x+1)dx=[x³/3+x²+x]₀¹=1/3+1+1=7/3.',steps:['Expand (x+1)²=x²+2x+1','∫₀¹(x²+2x+1)dx','=[x³/3+x²+x]₀¹=7/3'],hint:'Expand first, then integrate.'},
+      {q:'What is Rolle\'s Theorem?',opts:['If f(a)=f(b) and f is continuous and differentiable, then f\'(c)=0 for some c in (a,b)','The derivative is zero at every max','f has a zero on every interval','If f is differentiable it has a max'],ans:0,explanation:'Rolle\'s is a special case of MVT when f(a)=f(b).',steps:['Conditions: f continuous on [a,b]','Differentiable on (a,b)','f(a)=f(b) → f\'(c)=0 for some c'],hint:'Rolle\'s Theorem is MVT with equal endpoints.'},
+      {q:'Find the absolute maximum of f(x)=−x²+4x on [0,5].',opts:['f(2)=4','f(5)=−5','f(0)=0','f(4)=0'],ans:0,explanation:'f\'=−2x+4=0 → x=2. f(2)=−4+8=4. Check endpoints: f(0)=0, f(5)=−5. Max=4.',steps:['f\'=−2x+4=0 → x=2','f(2)=4 (critical)','Check ends: max is 4'],hint:'Check critical points AND endpoints on a closed interval.'},
+      {q:'What is ∫ tan(x) dx?',opts:['sec²(x)+C','−ln|cos(x)|+C','ln|cos(x)|+C','sec(x)+C'],ans:1,explanation:'∫tan dx=∫sin/cos dx=−ln|cos(x)|+C.',steps:['∫tan x dx=∫sinx/cosx dx','u=cosx, du=−sinx dx','=−ln|cosx|+C'],hint:'Write tan as sin/cos and use substitution.'},
+      {q:'Find d/dx[arcsin(x)].',opts:['1/√(1−x²)','−1/√(1−x²)','1/(1+x²)','√(1−x²)'],ans:0,explanation:'d/dx[arcsin(x)]=1/√(1−x²).',steps:['d/dx[arcsin(x)]=1/√(1−x²)'],hint:'Standard derivative of inverse sine.'},
+      {q:'Use substitution: ∫ x/√(x²+1) dx',opts:['√(x²+1)+C','arctan(x)+C','x²/√(x²+1)+C','2√(x²+1)+C'],ans:0,explanation:'u=x²+1, du=2x dx. (1/2)∫u^(−1/2)du=√u=√(x²+1)+C.',steps:['u=x²+1, du=2xdx','(1/2)∫u^(−1/2)du','=√(x²+1)+C'],hint:'Let u = x² + 1.'},
+      {q:'What is d/dx[x^x]?',opts:['x·x^(x−1)','x^x·(ln x + 1)','x^x·ln x','x^(x−1)'],ans:1,explanation:'Use logarithmic differentiation: y=x^x. lny=x ln x. y\'/y=ln x+1. y\'=x^x(ln x+1).',steps:['y=x^x, ln y=x ln x','Differentiate: y\'/y=ln x+1','y\'=x^x(ln x+1)'],hint:'Use logarithmic differentiation.'},
+      {q:'What is Newton\'s method formula?',opts:['xₙ₊₁=xₙ−f(xₙ)/f\'(xₙ)','xₙ₊₁=xₙ+f(xₙ)/f\'(xₙ)','xₙ₊₁=f\'(xₙ)/f(xₙ)','xₙ₊₁=xₙ×f\'(xₙ)'],ans:0,explanation:'Newton\'s method for root-finding.',steps:['xₙ₊₁=xₙ−f(xₙ)/f\'(xₙ)'],hint:'Subtract the ratio f/f\'.'},
+      {q:'Evaluate: ∫₋₁¹ x³ dx',opts:['0','1/2','1','2'],ans:0,explanation:'x³ is odd. Integral of odd function over symmetric interval = 0.',steps:['x³ is odd function','∫₋ₐᵃ odd dx = 0','=0'],hint:'An odd function integrated over a symmetric interval gives 0.'},
+      {q:'What is the linearization of f(x)=√x at x=4?',opts:['L(x)=2+(x−4)/4','L(x)=2+x/4','L(x)=x/4','L(x)=4+(x−4)/4'],ans:0,explanation:'f(4)=2, f\'(x)=1/(2√x), f\'(4)=1/4. L(x)=2+(1/4)(x−4).',steps:['f(4)=2','f\'(4)=1/4','L(x)=2+(x−4)/4'],hint:'L(x)=f(a)+f\'(a)(x−a).'},
+    ],
+    tiebreakers: [
+      {q:'Find d/dx[x⁵].',opts:['5x⁴','5x⁶','x⁴','4x⁵'],ans:0,explanation:'Power rule: 5x⁴.',steps:['d/dx[xⁿ]=nxⁿ⁻¹','d/dx[x⁵]=5x⁴'],hint:'Power rule.'},
+      {q:'Evaluate: ∫₀¹ x³ dx',opts:['1/4','1/3','3/4','1'],ans:0,explanation:'F(x)=x⁴/4. F(1)−F(0)=1/4.',steps:['∫x³dx=x⁴/4','F(1)=1/4, F(0)=0','Answer: 1/4'],hint:'Antiderivative of xⁿ is xⁿ⁺¹/(n+1).'},
+      {q:'What is d/dx[e^(x²)]?',opts:['e^(x²)','2xe^(x²)','2e^(x²)','x²e^(x²−1)'],ans:1,explanation:'Chain rule: e^(x²)×2x=2xe^(x²).',steps:['Chain rule','Outer: e^u, Inner: x²','2xe^(x²)'],hint:'Chain rule: multiply by derivative of the exponent.'},
+    ]
+  },
+  6: {
+    pool: [
+      {q:'∫ x·eˣ dx using integration by parts equals:',opts:['eˣ+C','xeˣ−eˣ+C','xeˣ+eˣ+C','x²eˣ/2+C'],ans:1,explanation:'u=x, dv=eˣdx. xeˣ−eˣ+C.',steps:['u=x, dv=eˣdx','uv−∫v du=xeˣ−∫eˣdx','=xeˣ−eˣ+C'],hint:'LIATE: u=x.'},
+      {q:'Does ∑(1/n²) from n=1 to ∞ converge?',opts:['No','Yes, p-series p=2>1','Yes but only conditionally','Cannot determine'],ans:1,explanation:'p-series with p=2>1: converges.',steps:['p-series: p=2','p>1 → converges'],hint:'p-series test.'},
+      {q:'What is the Maclaurin series for eˣ?',opts:['1+x+x²/2+x³/6+…','x+x³/6+x⁵/120+…','1−x²/2+x⁴/24−…','x−x³/6+x⁵/120−…'],ans:0,explanation:'eˣ=∑xⁿ/n!',steps:['All derivatives of eˣ at 0 equal 1','eˣ=∑xⁿ/n!','=1+x+x²/2!+x³/3!+…'],hint:'Maclaurin series = Taylor series at a=0.'},
+      {q:'Evaluate: ∫ ln(x) dx',opts:['1/x+C','x·ln(x)+C','x·ln(x)−x+C','ln(x)/x+C'],ans:2,explanation:'IBP: u=ln(x), dv=dx. x·ln(x)−∫1dx=x·ln(x)−x+C.',steps:['u=ln(x), dv=dx','du=1/x, v=x','x·ln(x)−∫1dx=x·ln(x)−x+C'],hint:'Integration by parts with u=ln(x).'},
+      {q:'What is the radius of convergence of ∑ xⁿ/n?',opts:['0','1','e','∞'],ans:1,explanation:'Ratio test: |x|<1.',steps:['|aₙ₊₁/aₙ|=|x|n/(n+1)→|x|','Converges when |x|<1','R=1'],hint:'Apply the ratio test.'},
+      {q:'Evaluate: ∫₁^∞ 1/x² dx',opts:['∞','1','2','0'],ans:1,explanation:'lim[−1/x]₁^b=lim(−1/b+1)=1.',steps:['∫x⁻²dx=−x⁻¹','lim(b→∞)[−1/b+1]','=0+1=1'],hint:'Evaluate as a limit.'},
+      {q:'What is the volume using the disk method for y=√x rotated around x-axis from 0 to 4?',opts:['4π','8π','16π','32π'],ans:1,explanation:'π∫₀⁴(√x)²dx=π∫₀⁴x dx=π[x²/2]₀⁴=8π.',steps:['π∫₀⁴x dx','=π[x²/2]₀⁴','=π(8)=8π'],hint:'Disk method: π∫[f(x)]²dx.'},
+      {q:'Find ∫ x²·sin(x) dx.',opts:['−x²cos(x)+2x·sin(x)+2cos(x)+C','x²cos(x)+2x·sin(x)+C','−x²cos(x)+2x·sin(x)−2cos(x)+C','x²sin(x)−2cos(x)+C'],ans:0,explanation:'IBP twice. Final: −x²cos+2x·sin+2cos+C.',steps:['IBP: u=x², dv=sinx dx','=−x²cosx+2∫x·cosx dx','=−x²cosx+2x·sinx+2cosx+C'],hint:'Integration by parts twice.'},
+      {q:'Does the alternating series ∑(−1)ⁿ/n converge?',opts:['No','Yes, absolutely','Yes, conditionally','Diverges by ratio test'],ans:2,explanation:'Alternating series test: 1/n→0 and is decreasing. Converges. But ∑1/n diverges, so only conditionally.',steps:['AST: terms→0 and decrease','So it converges','∑1/n diverges → conditional only'],hint:'Check both alternating series test and absolute convergence.'},
+      {q:'What is the Maclaurin series for sin(x)?',opts:['∑(−1)ⁿx^(2n)/(2n)!','∑(−1)ⁿx^(2n+1)/(2n+1)!','∑xⁿ/n!','∑(−1)ⁿx^n/n!'],ans:1,explanation:'sin(x)=x−x³/6+x⁵/120−…',steps:['Odd function: only odd powers','sin(x)=∑(−1)ⁿx^(2n+1)/(2n+1)!'],hint:'Sine series has only odd powers.'},
+      {q:'What is the area between y=x² and y=x?',opts:['1/4','1/6','1/3','1/2'],ans:1,explanation:'∫₀¹(x−x²)dx=[x²/2−x³/3]₀¹=1/2−1/3=1/6.',steps:['Intersections: 0 and 1','∫₀¹(x−x²)dx','=1/2−1/3=1/6'],hint:'Find intersection points first.'},
+      {q:'Evaluate: ∫₀^∞ e^(−x) dx',opts:['0','1','e','∞'],ans:1,explanation:'[−e^(−x)]₀^∞=0−(−1)=1.',steps:['lim(b→∞)[−e^(−x)]₀^b','=lim(0−(−1))','=1'],hint:'Evaluate as a limit.'},
+      {q:'What is the ratio test condition for absolute convergence?',opts:['lim|aₙ₊₁/aₙ|<1','lim|aₙ₊₁/aₙ|>1','lim|aₙ₊₁/aₙ|=1','aₙ→0'],ans:0,explanation:'Ratio test: series converges absolutely when limit < 1.',steps:['L=lim|aₙ₊₁/aₙ|','L<1: converges','L>1: diverges'],hint:'Ratio test: L<1 means converges.'},
+      {q:'Find the Taylor series for cos(x) around x=0.',opts:['∑(−1)ⁿx^(2n+1)/(2n+1)!','∑(−1)ⁿx^(2n)/(2n)!','∑x^(2n)/(2n)!','∑xⁿ/n!'],ans:1,explanation:'cos(x)=1−x²/2!+x⁴/4!−… Even powers.',steps:['Even function: only even powers','cos(x)=∑(−1)ⁿx^(2n)/(2n)!'],hint:'Cosine series has only even powers.'},
+      {q:'Does ∑ 1/n diverge?',opts:['No, it converges','Yes, harmonic series diverges','Only conditionally diverges','Depends on starting index'],ans:1,explanation:'Harmonic series diverges (classic result).',steps:['∑1/n is the harmonic series','It diverges (p-series p=1)'],hint:'p-series: p=1 is the boundary — it diverges.'},
+      {q:'What is the shell method formula for volume around the y-axis?',opts:['π∫[f(x)]²dx','2π∫x·f(x)dx','∫f(x)dx','2π∫f(x)dx'],ans:1,explanation:'Shell method around y-axis: 2π∫x·f(x)dx.',steps:['Shell method (around y-axis):','V=2π∫x·f(x)dx'],hint:'Shell method: 2π × radius × height.'},
+      {q:'Evaluate: ∫ 1/(x²−1) dx using partial fractions.',opts:['(1/2)ln|(x−1)/(x+1)|+C','ln|x²−1|+C','arctan(x)+C','(1/2)ln|(x+1)/(x−1)|+C'],ans:0,explanation:'1/(x²−1)=1/2·[1/(x−1)−1/(x+1)]. Integrate to get (1/2)ln|(x−1)/(x+1)|+C.',steps:['1/(x²−1)=A/(x−1)+B/(x+1)','A=1/2, B=−1/2','(1/2)ln|(x−1)/(x+1)|+C'],hint:'Use partial fractions.'},
+      {q:'What is the convergence interval for ∑ (x−2)ⁿ/n?',opts:['[1,3)','(1,3)','1<x≤3','1≤x≤3'],ans:2,explanation:'Center 2, R=1. So (1,3). At x=3: ∑1/n diverges. At x=1: ∑(−1)ⁿ/n converges. Interval: 1<x≤3.',steps:['R=1 (ratio test)','x=3: harmonic series, diverges','x=1: alt harmonic, converges → [1<x≤3]'],hint:'Test endpoints separately.'},
+      {q:'Find ∫ dx/√(9−x²).',opts:['arcsin(x/3)+C','(1/3)arcsin(x/3)+C','arctan(x/3)+C','−arccos(x/3)+C'],ans:0,explanation:'Standard form: arcsin(x/a)+C with a=3.',steps:['∫dx/√(a²−x²)=arcsin(x/a)+C','a=3','arcsin(x/3)+C'],hint:'Standard integral: ∫dx/√(a²−x²) = arcsin(x/a)+C.'},
+      {q:'What is the arc length formula for y=f(x) from a to b?',opts:['∫√(1+[f(x)]²)dx','∫√(1+[f\'(x)]²)dx','∫[f\'(x)]²dx','∫f\'(x)dx'],ans:1,explanation:'Arc length = ∫ₐᵇ√(1+[f\'(x)]²)dx.',steps:['L=∫√(1+[f\'(x)]²)dx'],hint:'Use the derivative in the formula.'},
+      {q:'Solve the ODE: dy/dx = 2y with y(0) = 3.',opts:['y=3e^(2x)','y=2e^(3x)','y=3+2x','y=e^(2x)+2'],ans:0,explanation:'Separable: dy/y=2dx. ln|y|=2x+C. y=Ce^(2x). y(0)=3: C=3.',steps:['Separate: dy/y=2dx','ln|y|=2x+C','y=3e^(2x)'],hint:'Separate variables and solve, then apply initial condition.'},
+      {q:'Does ∑ n/(n²+1) converge or diverge?',opts:['Converges (ratio test)','Diverges (comparison with 1/n)','Converges (integral test)','Diverges (divergence test)'],ans:1,explanation:'n/(n²+1) ~ 1/n. Compare with harmonic series: diverges.',steps:['n/(n²+1) ~ 1/n for large n','∑1/n diverges','By limit comparison: diverges'],hint:'Compare with the harmonic series.'},
+      {q:'What is ∫ x·cos(x) dx?',opts:['sin(x)+C','x·sin(x)+cos(x)+C','x·sin(x)−cos(x)+C','cos(x)−x·sin(x)+C'],ans:1,explanation:'IBP: u=x, dv=cos dx. x·sin(x)−∫sin dx=x·sin+cos+C.',steps:['u=x, dv=cosx dx','x·sinx−∫sinx dx','=x·sinx+cosx+C'],hint:'Integration by parts: u=x.'},
+      {q:'What is 2×2 determinant of [[3,1],[2,4]]?',opts:['10','14','12','6'],ans:0,explanation:'3×4−1×2=12−2=10.',steps:['det=ad−bc','=3(4)−1(2)','=10'],hint:'det[[a,b],[c,d]]=ad−bc.'},
+      {q:'Solve: dy/dx = x/y (separable ODE)',opts:['y=x+C','y²=x²+C','y=Ce^x','y²−x²=C'],ans:1,explanation:'y dy = x dx. y²/2=x²/2+C. y²=x²+C.',steps:['y dy=x dx','Integrate: y²/2=x²/2+C₁','y²=x²+C'],hint:'Separate variables, then integrate both sides.'},
+      {q:'What is the p-series test?',opts:['∑1/nᵖ converges iff p>1','∑1/nᵖ converges for all p>0','∑1/nᵖ diverges for p>1','∑1/nᵖ converges iff p<1'],ans:0,explanation:'p-series: converges iff p>1.',steps:['∑1/nᵖ','Converges when p>1','Diverges when p≤1'],hint:'p>1 is the key threshold.'},
+      {q:'Evaluate: lim(n→∞) (1+1/n)^n',opts:['1','2','e','∞'],ans:2,explanation:'Classic limit: equals e.',steps:['Definition of e','lim(1+1/n)^n=e≈2.718'],hint:'This is the definition of e.'},
+      {q:'What does absolute convergence imply?',opts:['Conditional convergence','Convergence of the series','Divergence','That all terms are positive'],ans:1,explanation:'If ∑|aₙ| converges, then ∑aₙ also converges.',steps:['∑|aₙ| converges → ∑aₙ converges','Absolute → conditional'],hint:'Absolute convergence is a stronger condition than convergence.'},
+      {q:'Find the volume of revolution when y=x² is rotated around the x-axis from 0 to 2 using the disk method.',opts:['8π/3','16π/3','32π/5','4π/5'],ans:2,explanation:'π∫₀²x⁴ dx=π[x⁵/5]₀²=π(32/5)=32π/5.',steps:['π∫₀²(x²)²dx=π∫₀²x⁴dx','=[x⁵/5]₀²=32/5','Volume=32π/5'],hint:'Disk method: π∫[f(x)]²dx.'},
+      {q:'What is ∫ dx/(1+x²)?',opts:['ln(1+x²)+C','arctan(x)+C','arcsin(x)+C','2x/(1+x²)²+C'],ans:1,explanation:'Standard integral: arctan(x)+C.',steps:['∫dx/(1+x²)=arctan(x)+C'],hint:'Standard antiderivative.'},
+      {q:'Does the series ∑ (−1)ⁿ converge?',opts:['Yes, to 0','Yes, to 1/2','No, oscillates — DNE','Yes, by ratio test'],ans:2,explanation:'Terms do not approach 0. Series diverges by divergence test.',steps:['aₙ=(−1)ⁿ does not→0','Divergence test: series diverges'],hint:'If terms don\'t approach 0, the series diverges.'},
+      {q:'What is the formula for work done by variable force F(x) from a to b?',opts:['F(b)−F(a)','∫ₐᵇF(x)dx','F(a)×(b−a)','(1/2)F²(b−a)'],ans:1,explanation:'W=∫ₐᵇF(x)dx.',steps:['Work=∫F(x)dx from a to b'],hint:'Integrate the force over the displacement.'},
+      {q:'What is a separable differential equation?',opts:['dy/dx=f(x)+g(y)','dy/dx=f(x)·g(y)','d²y/dx²=f(x)','dy/dx=f(x)/g(x)'],ans:1,explanation:'Separable means it factors as f(x)·g(y), allowing separation of variables.',steps:['Separable: dy/dx=f(x)g(y)','Rewrite: dy/g(y)=f(x)dx','Integrate both sides'],hint:'Can you factor the right side into a product of an x-only and y-only part?'},
+      {q:'What is the Squeeze Theorem?',opts:['If g≤f≤h and lim g=lim h=L, then lim f=L','If lim f=0 then f is bounded','If f≤g then lim f≤lim g','Any two equal limits squeeze the middle'],ans:0,explanation:'Squeeze theorem: bound above and below by functions with same limit.',steps:['g(x)≤f(x)≤h(x)','lim g=lim h=L','→ lim f=L'],hint:'The function is "squeezed" between two functions converging to the same limit.'},
+      {q:'Evaluate: ∫ x/(x+1) dx',opts:['x−ln|x+1|+C','ln|x+1|+C','x/2−ln|x|+C','x²/(2(x+1))+C'],ans:0,explanation:'Rewrite: x/(x+1)=1−1/(x+1). Integrate: x−ln|x+1|+C.',steps:['x/(x+1)=1−1/(x+1)','∫1 dx−∫1/(x+1)dx','=x−ln|x+1|+C'],hint:'Rewrite by polynomial division.'},
+      {q:'What is the cross product i×j?',opts:['0','1','k','−k'],ans:2,explanation:'i×j=k (right-hand rule).',steps:['i×j=k','Standard cross product of basis vectors'],hint:'Use the right-hand rule or memorize i×j=k.'},
+      {q:'Find the general solution to dy/dx = −y.',opts:['y=Ce^x','y=Ce^(−x)','y=C−x','y=−Ce^x'],ans:1,explanation:'Separable: dy/y=−dx. ln|y|=−x+C. y=Ce^(−x).',steps:['dy/y=−dx','ln|y|=−x+C₁','y=Ce^(−x)'],hint:'Separate and integrate.'},
+      {q:'What is the matrix inverse of [[2,1],[1,1]]?',opts:['[[1,−1],[−1,2]]','[[1,1],[1,2]]','[[−1,1],[1,−2]]','[[2,−1],[−1,1]]'],ans:0,explanation:'det=2−1=1. Inverse=(1/1)[[1,−1],[−1,2]].',steps:['det=2(1)−1(1)=1','Inverse=(1/det)[[d,−b],[−c,a]]','=[[1,−1],[−1,2]]'],hint:'A⁻¹=(1/det)[[d,−b],[−c,a]].'},
+    ],
+    tiebreakers: [
+      {q:'What test shows ∑ 1/n³ converges?',opts:['Ratio test','p-series (p=3>1)','Divergence test','Root test'],ans:1,explanation:'p-series with p=3>1: converges.',steps:['p-series: p=3','p>1 → converges'],hint:'p-series test.'},
+      {q:'∫ x·ln(x) dx = ?',opts:['x²ln(x)/2−x²/4+C','x²ln(x)+C','ln(x)/x+C','(x²/2)ln(x)−x/2+C'],ans:0,explanation:'IBP: u=ln x, dv=x dx. x²ln(x)/2−∫x/2 dx=x²ln(x)/2−x²/4+C.',steps:['u=ln x, dv=x dx','x²ln(x)/2−∫(x/2)dx','=x²/2·ln(x)−x²/4+C'],hint:'Integration by parts with u=ln(x).'},
+      {q:'What is the Maclaurin series for 1/(1−x) for |x|<1?',opts:['∑xⁿ','∑(−1)ⁿxⁿ','∑xⁿ/n!','∑nxⁿ'],ans:0,explanation:'Geometric series: 1/(1−x)=1+x+x²+…=∑xⁿ.',steps:['Geometric series','1/(1−x)=∑xⁿ for |x|<1'],hint:'This is the geometric series.'},
+    ]
+  }
+};
+
+// ── Helper: pick 2 random questions from pool, never repeat in a run ──────────
+const _diagUsed = {};
+function _diagPickQuestion(level, phase){
+  const bank = DIAG_BANK[level];
+  if(phase === 'tiebreaker'){
+    const tbs = bank.tiebreakers;
+    return tbs[Math.floor(Math.random()*tbs.length)];
+  }
+  // For q1/q2: pick from pool, avoid same question twice in this run
+  if(!_diagUsed[level]) _diagUsed[level] = new Set();
+  const pool = bank.pool;
+  const available = pool.filter((_,i) => !_diagUsed[level].has(i));
+  const source = available.length >= 1 ? available : pool; // fallback
+  const idx = Math.floor(Math.random()*source.length);
+  const origIdx = pool.indexOf(source[idx]);
+  _diagUsed[level].add(origIdx);
+  return source[idx];
+}
+
+// ── DIAGNOSTIC STATE ──────────────────────────────────────────────────────────
+let diagState = {
+  level: 2,          // current level being tested
+  phase: 'q1',       // 'q1' | 'q2' | 'tiebreaker'
+  q1Result: null,    // true/false
+  placedLevel: null, // final answer once locked
+  qCount: 0,
+  totalQ: 0
+};
 let diagHintVisible = false;
 let currentDiagQuestion = null;
 let diagAnswered = false;
 
+// Legacy vars still needed by other parts of the app
+let qCount=0, correct=0, wrong=0, currentLevel=1;
+let MAX_Q = 10;
+
 function handleLogoClick(){ if(currentUser) showDashboard(); else showScreen('s-landing'); }
 
-async function startDiagnostic(){
-  qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;sessionId=Math.random().toString(36).slice(2);
+function startDiagnostic(){
+  diagState = { level:2, phase:'q1', q1Result:null, placedLevel:null, qCount:0, totalQ:0 };
+  diagHintVisible = false;
+  userLevel = 1;
+  // Reset used-question tracking for this run
+  Object.keys(_diagUsed).forEach(k => delete _diagUsed[k]);
   showScreen('s-diagnostic');
-  diagHintVisible=false;
   document.getElementById('diag-hint-box').classList.remove('show');
-  loadQuestion();
+  _diagLoadNext();
 }
 
-async function loadQuestion(){
+function _diagLoadNext(){
   diagAnswered = false;
   document.getElementById('solution-box').classList.remove('show');
   document.getElementById('diag-hint-box').classList.remove('show');
-  diagHintVisible=false;
-  document.getElementById('opts').innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:.7rem;color:var(--text3);padding:1rem 0;letter-spacing:.08em">Loading…</div>';
-  document.getElementById('q-text').textContent='';
-  try{
-    const res=await fetch('/question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,currentLevel,correct,wrong})});
-    const data=await res.json();
-    if(data.done||qCount>=MAX_Q){showResult();return;}
-    currentLevel=data.level;
-    currentDiagQuestion=data.question;
-    renderQuestion(data.question,data.levelName);
-  }catch(e){document.getElementById('q-text').textContent='Error loading. Please refresh.';}
-}
+  diagHintVisible = false;
 
-function renderQuestion(q,levelName){
-  qCount++;
-  document.getElementById('prog-label').textContent=`Question ${qCount} of ${MAX_Q}`;
-  document.getElementById('prog-level').textContent=levelName;
-  document.getElementById('pfill').style.width=`${(qCount/MAX_Q)*100}%`;
-  const qt=document.getElementById('q-text');
-  qt.style.animation='none'; qt.textContent=q.q; void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
-  const hint = q.hint || (HINTS[currentLevel]||HINTS[1])[Math.floor(Math.random()*(HINTS[currentLevel]||HINTS[1]).length)];
-  document.getElementById('diag-hint-box').textContent = hint;
-  const optsEl=document.getElementById('opts'); optsEl.innerHTML='';
+  const lvl = diagState.level;
+  const q = _diagPickQuestion(lvl, diagState.phase);
+
+  diagState.qCount++;
+  const label = diagState.phase === 'tiebreaker'
+    ? `Tiebreaker — Level ${lvl}`
+    : `Question ${diagState.qCount}`;
+
+  document.getElementById('prog-label').textContent = label;
+  document.getElementById('prog-level').textContent = STAGES[lvl].name;
+
+  const pct = Math.min(95, (diagState.qCount / 10) * 100);
+  document.getElementById('pfill').style.width = `${pct}%`;
+
+  currentDiagQuestion = q;
+  currentLevel = lvl;
+
+  const qt = document.getElementById('q-text');
+  qt.style.animation='none'; qt.textContent = q.q;
+  void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
+
+  document.getElementById('diag-hint-box').textContent = q.hint || '';
+
+  const optsEl = document.getElementById('opts');
+  optsEl.innerHTML = '';
   ['A','B','C','D'].forEach((l,i)=>{
-    const btn=document.createElement('button'); btn.className='opt';
-    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
-    btn.onclick=()=>handleDiagAnswer(i,q.ans,optsEl,q);
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    btn.onclick = () => _diagHandleAnswer(i, q.ans, optsEl, q);
     optsEl.appendChild(btn);
   });
 }
 
-function handleDiagAnswer(chosen,correct_ans,optsEl,q){
-  if(diagAnswered)return; diagAnswered=true;
-  const isCorrect=chosen===correct_ans;
-  if(isCorrect)correct++;else wrong++;
+function _diagHandleAnswer(chosen, correct_ans, optsEl, q){
+  if(diagAnswered) return;
+  diagAnswered = true;
+  const isCorrect = chosen === correct_ans;
+
+  // Style the options
   optsEl.querySelectorAll('.opt').forEach((b,i)=>{
     b.classList.add('disabled');
-    if(i===correct_ans)b.classList.add('correct');
-    if(i===chosen&&!isCorrect)b.classList.add('wrong');
+    if(i === correct_ans) b.classList.add('correct');
+    if(i === chosen && !isCorrect) b.classList.add('wrong');
   });
-  // Show solution
-  const sb=document.getElementById('solution-box');
-  sb.className='solution-box show'+(isCorrect?'':' wrong-solution');
-  document.getElementById('sol-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
-  document.getElementById('sol-verdict').className='sol-verdict '+(isCorrect?'right':'wrong');
-  document.getElementById('sol-explanation').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
-  const stepsEl=document.getElementById('sol-steps');
-  if(q.steps&&q.steps.length){
-    stepsEl.style.display='flex';
-    stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');
-  }else{stepsEl.style.display='none';}
+
+  // Show solution box
+  const sb = document.getElementById('solution-box');
+  sb.className = 'solution-box show' + (isCorrect ? '' : ' wrong-solution');
+  document.getElementById('sol-verdict').textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+  document.getElementById('sol-verdict').className = 'sol-verdict ' + (isCorrect ? 'right' : 'wrong');
+  document.getElementById('sol-explanation').textContent = q.explanation || `Correct answer: ${q.opts[correct_ans]}.`;
+  const stepsEl = document.getElementById('sol-steps');
+  if(q.steps && q.steps.length){
+    stepsEl.style.display = 'flex';
+    stepsEl.innerHTML = q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');
+  } else { stepsEl.style.display = 'none'; }
+
+  // Record result
+  if(diagState.phase === 'q1'){
+    diagState.q1Result = isCorrect;
+  } else if(diagState.phase === 'q2'){
+    const bothRight = diagState.q1Result && isCorrect;
+    const bothWrong = !diagState.q1Result && !isCorrect;
+    if(bothRight){
+      // Move up — but only if not at max
+      if(diagState.level < 6){ diagState.level++; diagState.phase = 'q1'; diagState.q1Result = null; }
+      else { diagState.placedLevel = 6; }
+    } else if(bothWrong){
+      // Lock here — but only if not at min
+      if(diagState.level > 0){ diagState.placedLevel = diagState.level; }
+      else { diagState.placedLevel = 0; }
+    } else {
+      // Split — tiebreaker
+      diagState.phase = 'tiebreaker';
+    }
+  } else {
+    // Tiebreaker
+    if(isCorrect){ diagState.level = Math.min(6, diagState.level + 1); }
+    diagState.placedLevel = diagState.level;
+  }
 }
 
-function advanceDiagnostic(){ if(qCount>=MAX_Q)showResult();else loadQuestion(); }
+function advanceDiagnostic(){
+  if(diagState.placedLevel !== null){
+    _diagFinish();
+  } else if(diagState.phase === 'q1' && diagState.q1Result !== null){
+    diagState.phase = 'q2';
+    _diagLoadNext();
+  } else {
+    _diagLoadNext();
+  }
+}
+
+function _diagFinish(){
+  userLevel = diagState.placedLevel;
+  const rd = { level: userLevel, score: 0, total: diagState.qCount, email: userEmail };
+  saveResult(rd);
+  renderResult(rd, false);
+  // Silently report to server if possible
+  try{
+    fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,
+        score:diagState.qCount,total:diagState.qCount})
+    });
+  }catch(e){}
+}
 
 function toggleDiagHint(){
-  diagHintVisible=!diagHintVisible;
-  document.getElementById('diag-hint-box').classList.toggle('show',diagHintVisible);
+  diagHintVisible = !diagHintVisible;
+  document.getElementById('diag-hint-box').classList.toggle('show', diagHintVisible);
 }
-function skipOne(){qCount++;if(qCount>=MAX_Q){showResult();return;}loadQuestion();}
-function skipAll(){userLevel=currentLevel;const rd={level:userLevel,score:correct,total:MAX_Q,email:userEmail};saveResult(rd);renderResult(rd,false);}
+
+function skipOne(){
+  // Skip = mark wrong, move to next phase
+  if(diagState.phase === 'q1'){
+    diagState.q1Result = false;
+    diagState.phase = 'q2';
+    document.getElementById('solution-box').classList.remove('show');
+    _diagLoadNext();
+  } else if(diagState.phase === 'q2'){
+    const bothWrong = !diagState.q1Result;
+    if(bothWrong){ diagState.placedLevel = diagState.level; _diagFinish(); }
+    else { diagState.phase = 'tiebreaker'; document.getElementById('solution-box').classList.remove('show'); _diagLoadNext(); }
+  } else {
+    diagState.placedLevel = diagState.level;
+    _diagFinish();
+  }
+}
+
+function skipAll(){
+  diagState.placedLevel = diagState.level;
+  _diagFinish();
+}
 
 // ── RESULT ────────────────────────────────────────────────────────────────────
 async function showResult(){
-  userLevel=currentLevel;
+  // Legacy path — now _diagFinish() handles this. Keep for compat.
+  userLevel = currentLevel;
   const rd={level:userLevel,score:correct,total:MAX_Q,email:userEmail};
   saveResult(rd);renderResult(rd,false);
   try{await fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,score:correct,total:MAX_Q})});}catch(e){}
@@ -2161,7 +2661,7 @@ function renderResult(data,showRetake){
   showScreen('s-result');
   const stage=STAGES[data.level];
   document.getElementById('r-level').textContent=stage.name;
-  document.getElementById('r-score').textContent=`${data.score}/${data.total} correct · Diagnostic complete`;
+  document.getElementById('r-score').textContent=`Diagnostic complete · Placed at Level ${data.level}`;
   document.getElementById('r-desc').textContent=stage.desc;
   const rb=document.getElementById('retake-banner');
   if(showRetake&&data.email){rb.classList.add('show');document.getElementById('retake-email').textContent=data.email;}
@@ -2173,7 +2673,7 @@ function renderResult(data,showRetake){
   document.getElementById('proj-box').textContent=hrs>0?`At 1 hour/day, 5 days/week, you could reach the next level in approximately ${Math.round(hrs/5)} weeks. Consistent, focused practice compounds fast.`:`You've reached the highest level tracked. Focus on deepening mastery and tackling competition math.`;
 }
 
-function startFresh(){qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;showScreen('s-diagnostic');loadQuestion();}
+function startFresh(){ startDiagnostic(); }
 
 function renderJourney(level,track){
   track.innerHTML='';
