@@ -2488,8 +2488,6 @@ let diagHintVisible = false;
 let currentDiagQuestion = null;
 let diagAnswered = false;
 
-// Legacy vars still needed by other parts of the app
-let MAX_Q = 10;
 
 function handleLogoClick(){ if(currentUser) showDashboard(); else showScreen('s-landing'); }
 
