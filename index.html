@@ -6,6 +6,10 @@
 <title>Scalar — Adaptive Math Learning</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="window._katexReady=true;document.dispatchEvent(new Event('katex-ready'))"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -23,6 +27,19 @@
 
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .35s,color .25s}
+
+/* KaTeX override: match app font sizing */
+.katex{font-size:1em !important}
+.dq-question .katex,.prac-q .katex,.opt-text .katex,.dq-opt-text .katex{font-size:.98em !important}
+
+/* Weak spots lesson link button */
+.ws-lesson-btn{
+  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-mid);background:var(--accent-light);
+  padding:.2rem .5rem;border-radius:3px;text-decoration:none;white-space:nowrap;
+  transition:background .15s,border-color .15s;
+}
+.ws-lesson-btn:hover{background:var(--accent-mid)}
 
 /* ── NAV ── */
 nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
@@ -1893,6 +1910,24 @@ let currentUser = null, authMode = 'register';
 let sessionId = Math.random().toString(36).slice(2);
 let qCount=0,correct=0,wrong=0,currentLevel=1,userLevel=1,userEmail='';
 let MAX_Q = 10;
+let currentUserId = null; // persisted for /track-answer and /question calls
+
+// ── KATEX RENDER ─────────────────────────────────────────────────────────────
+function renderMath(el) {
+  if (!el) return;
+  if (window._katexReady && window.renderMathInElement) {
+    try {
+      renderMathInElement(el, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+        ],
+        throwOnError: false
+      });
+    } catch(e) {}
+  }
+}
 let dailyQuestions=[], dailyIndex=0, dailyCorrect=0;
 let currentDailyLevel = 1;
 let dailyResults = []; // per-question results for breakdown
@@ -1955,6 +1990,7 @@ async function submitAuth(){
     const data=await res.json();
     if(!res.ok){errEl.textContent=data.error||'Something went wrong.';errEl.classList.add('show');return;}
     setToken(data.token);
+    if (data.userId) currentUserId = data.userId;
     closeModal();
     checkAuth();
   }catch(e){errEl.textContent='Connection error. Try again.';errEl.classList.add('show');}
@@ -1971,7 +2007,8 @@ async function checkAuth(){
     const res=await fetch('/auth/me',{headers:{Authorization:`Bearer ${t}`}});
     if(!res.ok){setToken(null);updateNavForUser(null);showScreen('s-landing');return;}
     const data=await res.json();
-    currentUser={...data.user, streak: data.streak||0};
+    currentUser=data;
+    currentUserId=data.userId||null;
     updateNavForUser(currentUser);
     showDashboard();
   }catch(e){showScreen('s-landing');}
@@ -2089,7 +2126,7 @@ async function loadQuestion(){
   document.getElementById('opts').innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:.7rem;color:var(--text3);padding:1rem 0;letter-spacing:.08em">Loading…</div>';
   document.getElementById('q-text').textContent='';
   try{
-    const res=await fetch('/question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,currentLevel,correct,wrong})});
+    const res=await fetch('/question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,currentLevel,correct,wrong,userId:currentUserId})});
     const data=await res.json();
     if(data.done||qCount>=MAX_Q){showResult();return;}
     currentLevel=data.level;
@@ -2105,6 +2142,7 @@ function renderQuestion(q,levelName){
   document.getElementById('pfill').style.width=`${(qCount/MAX_Q)*100}%`;
   const qt=document.getElementById('q-text');
   qt.style.animation='none'; qt.textContent=q.q; void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
+  renderMath(qt);
   const hint = q.hint || (HINTS[currentLevel]||HINTS[1])[Math.floor(Math.random()*(HINTS[currentLevel]||HINTS[1]).length)];
   document.getElementById('diag-hint-box').textContent = hint;
   const optsEl=document.getElementById('opts'); optsEl.innerHTML='';
@@ -2114,6 +2152,7 @@ function renderQuestion(q,levelName){
     btn.onclick=()=>handleDiagAnswer(i,q.ans,optsEl,q);
     optsEl.appendChild(btn);
   });
+  renderMath(optsEl);
 }
 
 function handleDiagAnswer(chosen,correct_ans,optsEl,q){
@@ -2131,10 +2170,12 @@ function handleDiagAnswer(chosen,correct_ans,optsEl,q){
   document.getElementById('sol-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
   document.getElementById('sol-verdict').className='sol-verdict '+(isCorrect?'right':'wrong');
   document.getElementById('sol-explanation').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  renderMath(document.getElementById('sol-explanation'));
   const stepsEl=document.getElementById('sol-steps');
   if(q.steps&&q.steps.length){
     stepsEl.style.display='flex';
     stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');
+    renderMath(stepsEl);
   }else{stepsEl.style.display='none';}
 }
 
@@ -2152,7 +2193,7 @@ async function showResult(){
   userLevel=currentLevel;
   const rd={level:userLevel,score:correct,total:MAX_Q,email:userEmail};
   saveResult(rd);renderResult(rd,false);
-  try{await fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,score:correct,total:MAX_Q})});}catch(e){}
+  try{await fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,score:correct,total:MAX_Q,userId:currentUserId})});}catch(e){}
 }
 
 function saveResult(data){ try{localStorage.setItem('apexmath_result',JSON.stringify(data));}catch(e){} }
@@ -2329,9 +2370,9 @@ async function showDashboard(){
       document.getElementById('quiz-start-btn').disabled=false;
     }
 
-    // Weak spots card
-    const ws=getWeakSpots();
-    const wsCount=Object.keys(ws).length;
+    // Weak spots card — use data from API
+    const wsData=data.weakTopics||[];
+    const wsCount=wsData.length;
     document.getElementById('ws-card-sub').textContent=wsCount>0?`${wsCount} topics tracked — tap to see what to work on`:`No weak spots yet. Complete quizzes and they'll show here.`;
 
     // Path progress (mini bar)
@@ -2527,24 +2568,7 @@ function renderFormulas2(){
   if(!wrap.children.length) wrap.innerHTML=`<div style="color:var(--text3);font-size:.84rem;padding:1rem 0">No formulas found${search?' for "'+search+'"':''}</div>`;
 }
 
-// ── WEAK SPOTS MODAL ──────────────────────────────────────────────────────────
-function renderWeakSpots2(){
-  const ws=getWeakSpots();
-  const entries=Object.entries(ws).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const wrap=document.getElementById('ws-modal-content'); if(!wrap)return;
-  if(!entries.length){
-    wrap.innerHTML='<div style="text-align:center;padding:2rem 1rem;color:var(--text3);font-size:.86rem;line-height:1.7"><div style="font-size:2rem;margin-bottom:.75rem">🎯</div>No data yet. Complete quizzes and your weak spots will appear here.</div>';
-    return;
-  }
-  const max=entries[0][1];
-  wrap.innerHTML=entries.map(([topic,count])=>{
-    const pct=Math.round((count/max)*100);
-    const color=pct>60?'var(--red)':'var(--accent)';
-    return`<div class="ws-item2"><div class="ws-top2"><span>${topic}</span><span class="ws-count2">missed ${count}×</span></div><div class="ws-bar-bg2"><div class="ws-bar-fill2" style="width:${pct}%;background:${color}"></div></div></div>`;
-  }).join('');
-}
-// keep old renderWeakSpots
-function renderWeakSpots(){ renderWeakSpots2(); }
+// ── WEAK SPOTS MODAL — see DB-backed renderWeakSpots2 defined later ──────────
 
 // ── PATH MODAL ────────────────────────────────────────────────────────────────
 function renderPathModal(){
@@ -2570,7 +2594,7 @@ function renderPathModal(){
   });
 }
 
-// ── TIMER MODAL ───────────────────────────────────────────────────────────────
+// ── TIMER MODAL (DB-synced, localStorage fallback) ───────────────────────────
 let t2Interval=null, t2StartTime=0, t2Elapsed=0, t2Running=false;
 function timerStart2(){
   if(t2Running)return; t2Running=true; t2StartTime=Date.now()-t2Elapsed;
@@ -2580,12 +2604,18 @@ function timerStart2(){
   document.getElementById('timer-status2').textContent='running…';
   document.getElementById('timer-digits2').classList.add('running');
 }
-function timerStop2(){
+async function timerStop2(){
   if(!t2Running)return; t2Running=false; clearInterval(t2Interval);
   t2Elapsed=Date.now()-t2StartTime;
+  const dur=t2Elapsed;
+  // Save to localStorage
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
-  sessions.push({date:new Date().toLocaleDateString(),dur:t2Elapsed});
+  sessions.push({date:new Date().toLocaleDateString(),dur});
   localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
+  // Save to DB
+  if(getToken()&&dur>10000){
+    try{await fetch('/study-session',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({durationMs:dur})});}catch(e){}
+  }
   t2Elapsed=0;
   document.getElementById('timer-btn-start2').disabled=false;
   document.getElementById('timer-btn-stop2').disabled=true;
@@ -2606,7 +2636,21 @@ function timerTick2(){
   const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
   document.getElementById('timer-digits2').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
-function renderTimerTotal2(){
+async function renderTimerTotal2(){
+  // Try to get from DB
+  if(getToken()){
+    try{
+      const res=await fetch('/study-sessions',{headers:{Authorization:`Bearer ${getToken()}`}});
+      const data=await res.json();
+      const ms=data.weekTotalMs||0;
+      const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+      const txt=`${h}h ${m}m`;
+      const el=document.getElementById('timer-total2');if(el)el.textContent=txt;
+      const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week →';
+      return;
+    }catch(e){}
+  }
+  // Fallback: localStorage
   const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
   const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<7*24*3600*1000).reduce((a,s)=>a+s.dur,0);
   const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
@@ -2624,20 +2668,40 @@ function renderTimerLog2(){
   }).join('');
 }
 
-// ── NOTES MODAL ───────────────────────────────────────────────────────────────
-function loadNote2(){
-  const level=document.getElementById('notes-level-sel2')?.value||userLevel;
+// ── NOTES MODAL (DB-synced, localStorage fallback) ───────────────────────────
+let _noteSaveTimer=null;
+async function loadNote2(){
+  const level=parseInt(document.getElementById('notes-level-sel2')?.value??userLevel);
   const a=document.getElementById('notes-area2'); if(!a)return;
+  // Try DB first
+  if(getToken()){
+    try{
+      const res=await fetch(`/notes/${level}`,{headers:{Authorization:`Bearer ${getToken()}`}});
+      const data=await res.json();
+      a.value=data.content||localStorage.getItem('apexmath_note_'+level)||'';
+      document.getElementById('notes-chars2').textContent=a.value.length+' chars';
+      return;
+    }catch(e){}
+  }
   a.value=localStorage.getItem('apexmath_note_'+level)||'';
   document.getElementById('notes-chars2').textContent=a.value.length+' chars';
 }
 function autoSaveNote2(){
-  const level=document.getElementById('notes-level-sel2').value;
+  const level=parseInt(document.getElementById('notes-level-sel2').value);
   const v=document.getElementById('notes-area2').value;
-  localStorage.setItem('apexmath_note_'+level,v);
+  localStorage.setItem('apexmath_note_'+level,v); // always save local copy
   document.getElementById('notes-chars2').textContent=v.length+' chars';
-  const s=document.getElementById('notes-saved2'); s.classList.add('show');
-  setTimeout(()=>s.classList.remove('show'),2000);
+  const s=document.getElementById('notes-saved2'); s.classList.remove('show');
+  clearTimeout(_noteSaveTimer);
+  _noteSaveTimer=setTimeout(async()=>{
+    if(getToken()){
+      try{
+        await fetch(`/notes/${level}`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({content:v})});
+      }catch(e){}
+    }
+    s.classList.add('show');
+    setTimeout(()=>s.classList.remove('show'),2000);
+  },800);
 }
 function switchNote2(){loadNote2();}
 
@@ -2712,6 +2776,7 @@ function renderDailyQuestion(){
   document.getElementById('dq-fill').style.width=`${(dailyIndex/5)*100}%`;
   const qt=document.getElementById('dq-text');
   qt.style.animation='none'; qt.textContent=q.q; void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
+  renderMath(qt);
   // Hint
   const hint=q.hint||(HINTS[currentDailyLevel]||HINTS[1])[Math.floor(Math.random()*(HINTS[currentDailyLevel]||HINTS[1]).length)];
   document.getElementById('dq-hint-box').textContent=hint;
@@ -2728,17 +2793,22 @@ function renderDailyQuestion(){
     btn.onclick=()=>handleDailyAnswer(i,q.ans,optsEl,q);
     optsEl.appendChild(btn);
   });
+  renderMath(optsEl);
 }
 
 function handleDailyAnswer(chosen,correct_ans,optsEl,q){
   if(dailyAnswered)return; dailyAnswered=true;
   const isCorrect=chosen===correct_ans;
   if(isCorrect)dailyCorrect++;
-  else{
-    const topic=q.topic||STAGES[currentDailyLevel]?.name||'General';
-    trackWrongAnswer(topic);
+  const topic=q.topic||STAGES[currentDailyLevel]?.name||'General';
+  if(!isCorrect) trackWrongAnswer(topic); // keep localStorage fallback
+  dailyResults.push({isCorrect,chosen,correct_ans,q,topic});
+
+  // Track to DB
+  if(getToken()){
+    fetch('/track-answer',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({topic,correct:isCorrect})}).catch(()=>{});
   }
-  dailyResults.push({isCorrect,chosen,correct_ans,q});
+
   optsEl.querySelectorAll('.dq-opt').forEach((b,i)=>{
     b.classList.add('dq-disabled');
     if(i===correct_ans)b.classList.add('dq-correct');
@@ -2751,27 +2821,37 @@ function handleDailyAnswer(chosen,correct_ans,optsEl,q){
   const verdict=document.getElementById('dq-sol-verdict');
   verdict.textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
   verdict.className='dq-sol-verdict '+(isCorrect?'right':'wrong');
-  document.getElementById('dq-sol-body').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  const explanationEl=document.getElementById('dq-sol-body');
+  explanationEl.textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  renderMath(explanationEl);
   // Steps
   const stepsEl=document.getElementById('dq-sol-steps');
   if(q.steps&&q.steps.length){
     stepsEl.style.display='flex';
     stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="dq-sol-step"><span class="dq-sol-step-num">step ${i+1}</span>${s}</div>`).join('');
+    renderMath(stepsEl);
   }else stepsEl.style.display='none';
-  // Inline resources (on wrong answers especially)
+  // Resources panel — show lesson link if wrong, otherwise general resources
   const resEl=document.getElementById('dq-resources');
   const resources=(STAGES[currentDailyLevel]?.resources)||[];
-  if(!isCorrect&&resources.length){
+  if(!isCorrect){
     resEl.style.display='flex';
     const typeIcons={'video':'▶','course':'📖','book':'📚','tool':'🛠','notes':'📝'};
-    resEl.innerHTML=`<div class="dq-resources-label">Review this topic</div>`+
+    // "Learn this concept" lesson link
+    const lessonHref=`lessons.html?level=${currentDailyLevel}&topic=${encodeURIComponent(topic)}`;
+    resEl.innerHTML=`<div class="dq-resources-label">You missed this — review it now</div>
+      <a class="dq-resource-link" href="${lessonHref}" style="background:var(--accent-light);border-color:var(--accent-mid)">
+        <span class="dq-resource-type" style="color:var(--accent);border-color:var(--accent-mid)">lesson</span>
+        <span class="dq-resource-name" style="color:var(--text)">Learn: ${topic}</span>
+        <span class="dq-resource-arrow">→</span>
+      </a>`+
       resources.map(r=>`<a class="dq-resource-link" href="${r.url}" target="_blank" rel="noopener">
         <span class="dq-resource-type">${r.type}</span>
         <span class="dq-resource-name">${r.name}</span>
         <span class="dq-resource-arrow">↗</span>
       </a>`).join('');
   }else resEl.style.display='none';
-  // Change next button text on last question
+  // Next button label
   const nextBtn=document.getElementById('dq-next-btn');
   if(nextBtn)nextBtn.textContent=dailyIndex>=4?'See Results →':'Next Question →';
 }
@@ -2793,7 +2873,8 @@ async function finishDailyQuiz(){
   const passed=dailyCorrect>=3;
   let streak=0;
   try{
-    const res=await fetch('/daily/complete',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({score:dailyCorrect})});
+    const topicResults=dailyResults.map(r=>({topic:r.topic||'General',correct:r.isCorrect}));
+    const res=await fetch('/daily/complete',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({score:dailyCorrect,topicResults})});
     const data=await res.json(); streak=data.streak||0;
   }catch(e){}
   showScreen('s-daily-done');
@@ -2910,6 +2991,7 @@ function handlePracticeAnswer(chosen,q,optsEl){
   document.getElementById('prac-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
   document.getElementById('prac-verdict').className='sol-verdict '+(isCorrect?'right':'wrong');
   document.getElementById('prac-explanation').textContent=q.explanation||`Correct: ${q.opts[q.ans]}`;
+  renderMath(document.getElementById('prac-explanation'));
   const stepsEl=document.getElementById('prac-steps');
   if(q.steps){stepsEl.style.display='flex';stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');}
   else stepsEl.style.display='none';
@@ -2971,22 +3053,53 @@ function rateCard(rating){
   }
 }
 
-// ── WEAK SPOTS ────────────────────────────────────────────────────────────────
-function getWeakSpots(){try{return JSON.parse(localStorage.getItem('apexmath_weakspots'))||{};}catch(e){return{};}}
-function trackWrongAnswer(topic){const ws=getWeakSpots();ws[topic]=(ws[topic]||0)+1;localStorage.setItem('apexmath_weakspots',JSON.stringify(ws));}
-function renderWeakSpots(){
-  const ws=getWeakSpots();
-  const entries=Object.entries(ws).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const list=document.getElementById('ws-list'),empty=document.getElementById('ws-empty');
-  if(!entries.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  const max=entries[0][1];
-  list.innerHTML=entries.map(([topic,count])=>{
-    const pct=Math.round((count/max)*100);
+async function renderWeakSpots2(){
+  const wrap=document.getElementById('ws-modal-content'); if(!wrap)return;
+  wrap.innerHTML='<div style="font-size:.82rem;color:var(--text3);padding:1rem 0">Loading…</div>';
+  let topics=[];
+  try{
+    if(getToken()){
+      const res=await fetch('/topic-performance',{headers:{Authorization:`Bearer ${getToken()}`}});
+      const data=await res.json();
+      topics=data.topics||[];
+    }
+  }catch(e){}
+  // Fall back to localStorage if empty
+  if(!topics.length){
+    const ws=getWeakSpots();
+    topics=Object.entries(ws).map(([t,c])=>({topic:t,wrong_count:c,correct_count:0,lesson:null}))
+      .sort((a,b)=>b.wrong_count-a.wrong_count);
+  }
+  if(!topics.length){
+    wrap.innerHTML='<div style="font-size:.86rem;color:var(--text3);line-height:1.65">No weak spots yet. Complete quizzes and they\'ll show here.</div>';
+    return;
+  }
+  const max=Math.max(...topics.map(t=>t.wrong_count),1);
+  wrap.innerHTML=topics.slice(0,10).map(t=>{
+    const pct=Math.round((t.wrong_count/max)*100);
     const color=pct>60?'var(--red)':'var(--accent)';
-    return`<div class="ws-item"><div class="ws-top"><span class="ws-topic">${topic}</span><span class="ws-count">missed ${count}×</span></div><div class="ws-bar-bg"><div class="ws-bar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+    const lessonSlug=t.lesson?.slug;
+    const lessonLevel=t.lesson?.level??currentDailyLevel;
+    const lessonBtn=lessonSlug
+      ?`<a href="lessons.html?level=${lessonLevel}&topic=${encodeURIComponent(t.topic)}" class="ws-lesson-btn">Study →</a>`
+      :'';
+    return`<div class="ws-item">
+      <div class="ws-top">
+        <span class="ws-topic">${t.topic}</span>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          ${lessonBtn}
+          <span class="ws-count">missed ${t.wrong_count}×</span>
+        </div>
+      </div>
+      <div class="ws-bar-bg"><div class="ws-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
   }).join('');
 }
+
+// ── WEAK SPOTS (localStorage fallback) ───────────────────────────────────────
+function getWeakSpots(){try{return JSON.parse(localStorage.getItem('apexmath_weakspots'))||{};}catch(e){return{};}}
+function trackWrongAnswer(topic){const ws=getWeakSpots();ws[topic]=(ws[topic]||0)+1;localStorage.setItem('apexmath_weakspots',JSON.stringify(ws));}
+function renderWeakSpots(){ renderWeakSpots2(); }
 
 // ── TIMER ─────────────────────────────────────────────────────────────────────
 function timerStart(){
