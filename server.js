@@ -57,14 +57,20 @@ pool.query(`
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    password_salt TEXT NOT NULL,
+    password_hash TEXT,
+    password_salt TEXT,
     level INTEGER DEFAULT 0,
     streak INTEGER DEFAULT 0,
     last_quiz_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
   )
-`).catch(err => console.error('Users table error:', err.message));
+`).then(() => Promise.all([
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT`),
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_salt TEXT`),
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0`),
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0`),
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_quiz_date TIMESTAMP`),
+])).then(() => console.log('Users table ready')).catch(err => console.error('Users table error:', err.message));
 
 Promise.all([
   pool.query(`
