@@ -16,19 +16,23 @@ function verifyPassword(password, salt, storedHash) {
   return hash === storedHash;
 }
 function makeToken(userId) {
-  const payload = Buffer.from(JSON.stringify({ userId, iat: Date.now() })).toString('base64');
+  // Use base64url (no dots) so we can safely split on '|'
+  const payload = Buffer.from(JSON.stringify({ userId, iat: Date.now() })).toString('base64url');
   const sig = crypto.createHmac('sha256', process.env.JWT_SECRET || 'scalar-dev-secret')
     .update(payload).digest('hex');
-  return `${payload}.${sig}`;
+  return `${payload}|${sig}`;
 }
 function verifyToken(token) {
   if (!token) return null;
-  const [payload, sig] = token.split('.');
+  const lastPipe = token.lastIndexOf('|');
+  if (lastPipe === -1) return null;
+  const payload = token.slice(0, lastPipe);
+  const sig = token.slice(lastPipe + 1);
   if (!payload || !sig) return null;
   const expected = crypto.createHmac('sha256', process.env.JWT_SECRET || 'scalar-dev-secret')
     .update(payload).digest('hex');
   if (expected !== sig) return null;
-  try { return JSON.parse(Buffer.from(payload, 'base64').toString()); } catch { return null; }
+  try { return JSON.parse(Buffer.from(payload, 'base64url').toString()); } catch { return null; }
 }
 function authMiddleware(req, res, next) {
   const token = (req.headers.authorization || '').replace('Bearer ', '');
@@ -45,7 +49,7 @@ app.use(express.static(__dirname));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
 // ── DB init ───────────────────────────────────────────────────────────────────
@@ -173,8 +177,9 @@ app.post('/auth/register', async (req, res) => {
     const token = makeToken(result.rows[0].id);
     res.json({ token, email: result.rows[0].email, level: 0, levelName: LEVEL_NAMES[0], streak: 0 });
   } catch (err) {
+    console.error('Register error:', err.message);
     if (err.code === '23505') return res.status(409).json({ error: 'Email already registered' });
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -188,8 +193,9 @@ app.post('/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     const token = makeToken(user.id);
     res.json({ token, email: user.email, level: user.level || 0, levelName: LEVEL_NAMES[user.level || 0], streak: user.streak || 0 });
-  } catch {
-    res.status(500).json({ error: 'Server error' });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
