@@ -1971,10 +1971,8 @@ async function checkAuth(){
     const res=await fetch('/auth/me',{headers:{Authorization:`Bearer ${t}`}});
     if(!res.ok){setToken(null);updateNavForUser(null);showScreen('s-landing');return;}
     const data=await res.json();
-    currentUser=data.user;
+    currentUser={...data.user, streak: data.streak||0};
     updateNavForUser(currentUser);
-    const saved=localStorage.getItem('apexmath_result');
-    if(saved){const rd=JSON.parse(saved);if(rd.email===currentUser.email){showDashboard();return;}}
     showDashboard();
   }catch(e){showScreen('s-landing');}
 }
