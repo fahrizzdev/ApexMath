@@ -198,7 +198,11 @@ app.get('/auth/me', authMiddleware, async (req, res) => {
     const result = await pool.query('SELECT id, email, level, streak, last_quiz_date FROM users WHERE id=$1', [req.userId]);
     if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
     const u = result.rows[0];
-    res.json({ email: u.email, level: u.level || 0, levelName: LEVEL_NAMES[u.level || 0], streak: u.streak || 0, lastQuizDate: u.last_quiz_date });
+    const level = u.level || 0;
+    res.json({
+      user: { email: u.email, level, level_name: LEVEL_NAMES[level] },
+      streak: u.streak || 0
+    });
   } catch {
     res.status(500).json({ error: 'Server error' });
   }
@@ -247,16 +251,30 @@ app.get('/dashboard', authMiddleware, async (req, res) => {
     const result = await pool.query('SELECT email, level, streak, last_quiz_date FROM users WHERE id=$1', [req.userId]);
     if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
     const u = result.rows[0];
+    const level = u.level || 0;
+    const streak = u.streak || 0;
     const today = new Date().toISOString().split('T')[0];
-    const quizDoneToday = u.last_quiz_date ? u.last_quiz_date.toISOString().split('T')[0] === today : false;
-    res.json({
-      email: u.email,
-      level: u.level || 0,
-      levelName: LEVEL_NAMES[u.level || 0],
-      streak: u.streak || 0,
-      quizDoneToday
+    const lastDate = u.last_quiz_date ? new Date(u.last_quiz_date).toISOString().split('T')[0] : null;
+    const completedToday = lastDate === today;
+
+    // Build a 7-day strip: true if that day had a quiz session within current streak
+    const weekDays = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(); d.setDate(d.getDate() - (6 - i));
+      const ds = d.toISOString().split('T')[0];
+      // Mark as done if it falls within the current streak window
+      const daysAgo = 6 - i;
+      return { date: ds, done: completedToday ? daysAgo < streak : daysAgo < streak - 1 && streak > 0 };
     });
-  } catch {
+
+    res.json({
+      user: { email: u.email, level, level_name: LEVEL_NAMES[level] },
+      streak,
+      completedToday,
+      passedToday: completedToday,
+      totalQuizzes: streak,
+      weekDays
+    });
+  } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 });
