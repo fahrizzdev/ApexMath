@@ -1,0 +1,3097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Scalar — Adaptive Math Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f2ed;--bg2:#eeebe4;--surface:#fff;
+  --border:rgba(0,0,0,0.08);--text:#1a1916;--text2:#6b6860;--text3:#a8a49d;
+  --accent:#2d5a27;--accent-light:rgba(45,90,39,0.09);--accent-mid:rgba(45,90,39,0.18);
+  --red:#c0392b;--red-light:rgba(192,57,43,0.08);
+  --gold:#92700a;--gold-light:rgba(146,112,10,0.1);
+  --shadow:0 2px 12px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.05);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.1);
+}
+[data-theme="slate"]{--bg:#f0f2f5;--bg2:#e8ebef;--surface:#fff;--border:rgba(0,0,0,0.08);--text:#1a1c20;--text2:#636870;--text3:#9fa4ad;--accent:#1a56db;--accent-light:rgba(26,86,219,0.07);--accent-mid:rgba(26,86,219,0.16)}
+[data-theme="sand"]{--bg:#faf6f0;--bg2:#f2ece2;--surface:#fff;--border:rgba(0,0,0,0.07);--text:#2a2218;--text2:#7a6e62;--text3:#b0a99f;--accent:#b45309;--accent-light:rgba(180,83,9,0.07);--accent-mid:rgba(180,83,9,0.16)}
+[data-theme="ink"]{--bg:#1c1c1e;--bg2:#252528;--surface:#2c2c2f;--border:rgba(255,255,255,0.08);--text:#f0ede8;--text2:#9b978f;--text3:#5a5750;--accent:#a8c5a0;--accent-light:rgba(168,197,160,0.08);--accent-mid:rgba(168,197,160,0.18)}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .35s,color .25s}
+
+/* ── NAV ── */
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
+.logo{font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-.02em;cursor:pointer;color:var(--text);text-decoration:none}
+.logo em{color:var(--accent);font-style:normal}
+.nav-right{display:flex;align-items:center;gap:.6rem}
+.nav-btn{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nav-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn.primary:hover{opacity:.85}
+.nav-user-tag{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);padding:.3rem .7rem;border:1px solid var(--accent-mid);background:var(--accent-light)}
+.theme-wrap{position:relative}
+.theme-toggle{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.35rem .6rem;background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s}
+.theme-toggle:hover{border-color:var(--text3);color:var(--text)}
+.theme-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-lg);min-width:130px;display:none;flex-direction:column;z-index:300}
+.theme-drop.open{display:flex}
+.theme-opt{padding:.6rem 1rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:.5rem;border:none;background:none;width:100%;transition:background .15s}
+.theme-opt:hover{background:var(--bg2);color:var(--text)}
+.theme-opt.active{color:var(--accent)}
+.t-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);padding:2.5rem;width:100%;max-width:420px;box-shadow:var(--shadow-lg)}
+.modal-title{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-.02em;color:var(--text);margin-bottom:.3rem}
+.modal-sub{font-size:.84rem;color:var(--text2);margin-bottom:1.75rem;line-height:1.6}
+.modal input{width:100%;padding:.65rem .85rem;background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;margin-bottom:.75rem;transition:border-color .2s}
+.modal input:focus{border-color:var(--accent)}
+.modal-btn{width:100%;padding:.8rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-bottom:.75rem}
+.modal-btn:hover{opacity:.85}
+.modal-switch{font-size:.82rem;color:var(--text2);text-align:center}
+.modal-switch span{color:var(--accent);cursor:pointer;text-decoration:underline}
+.modal-err{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;color:var(--red);margin-top:.25rem;display:none}
+.modal-err.show{display:block}
+.modal-close{float:right;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;margin-top:-.5rem;margin-right:-.5rem}
+
+/* ──────────────────────────────────────
+   LANDING PAGE
+────────────────────────────────────── */
+#s-landing{background:var(--bg);overflow:hidden}
+.land-hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;background:#0d0f0a}
+.land-canvas{position:absolute;inset:0;width:100%;height:100%}
+.land-orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+.land-orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(45,90,39,.3) 0%,transparent 70%);top:-150px;left:-100px;animation:orbPulse 10s ease-in-out infinite}
+.land-orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(45,90,39,.15) 0%,transparent 70%);bottom:-80px;right:5%;animation:orbPulse 14s ease-in-out infinite reverse}
+@keyframes orbPulse{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.1) translateY(-20px)}}
+.land-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
+.land-hero-inner{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:6rem 3rem 4rem;display:grid;grid-template-columns:1.1fr .9fr;gap:4rem;align-items:center}
+.land-eyebrow{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;animation:fadeUp .7s .1s ease both}
+.land-h1{font-family:'DM Serif Display',serif;font-size:clamp(2.8rem,5.5vw,4.5rem);line-height:1.05;letter-spacing:-.035em;color:#fff;margin-bottom:1.5rem;animation:fadeUp .7s .2s ease both}
+.land-h1 em{font-style:italic;color:rgba(168,197,160,.8)}
+.land-sub{font-size:1rem;color:rgba(255,255,255,.5);line-height:1.8;max-width:440px;margin-bottom:2.5rem;animation:fadeUp .7s .3s ease both}
+.land-btns{display:flex;gap:.75rem;flex-wrap:wrap;animation:fadeUp .7s .4s ease both}
+.land-cta{padding:.9rem 2rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.land-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.land-cta:hover::before{transform:translateX(100%)}
+.land-cta:hover{box-shadow:0 0 24px rgba(45,90,39,.5);transform:translateY(-1px)}
+.land-ghost{padding:.9rem 1.6rem;background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.land-ghost:hover{background:rgba(255,255,255,.12);color:#fff}
+.land-stats-row{display:flex;gap:2.5rem;margin-top:3rem;animation:fadeUp .7s .5s ease both}
+.land-stat-item{display:flex;flex-direction:column;gap:.2rem}
+.land-stat-num{font-family:'DM Serif Display',serif;font-size:2rem;color:#fff;line-height:1;letter-spacing:-.03em}
+.land-stat-label{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+
+/* PREVIEW CARD (right side) */
+.land-preview{animation:fadeUp .7s .35s ease both}
+.preview-window{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.preview-bar{background:rgba(255,255,255,.06);padding:.6rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.preview-dot{width:8px;height:8px;border-radius:50%}
+.preview-dot-r{background:rgba(255,100,100,.5)}
+.preview-dot-y{background:rgba(255,200,0,.5)}
+.preview-dot-g{background:rgba(100,220,100,.5)}
+.preview-body{padding:1.5rem;display:flex;flex-direction:column;gap:.75rem}
+.preview-q{font-family:'DM Mono',monospace;font-size:.75rem;color:rgba(255,255,255,.8);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:.75rem 1rem;line-height:1.6}
+.preview-opts{display:flex;flex-direction:column;gap:.4rem}
+.preview-opt{font-family:'DM Mono',monospace;font-size:.76rem;padding:.5rem .85rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.5);display:flex;align-items:center;gap:.6rem;transition:all .3s}
+.preview-opt.correct-ans{background:rgba(45,90,39,.25);border-color:rgba(45,90,39,.6);color:rgba(168,220,160,.9)}
+.preview-opt span{font-size:.72rem;color:rgba(255,255,255,.25)}
+.preview-solve{background:rgba(45,90,39,.12);border:1px solid rgba(45,90,39,.3);padding:.85rem 1rem;border-radius:3px}
+.preview-solve-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.35rem}
+.preview-solve-text{font-size:.74rem;color:rgba(255,255,255,.6);line-height:1.6}
+
+/* FEATURES SECTION */
+.land-features{max-width:1100px;margin:0 auto;padding:6rem 3rem}
+.land-features-eyebrow{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.land-features-h2{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.03em;color:var(--text);margin-bottom:.75rem;line-height:1.1}
+.land-features-sub{font-size:.95rem;color:var(--text2);line-height:1.75;max-width:520px;margin-bottom:3.5rem}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.feat-card{background:var(--surface);border:1px solid var(--border);padding:1.75rem;box-shadow:var(--shadow);transition:all .25s;cursor:default;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.feat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-icon{font-size:1.4rem;margin-bottom:.9rem}
+.feat-name{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--text);margin-bottom:.4rem;letter-spacing:-.01em}
+.feat-desc{font-size:.82rem;color:var(--text2);line-height:1.7}
+
+/* HOW IT WORKS */
+.land-how{background:var(--bg2);padding:5rem 3rem}
+.land-how-inner{max-width:900px;margin:0 auto}
+.land-how h2{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.03em;color:var(--text);margin-bottom:3rem}
+.steps-list{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.step-card{display:flex;flex-direction:column;gap:.75rem}
+.step-num{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:.2rem .6rem;border:1px solid var(--accent-mid);background:var(--accent-light);width:fit-content}
+.step-title{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--text);letter-spacing:-.01em}
+.step-body{font-size:.84rem;color:var(--text2);line-height:1.7}
+
+/* LAND FOOTER */
+.land-foot{background:#0d0f0a;padding:3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem}
+.land-foot-logo{font-family:'DM Serif Display',serif;font-size:1rem;color:#fff}
+.land-foot-logo em{color:var(--accent);font-style:normal}
+.land-foot-text{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ──────────────────────────────────────
+   DIAGNOSTIC
+────────────────────────────────────── */
+#s-diagnostic{max-width:700px;margin:0 auto;padding:4rem 2.5rem 5rem}
+.progress-wrap{margin-bottom:2.5rem}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.prog-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.prog-level{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.pbar{height:3px;background:var(--bg2);overflow:hidden}
+.pfill{height:100%;background:var(--accent);transition:width .4s ease}
+.q-text{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-.02em;color:var(--text);line-height:1.45;margin-bottom:1.75rem;opacity:0;animation:fadeUp .3s ease forwards}
+.opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.opt{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;cursor:pointer;transition:all .15s;text-align:left}
+.opt:hover:not(.disabled){border-color:var(--accent);background:var(--accent-light)}
+.opt.correct{border-color:var(--accent)!important;background:var(--accent-light)!important;color:var(--accent)}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-light)!important;color:var(--red)}
+.opt.disabled{cursor:default;pointer-events:none}
+.opt-letter{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;color:var(--text3);flex-shrink:0;width:18px}
+
+/* SOLUTION BOX (appears after answer) */
+.solution-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.1rem 1.25rem;margin-bottom:1.5rem;display:none;animation:fadeUp .35s ease}
+.solution-box.show{display:block}
+.solution-box.wrong-solution{border-left-color:var(--red)}
+.sol-verdict{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.sol-verdict.right{color:var(--accent)}
+.sol-verdict.wrong{color:var(--red)}
+.sol-explanation{font-size:.88rem;color:var(--text2);line-height:1.75;margin-bottom:.6rem}
+.sol-steps{display:flex;flex-direction:column;gap:.35rem;padding:.75rem;background:var(--bg);border:1px solid var(--border)}
+.sol-step{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);line-height:1.5}
+.sol-step strong{color:var(--accent)}
+.sol-next-btn{margin-top:.75rem;padding:.6rem 1.2rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.sol-next-btn:hover{opacity:.85}
+
+.diag-hint-wrap{margin-bottom:1.25rem}
+.hint-btn{display:flex;align-items:center;gap:.5rem;background:none;border:none;font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);cursor:pointer;padding:0;transition:color .2s}
+.hint-btn:hover{color:var(--accent)}
+.hint-box{background:var(--gold-light,rgba(146,112,10,.1));border:1px solid rgba(146,112,10,.2);padding:.85rem 1rem;margin-top:.6rem;font-size:.86rem;color:var(--text2);line-height:1.7;display:none;animation:fadeUp .3s ease}
+.hint-box.show{display:block}
+
+.skip-row{display:flex;gap:.75rem;margin-top:.5rem}
+.skip-btn{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .75rem;background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s}
+.skip-btn:hover{border-color:var(--text3);color:var(--text2)}
+
+/* ──────────────────────────────────────
+   RESULT
+────────────────────────────────────── */
+#s-result{}
+.result-hero{display:flex;gap:2.5rem;padding:3.5rem 3rem;flex-wrap:wrap;max-width:1000px;margin:0 auto}
+.result-hero-left{flex:1;min-width:260px}
+.r-eyebrow{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.r-level{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:var(--text);line-height:1.1;margin-bottom:.4rem}
+.r-score{font-family:'DM Mono',monospace;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+.r-desc{font-size:.92rem;color:var(--text2);line-height:1.75;margin-bottom:1.5rem}
+.r-action-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.r-cta{padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.r-cta:hover{opacity:.85}
+.r-ghost{padding:.75rem 1.2rem;background:none;border:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.r-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.retake-banner{display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 3rem;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.retake-banner.show{display:flex}
+.retake-text{font-size:.86rem;color:var(--text2)}
+.retake-btn{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s}
+.retake-btn:hover{border-color:var(--accent);color:var(--accent)}
+.schedule-widget{width:300px;flex-shrink:0}
+.sw-title{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:.86rem;font-weight:500;color:var(--text)}
+.sw-body{border:1px solid var(--border);border-top:none;background:var(--surface);padding:1rem;display:none}
+.sw-body.open{display:block}
+.sw-field{margin-bottom:.85rem}
+.sw-field label{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:.3rem}
+.sw-field input,.sw-field select{width:100%;padding:.45rem .7rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.day-btn{padding:.35rem 0;background:var(--bg);border:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;font-size:.72rem;cursor:pointer;transition:all .15s}
+.day-btn.sel{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent)}
+.sw-result{padding:.75rem;background:var(--bg);margin-top:.5rem;border:1px solid var(--border)}
+.sw-result-item{display:flex;justify-content:space-between;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.sw-result-item:last-child{border-bottom:none}
+.sw-result-item span:last-child{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent)}
+
+.projection-box{margin:0 3rem 2rem;max-width:940px;padding:1.25rem 1.5rem;background:var(--surface);border:1px solid var(--border);font-size:.88rem;color:var(--text2);line-height:1.75}
+.journey-section{padding:2rem 3rem 5rem;max-width:1000px;margin:0 auto}
+.section-label{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:1.5rem}
+.journey-stage{display:grid;grid-template-columns:24px 1fr;gap:1.25rem;padding:1.25rem 0;border-bottom:1px solid var(--border);opacity:0;transform:translateY(12px);transition:all .4s ease}
+.journey-stage.visible{opacity:1;transform:translateY(0)}
+.journey-stage:last-child{border-bottom:none}
+.journey-stage.is-current{background:var(--accent-light);padding:1.25rem 1rem;margin:0 -1rem;border:1px solid var(--accent-mid)}
+.stage-dot{width:20px;height:20px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);margin-top:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem}
+.stage-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.stage-dot.current{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-mid)}
+.stage-name{font-weight:500;color:var(--text);margin-bottom:.3rem;font-size:.95rem}
+.stage-name.cl{color:var(--accent)}
+.stage-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem}
+.tag{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .45rem;border:1px solid var(--border)}
+.tag.ct{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
+.tag.nt{color:var(--gold,#92700a);border-color:rgba(146,112,10,.25);background:var(--gold-light,rgba(146,112,10,.1))}
+.tag.tt{color:var(--text3)}
+.stage-desc{font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:.75rem}
+.resources{display:flex;flex-direction:column;gap:.3rem}
+.resource-row{display:flex;align-items:center;gap:.75rem;font-size:.8rem;padding:.35rem 0;border-bottom:1px solid var(--border)}
+.resource-row:last-child{border-bottom:none}
+.res-type{font-family:'DM Mono',monospace;font-size:.70rem;letter-spacing:.08em;text-transform:uppercase;padding:.1rem .4rem;background:var(--bg2);border:1px solid var(--border);flex-shrink:0}
+.res-name{flex:1;color:var(--text2)}
+.res-link{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-decoration:none}
+.res-link:hover{text-decoration:underline}
+.next-callout{font-size:.82rem;color:var(--text2);background:var(--bg);border-left:3px solid var(--accent);padding:.6rem .85rem;margin-bottom:.75rem}
+
+/* ──────────────────────────────────────
+   DASHBOARD — Scrollable, fun, no tabs
+────────────────────────────────────── */
+/* ════════════════════════════════════════
+   DASHBOARD — clean modern redesign
+════════════════════════════════════════ */
+#s-dashboard{background:var(--bg);min-height:100vh}
+
+/* Top bar */
+.dash-topbar{
+  position:sticky;top:0;z-index:150;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 2rem;
+}
+.dash-topbar-left{display:flex;align-items:center;gap:.75rem}
+.dash-level-chip{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1.5px solid var(--accent-mid);background:var(--accent-light);
+  padding:.28rem .75rem;border-radius:4px;
+}
+.dash-streak-chip{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.06em;
+  color:var(--text);border:1.5px solid var(--border);background:var(--surface);
+  padding:.28rem .7rem;border-radius:4px;font-weight:500;
+}
+.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.3);background:rgba(255,120,0,.05);color:#c85000}
+
+/* XP bar */
+.dash-topbar-xp{display:flex;align-items:center;gap:.65rem;flex:1;max-width:200px;margin:0 1.25rem}
+.dash-topbar-xp-track{flex:1;height:3px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.dash-topbar-xp-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
+
+/* FULL LAYOUT — sidebar + main + aside */
+.dash-layout{
+  display:grid;
+  grid-template-columns:220px 1fr 200px;
+  gap:0;
+  min-height:calc(100vh - 49px);
+  max-width:1400px;margin:0 auto;
+}
+
+/* LEFT SIDEBAR */
+.dash-sidebar{
+  border-right:1px solid var(--border);
+  padding:2rem 1.25rem;
+  display:flex;flex-direction:column;gap:1.75rem;
+  position:sticky;top:49px;height:calc(100vh - 49px);overflow-y:auto;
+}
+.dash-sidebar-section{display:flex;flex-direction:column;gap:.35rem}
+.dash-sidebar-label{
+  font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text3);padding:.2rem .5rem;margin-bottom:.2rem;
+}
+.dash-sidebar-item{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.55rem .65rem;border-radius:6px;
+  font-size:.83rem;color:var(--text2);cursor:pointer;
+  transition:background .15s, color .15s;border:none;background:none;text-align:left;width:100%;
+}
+.dash-sidebar-item:hover{background:var(--bg2);color:var(--text)}
+.dash-sidebar-item.active{background:var(--accent-light);color:var(--accent)}
+.dash-sidebar-icon{font-size:1rem;flex-shrink:0;width:20px;text-align:center}
+
+/* Level indicator in sidebar */
+.dash-level-card{
+  background:var(--accent-light);border:1px solid var(--accent-mid);
+  border-radius:8px;padding:.85rem;
+}
+.dash-level-card-label{font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+.dash-level-card-name{font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--text);letter-spacing:-.01em;margin-bottom:.6rem}
+.dash-level-bar{height:3px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.dash-level-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1s ease}
+
+/* MAIN CONTENT */
+.dash-main{
+  padding:2rem 1.75rem 4rem;
+  min-width:0;
+}
+
+/* RIGHT ASIDE */
+.dash-aside{
+  border-left:1px solid var(--border);
+  padding:2rem 1.25rem;
+  display:flex;flex-direction:column;gap:1.5rem;
+  position:sticky;top:49px;height:calc(100vh - 49px);overflow-y:auto;
+}
+.dash-aside-label{
+  font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:.5rem;
+}
+
+/* Week strip in aside */
+.dash-week-mini{display:flex;flex-direction:column;gap:.5rem}
+.week-pip-row{display:flex;align-items:center;gap:.5rem}
+.week-pip-mini{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;transition:all .3s;flex-shrink:0;
+}
+.week-pip-mini.done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px var(--accent-light)}
+.week-pip-mini.today{border-color:var(--accent);border-width:2px}
+.week-pip-date{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.06em;color:var(--text3)}
+.week-pip-date.today-label{color:var(--accent)}
+
+/* Stat boxes in aside */
+.dash-aside-stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:.85rem;
+}
+.dash-aside-stat-val{font-family:'DM Serif Display',serif;font-size:1.75rem;letter-spacing:-.03em;color:var(--text);line-height:1}
+.dash-aside-stat-label{font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:.2rem}
+
+/* Resource links in aside */
+.dash-aside-resource{
+  display:flex;flex-direction:column;gap:.4rem;
+}
+.dash-aside-res-link{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.45rem .6rem;border-radius:5px;border:1px solid var(--border);
+  background:var(--surface);text-decoration:none;
+  font-size:.75rem;color:var(--text2);transition:border-color .15s;
+}
+.dash-aside-res-link:hover{border-color:var(--accent);color:var(--accent)}
+.dash-aside-res-icon{font-size:.85rem;flex-shrink:0}
+
+/* GREET */
+.dash-greet-section{margin-bottom:1.5rem}
+.dash-greet-text{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.5rem,2.5vw,2.2rem);
+  letter-spacing:-.03em;color:var(--text);line-height:1.1;
+  margin-bottom:.25rem;
+}
+.dash-greet-sub{font-size:.85rem;color:var(--text2);line-height:1.7}
+
+/* Compatibility — keep week strip id working but hide old one */
+.dash-week-strip{display:none}
+.week-pip,.week-pip-circle,.week-pip-day{display:none}
+
+/* ════════════════════════════════════════
+   BENTO GRID — asymmetric, modern
+════════════════════════════════════════ */
+.dash-grid{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr;
+  grid-auto-rows:auto;
+  gap:1rem;
+  width:100%;
+}
+
+/* Base card */
+.tool-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.4rem;
+  cursor:pointer;
+  transition:box-shadow .2s ease, transform .18s ease, border-color .2s;
+  position:relative;overflow:hidden;
+  text-align:left;
+  display:flex;flex-direction:column;gap:.55rem;
+}
+.tool-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(0,0,0,.08);
+  border-color:var(--accent-mid);
+}
+.tool-card:active{transform:translateY(0)}
+
+/* Subtle left accent line on hover */
+.tool-card::after{
+  content:'';position:absolute;left:0;top:16px;bottom:16px;width:2.5px;
+  background:var(--accent);border-radius:0 2px 2px 0;
+  opacity:0;transition:opacity .2s;
+}
+.tool-card:hover::after{opacity:1}
+.tool-card-quiz::after,.tool-card-streak::after{display:none}
+
+/* QUIZ — full-width hero, col 1-2 */
+.tool-card-quiz{
+  grid-column:1/3;
+  background:linear-gradient(135deg,#0b1a0b 0%,#112411 100%);
+  border:1px solid rgba(45,90,39,.45);
+  border-radius:12px;
+  flex-direction:row;align-items:center;gap:1.5rem;
+  padding:1.75rem 2rem;
+}
+.tool-card-quiz:hover{
+  box-shadow:0 10px 36px rgba(45,90,39,.25);
+  border-color:rgba(45,90,39,.7);
+  transform:translateY(-2px);
+}
+.quiz-card-emoji{font-size:2.5rem;flex-shrink:0;filter:drop-shadow(0 2px 12px rgba(45,90,39,.6))}
+.quiz-card-body{flex:1}
+.quiz-card-title{font-family:'DM Serif Display',serif;font-size:1.35rem;letter-spacing:-.02em;color:#fff;margin-bottom:.25rem}
+.quiz-card-sub{font-size:.83rem;color:rgba(255,255,255,.45);line-height:1.65;margin-bottom:.85rem}
+.quiz-card-btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.65rem 1.4rem;background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:all .2s;position:relative;overflow:hidden;
+}
+.quiz-card-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);transition:transform .5s}
+.quiz-card-btn:hover::after{transform:translateX(100%)}
+.quiz-card-btn:hover{box-shadow:0 0 18px rgba(45,90,39,.55);transform:translateY(-1px)}
+.quiz-card-btn:disabled{opacity:.3;cursor:default;transform:none}
+.quiz-done-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:#a8c5a0;padding:.3rem .7rem;border:1px solid rgba(45,90,39,.35);background:rgba(45,90,39,.18);border-radius:4px}
+
+/* STREAK — tall right col, rows 1-2 */
+.tool-card-streak{
+  grid-column:3;grid-row:1/3;
+  background:linear-gradient(160deg,#fffaf4 0%,#fff3e3 100%);
+  border:1px solid rgba(200,100,0,.18);
+  border-radius:12px;
+  justify-content:space-between;
+}
+[data-theme="ink"] .tool-card-streak{
+  background:linear-gradient(160deg,#201c16 0%,#1e1a12 100%);
+  border-color:rgba(200,120,20,.2);
+}
+.streak-big{
+  font-family:'DM Serif Display',serif;
+  font-size:4rem;letter-spacing:-.05em;color:#b85a00;line-height:1;
+  margin-top:.25rem;
+}
+[data-theme="ink"] .streak-big{color:#d4822a}
+.streak-label{font-family:'DM Mono',monospace;font-size:.70rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(184,90,0,.5)}
+.streak-week-row{display:flex;gap:.3rem;margin-top:.5rem}
+.swr-dot{width:6px;height:6px;border-radius:50%;background:rgba(184,90,0,.15);transition:background .3s}
+.swr-dot.lit{background:#b85a00}
+
+/* PRACTICE — col 1, row 2 */
+.tool-card-practice{
+  grid-column:1;
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--surface) 100%);
+}
+[data-theme="ink"] .tool-card-practice{background:linear-gradient(135deg,#202024,#252528)}
+
+/* FORMULA */
+.tool-card-formulas{
+  background:linear-gradient(135deg,var(--accent-light) 0%,var(--surface) 100%);
+  border-color:var(--accent-mid);
+}
+
+/* PATH — full width */
+.tool-card-path{
+  grid-column:1/4;
+  flex-direction:row;align-items:center;gap:1.25rem;
+  padding:1.1rem 1.5rem;
+}
+.path-bar-wrap{flex:1}
+.path-bar-track{height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-top:.35rem}
+.path-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),rgba(100,200,80,.7));border-radius:2px;transition:width 1.1s ease}
+.path-label-row{display:flex;justify-content:space-between;align-items:baseline}
+
+/* LESSONS — col 1-2 in last row */
+.tool-card-lessons{grid-column:1/3}
+
+/* Card content */
+.tc-icon{font-size:1.75rem;line-height:1;margin-bottom:.05rem}
+.tc-title{font-family:'DM Serif Display',serif;font-size:1rem;letter-spacing:-.01em;color:var(--text);line-height:1.2}
+.tc-sub{font-size:.78rem;color:var(--text2);line-height:1.6;flex:1}
+.tc-cta{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:.3rem;margin-top:.15rem;transition:gap .2s}
+.tool-card:hover .tc-cta{gap:.5rem}
+
+/* BADGES SECTION */
+.dash-badges-section{max-width:900px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.dash-section-label{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem}
+.badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.badge-pill{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.4rem .9rem;border-radius:99px;
+  border:1.5px solid var(--border);background:var(--bg2);
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);transition:all .25s;cursor:default;
+}
+.badge-pill.earned{
+  border-color:var(--accent-mid);background:var(--accent-light);
+  color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-light);
+}
+.badge-pill.earned.new-badge{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.badge-emoji{font-size:.85rem}
+
+/* MODAL OVERLAY for sub-screens inside dashboard */
+.dash-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:none;align-items:flex-start;justify-content:center;
+  overflow-y:auto;padding:1.5rem;backdrop-filter:blur(6px);
+}
+.dash-modal.open{display:flex}
+.dash-modal-box{
+  background:var(--bg);border:1.5px solid var(--border);
+  width:100%;max-width:680px;border-radius:12px;
+  margin:auto;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+.dmb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.dmb-title{font-family:'DM Serif Display',serif;font-size:1.25rem;letter-spacing:-.02em;color:var(--text)}
+.dmb-close{background:none;border:none;font-size:1.25rem;color:var(--text3);cursor:pointer;padding:.25rem;line-height:1;border-radius:4px;transition:color .2s}
+.dmb-close:hover{color:var(--text)}
+.dmb-body{padding:1.5rem}
+
+/* settings inside modal */
+.setting-row2{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid var(--border);gap:1rem}
+.setting-row2:last-child{border-bottom:none}
+.setting-name2{font-size:.88rem;color:var(--text);margin-bottom:.12rem;font-weight:400}
+.setting-val2{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.04em;color:var(--text3)}
+.setting-btn2{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.32rem .7rem;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;border-radius:4px;flex-shrink:0}
+.setting-btn2:hover{border-color:var(--accent);color:var(--accent)}
+.setting-btn2.danger:hover{border-color:var(--red);color:var(--red)}
+.settings-sub2{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.settings-sub2.open{max-height:300px;padding:.75rem 0 .25rem}
+
+/* Practice modal */
+.prac-level-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.prac-lvl-btn{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:.32rem .7rem;background:none;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s;border-radius:4px}
+.prac-lvl-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.prac-lvl-btn:hover:not(.active){border-color:var(--text3);color:var(--text)}
+.prac-q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1rem}
+.prac-q-text{font-size:1rem;color:var(--text);line-height:1.55;margin-bottom:1rem;font-weight:400}
+.prac-stats-row{display:flex;gap:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+.pstat{display:flex;flex-direction:column;gap:.12rem}
+.pstat-label{font-family:'DM Mono',monospace;font-size:.70rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.pstat-val{font-family:'DM Serif Display',serif;font-size:1.2rem;letter-spacing:-.02em;color:var(--text)}
+.pstat-val.green{color:var(--accent)}
+
+/* Flashcard modal */
+.fc-card-outer{perspective:700px;cursor:pointer;margin-bottom:1rem}
+.fc-card-inner{width:100%;min-height:180px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.2,.2,1)}
+.fc-card-inner.flipped{transform:rotateY(180deg)}
+.fc-face2{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 2rem;text-align:center;border:1.5px solid var(--border);border-radius:8px;background:var(--surface)}
+.fc-back2{transform:rotateY(180deg);background:var(--accent-light);border-color:var(--accent-mid)}
+.fc-face-label{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem}
+.fc-back2 .fc-face-label{color:var(--accent)}
+.fc-face-content{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text);line-height:1.4;letter-spacing:-.01em}
+.fc-back2 .fc-face-content{font-family:'DM Mono',monospace;font-size:.84rem;line-height:1.65;color:var(--text2)}
+.fc-tap-hint{font-size:.75rem;color:var(--text3);margin-top:.4rem}
+.fc-nav-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.fc-nav-btn2{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .85rem;background:none;border:1.5px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;border-radius:4px}
+.fc-nav-btn2:hover{border-color:var(--accent);color:var(--accent)}
+.fc-counter2{font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.08em;color:var(--text3)}
+.fc-rate-row{display:flex;gap:.5rem;justify-content:center;margin-top:.85rem}
+.fc-rate2{padding:.38rem .9rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--border);background:none;cursor:pointer;transition:all .2s;border-radius:4px}
+.fc-rate2.easy{color:var(--accent);border-color:var(--accent-mid)}
+.fc-rate2.easy:hover{background:var(--accent-light)}
+.fc-rate2.hard{color:var(--red);border-color:rgba(192,57,43,.3)}
+.fc-rate2.hard:hover{background:var(--red-light)}
+
+/* Formula modal */
+.formula-search2{width:100%;padding:.6rem .85rem;background:var(--bg);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;border-radius:6px;margin-bottom:1.25rem;transition:border-color .2s}
+.formula-search2:focus{border-color:var(--accent)}
+.formula-level-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.flvl-btn{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .65rem;background:none;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all .2s;border-radius:4px}
+.flvl-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.formula-cat2{margin-bottom:1.5rem}
+.fcat-title{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-bottom:.6rem}
+.fitem{display:flex;align-items:flex-start;gap:.85rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.fitem:last-child{border-bottom:none}
+.fitem-math{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--text);background:var(--bg);border:1px solid var(--border);padding:.22rem .5rem;flex-shrink:0;white-space:nowrap;border-radius:4px}
+.fitem-name{font-size:.82rem;color:var(--text2);line-height:1.55;flex:1}
+
+/* Weak spots modal */
+.ws-item2{margin-bottom:.85rem}
+.ws-top2{display:flex;justify-content:space-between;font-size:.86rem;color:var(--text);margin-bottom:.25rem}
+.ws-count2{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text3)}
+.ws-bar-bg2{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.ws-bar-fill2{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* Timer modal */
+.timer-face2{text-align:center;padding:1.5rem 0 1rem}
+.timer-digits2{font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,8vw,4rem);letter-spacing:-.04em;color:var(--text);line-height:1;transition:color .3s}
+.timer-digits2.running{color:var(--accent)}
+.timer-status2{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:.4rem}
+.timer-btns2{display:flex;gap:.6rem;justify-content:center;margin-bottom:1.5rem}
+.timer-log-item{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--text2)}
+.timer-log-dur2{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--accent)}
+
+/* Notes modal */
+.notes-area2{width:100%;min-height:280px;padding:1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;line-height:1.75;outline:none;resize:vertical;transition:border-color .2s}
+.notes-area2:focus{border-color:var(--accent)}
+.notes-footer2{display:flex;justify-content:space-between;align-items:center;margin-top:.4rem}
+.notes-saved2{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);opacity:0;transition:opacity .3s}
+.notes-saved2.show{opacity:1}
+
+/* Path section inline */
+.path-stages{display:flex;flex-direction:column;gap:0}
+.ps-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.ps-item:last-child{border-bottom:none}
+.ps-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0;margin-top:2px}
+.ps-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.ps-dot.current{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-light)}
+.ps-name{font-size:.9rem;color:var(--text);font-weight:400;margin-bottom:.15rem}
+.ps-name.current-level{color:var(--accent);font-weight:500}
+.ps-desc{font-size:.79rem;color:var(--text2);line-height:1.6}
+.ps-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border:1px solid var(--border);color:var(--text3);border-radius:3px;margin-right:.3rem;margin-top:.3rem}
+.ps-tag.here{color:var(--accent);border-color:var(--accent-mid);background:var(--accent-light)}
+
+/* ══════════════════════════════════════════════════
+   DAILY QUIZ — complete redesign
+══════════════════════════════════════════════════ */
+#s-daily{background:var(--bg);min-height:100vh}
+.daily-shell{
+  max-width:680px;margin:0 auto;
+  padding:2rem 2rem 5rem;
+}
+
+/* Top nav row */
+.dq-topnav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2rem;
+}
+.dq-back-btn{
+  display:flex;align-items:center;gap:.4rem;
+  background:none;border:none;
+  font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);cursor:pointer;padding:0;transition:color .2s;
+}
+.dq-back-btn:hover{color:var(--accent)}
+.dq-progress-info{
+  font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text3);
+}
+
+/* Progress bar */
+.dq-progress-bar{
+  height:3px;background:var(--bg2);border-radius:2px;overflow:hidden;
+  margin-bottom:2.5rem;
+}
+.dq-progress-fill{
+  height:100%;background:var(--accent);border-radius:2px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Level pill */
+.dq-level-pill{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-mid);background:var(--accent-light);
+  padding:.22rem .65rem;border-radius:3px;margin-bottom:1.25rem;
+}
+
+/* Question text */
+.dq-question{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.25rem,3vw,1.7rem);
+  letter-spacing:-.02em;color:var(--text);line-height:1.4;
+  margin-bottom:1.75rem;
+}
+
+/* Answer options */
+.dq-options{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.dq-opt{
+  display:flex;align-items:center;gap:.85rem;
+  padding:.9rem 1.1rem;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;text-align:left;
+  transition:border-color .15s, background .15s, transform .1s;
+  width:100%;
+}
+.dq-opt:hover:not(.dq-disabled){
+  border-color:var(--accent);
+  background:var(--accent-light);
+  transform:translateX(2px);
+}
+.dq-opt.dq-correct{
+  border-color:var(--accent)!important;
+  background:var(--accent-light)!important;
+}
+.dq-opt.dq-wrong{
+  border-color:var(--red)!important;
+  background:var(--red-light)!important;
+}
+.dq-opt.dq-disabled{cursor:default;pointer-events:none}
+.dq-opt-letter{
+  font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.04em;
+  color:var(--text3);flex-shrink:0;
+  width:22px;height:22px;border:1px solid var(--border);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.dq-opt:hover:not(.dq-disabled) .dq-opt-letter{border-color:var(--accent);color:var(--accent)}
+.dq-opt.dq-correct .dq-opt-letter{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.dq-opt.dq-wrong .dq-opt-letter{border-color:var(--red);color:var(--red)}
+.dq-opt-text{font-size:.9rem;color:var(--text);line-height:1.4;flex:1}
+
+/* Hint */
+.dq-hint-row{margin-bottom:1.25rem}
+.dq-hint-toggle{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:none;border:none;padding:0;
+  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold,#92700a);cursor:pointer;transition:opacity .2s;
+}
+.dq-hint-toggle:hover{opacity:.7}
+.dq-hint-content{
+  display:none;
+  margin-top:.65rem;
+  background:rgba(146,112,10,.07);
+  border:1px solid rgba(146,112,10,.2);
+  border-left:3px solid var(--gold,#92700a);
+  border-radius:0 6px 6px 0;
+  padding:.85rem 1rem;
+  font-size:.86rem;color:var(--text2);line-height:1.7;
+  animation:fadeUp .25s ease;
+}
+.dq-hint-content.show{display:block}
+
+/* Solution panel */
+.dq-solution-panel{
+  display:none;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:1.25rem;
+  animation:fadeUp .3s ease;
+}
+.dq-solution-panel.show{display:block}
+.dq-solution-panel.dq-sol-wrong{border-color:rgba(192,57,43,.3)}
+
+.dq-sol-header{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.85rem 1.1rem;
+  border-bottom:1px solid var(--border);
+}
+.dq-sol-verdict{
+  font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:500;
+}
+.dq-sol-verdict.right{color:var(--accent)}
+.dq-sol-verdict.wrong{color:var(--red)}
+
+.dq-sol-body{padding:1.1rem 1.1rem .85rem}
+.dq-sol-explanation{font-size:.88rem;color:var(--text2);line-height:1.8;margin-bottom:.85rem}
+.dq-sol-steps-wrap{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.75rem 1rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  margin-bottom:.85rem;
+}
+.dq-sol-step{
+  font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);line-height:1.55;
+  display:flex;align-items:baseline;gap:.6rem;
+}
+.dq-sol-step-num{
+  font-size:.70rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);flex-shrink:0;padding-top:.05rem;
+}
+
+/* Resources inside solution */
+.dq-resources{
+  border-top:1px solid var(--border);
+  padding:.85rem 1.1rem;
+  display:flex;flex-direction:column;gap:.5rem;
+}
+.dq-resources-label{
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:.3rem;
+}
+.dq-resource-link{
+  display:flex;align-items:center;gap:.6rem;
+  text-decoration:none;
+  padding:.5rem .75rem;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:var(--bg);
+  transition:border-color .15s, background .15s;
+}
+.dq-resource-link:hover{border-color:var(--accent);background:var(--accent-light)}
+.dq-resource-type{
+  font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);border:1px solid var(--border);padding:.1rem .4rem;border-radius:2px;flex-shrink:0;
+}
+.dq-resource-name{font-size:.82rem;color:var(--text2);flex:1}
+.dq-resource-arrow{font-size:.7rem;color:var(--accent);flex-shrink:0}
+
+/* Next button */
+.dq-next-btn{
+  width:100%;padding:.85rem;
+  background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:8px;
+  transition:opacity .2s, transform .15s;
+}
+.dq-next-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ══════════════════════════════════════════════════
+   DAILY DONE — results screen
+══════════════════════════════════════════════════ */
+#s-daily-done{background:var(--bg);min-height:100vh}
+.done-shell{
+  max-width:600px;margin:0 auto;
+  padding:3rem 2rem 5rem;
+}
+.done-score-row{
+  display:flex;align-items:flex-end;gap:1rem;margin-bottom:.5rem;
+}
+.done-score-big{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(3rem,8vw,5rem);
+  letter-spacing:-.05em;color:var(--text);line-height:1;
+}
+.done-score-denom{
+  font-family:'DM Serif Display',serif;
+  font-size:1.75rem;color:var(--text3);letter-spacing:-.02em;
+  padding-bottom:.4rem;
+}
+.done-label{
+  font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:.4rem;
+}
+.done-headline{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.5rem,3vw,2.2rem);
+  letter-spacing:-.03em;color:var(--text);line-height:1.15;
+  margin-bottom:.4rem;
+}
+.done-sub{font-size:.9rem;color:var(--text2);line-height:1.7;margin-bottom:1.75rem}
+
+/* Streak badge */
+.done-streak-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+  border:1.5px solid rgba(200,100,0,.3);background:rgba(200,100,0,.06);
+  color:#c06000;padding:.4rem .9rem;border-radius:4px;
+  margin-bottom:2rem;
+}
+
+/* Question breakdown dots */
+.done-breakdown{
+  display:flex;gap:.5rem;margin-bottom:2rem;
+}
+.done-q{
+  flex:1;height:6px;border-radius:3px;
+  background:var(--bg2);overflow:hidden;
+  position:relative;
+}
+.done-q::after{
+  content:'';position:absolute;inset:0;border-radius:3px;
+  transition:background .4s;
+}
+.done-q.passed::after{background:var(--accent)}
+.done-q.failed::after{background:var(--red)}
+
+/* Review list */
+.done-review{
+  display:flex;flex-direction:column;gap:.65rem;margin-bottom:2rem;
+}
+.done-review-item{
+  display:flex;align-items:flex-start;gap:.85rem;
+  padding:.85rem 1rem;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+}
+.done-review-num{
+  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.06em;
+  color:var(--text3);flex-shrink:0;padding-top:.1rem;
+}
+.done-review-q{font-size:.84rem;color:var(--text);line-height:1.45;flex:1}
+.done-review-icon{font-size:.9rem;flex-shrink:0}
+
+/* Actions */
+.done-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.done-btn-primary{
+  padding:.75rem 1.5rem;background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:opacity .2s;
+}
+.done-btn-primary:hover{opacity:.85}
+.done-btn-ghost{
+  padding:.75rem 1.2rem;background:none;border:1.5px solid var(--border);
+  color:var(--text2);font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;transition:all .2s;
+}
+.done-btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Resources section at bottom of done screen */
+.done-resources-section{margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border)}
+.done-resources-title{
+  font-family:'DM Serif Display',serif;font-size:1.1rem;letter-spacing:-.01em;
+  color:var(--text);margin-bottom:.35rem;
+}
+.done-resources-sub{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:1.25rem}
+.done-resource-grid{display:flex;flex-direction:column;gap:.6rem}
+.done-resource-card{
+  display:flex;align-items:center;gap:1rem;
+  padding:.85rem 1rem;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface);text-decoration:none;
+  transition:border-color .15s, transform .15s;
+}
+.done-resource-card:hover{border-color:var(--accent);transform:translateX(3px)}
+.done-resource-icon{font-size:1.25rem;flex-shrink:0}
+.done-resource-info{flex:1}
+.done-resource-name{font-size:.88rem;color:var(--text);font-weight:400;margin-bottom:.1rem}
+.done-resource-desc{font-size:.75rem;color:var(--text3)}
+.done-resource-cta{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);flex-shrink:0}
+
+/* ── MOBILE ── */
+@media(max-width:680px){
+  nav{padding:.9rem 1.25rem}
+  .land-hero-inner{grid-template-columns:1fr;gap:2rem;padding:4rem 1.5rem 3rem}
+  .land-preview{display:none}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .steps-list{grid-template-columns:1fr}
+  .land-features{padding:4rem 1.5rem}
+  .land-how{padding:3.5rem 1.5rem}
+  .land-foot{padding:2rem 1.5rem;flex-direction:column;align-items:flex-start}
+  #s-diagnostic{padding:2.5rem 1.25rem 4rem}
+  .result-hero{padding:2rem 1.25rem;flex-direction:column}
+  .schedule-widget{width:100%}
+  .projection-box{margin:0 1.25rem 1.5rem}
+  .journey-section{padding:1.5rem 1.25rem 4rem}
+  .daily-wrap{padding:2.5rem 1.25rem 4rem}
+  .done-wrap{padding:3.5rem 1.25rem}
+  .done-breakdown{grid-template-columns:repeat(5,1fr)}
+  /* Dashboard mobile — stack to single column */
+  .dash-layout{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .dash-aside{display:none}
+  .dash-main{padding:1.25rem 1rem 3rem}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .tool-card-quiz{grid-column:1/-1;flex-direction:column;gap:1rem}
+  .tool-card-streak{grid-column:1/-1;grid-row:auto}
+  .tool-card-path{grid-column:1/-1}
+  .tool-card-lessons{grid-column:1/-1}
+  .daily-shell{padding:1.25rem 1rem 3rem}
+  .done-shell{padding:2rem 1rem 3rem}
+}
+@media(min-width:681px) and (max-width:1024px){
+  .dash-layout{grid-template-columns:200px 1fr}
+  .dash-aside{display:none}
+  .dash-main{padding:1.5rem 1.25rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" onclick="handleLogoClick()">Sc<em>alar</em></a>
+  <div class="nav-right">
+    <div id="nav-auth-area">
+      <button class="nav-btn" onclick="openModal('login')">Log In</button>
+      <button class="nav-btn primary" onclick="openModal('register')">Get Started</button>
+    </div>
+    <div id="nav-user-area" style="display:none">
+      <span class="nav-user-tag" id="nav-user-tag">—</span>
+      <button class="nav-btn" onclick="signOut()">Sign Out</button>
+    </div>
+    <div class="theme-wrap">
+      <button class="theme-toggle" onclick="toggleThemeDrop(this)">Theme ▾</button>
+      <div class="theme-drop" id="theme-drop">
+        <button class="theme-opt active" onclick="setTheme('',this)"><div class="t-dot" style="background:#2d5a27"></div>Forest</button>
+        <button class="theme-opt" onclick="setTheme('slate',this)"><div class="t-dot" style="background:#1a56db"></div>Slate</button>
+        <button class="theme-opt" onclick="setTheme('sand',this)"><div class="t-dot" style="background:#b45309"></div>Sand</button>
+        <button class="theme-opt" onclick="setTheme('ink',this)"><div class="t-dot" style="background:#a8c5a0"></div>Ink</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Create Account</div>
+    <div class="modal-sub" id="modal-sub">Join free. No credit card. Start learning today.</div>
+    <input type="email" id="auth-email" placeholder="Email address" autocomplete="email"/>
+    <input type="password" id="auth-password" placeholder="Password" autocomplete="current-password"/>
+    <div class="modal-err" id="auth-err"></div>
+    <button class="modal-btn" id="auth-submit-btn" onclick="submitAuth()">Create Account</button>
+    <div class="modal-switch" id="modal-switch">Already have an account? <span onclick="toggleAuthMode()">Log in</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     LANDING
+══════════════════════════════════ -->
+<div class="screen active" id="s-landing">
+
+  <!-- HERO -->
+  <div class="land-hero">
+    <div class="land-orb land-orb-1"></div>
+    <div class="land-orb land-orb-2"></div>
+    <div class="land-grid"></div>
+    <canvas class="land-canvas" id="land-canvas"></canvas>
+    <div class="land-hero-inner">
+      <div class="land-hero-left">
+        <div class="land-eyebrow">Free · Adaptive · Built by a student, for students</div>
+        <h1 class="land-h1">Your math level<br/>shouldn't be<br/><em>decided for you.</em></h1>
+        <p class="land-sub">Take a 10-question diagnostic. Get placed at your exact level. Follow a clear path all the way to Calculus II and beyond — with interactive lessons, daily quizzes, and real explanations.</p>
+        <div class="land-btns">
+          <button class="land-cta" onclick="openModal('register')">Get Started Free →</button>
+          <button class="land-ghost" onclick="openModal('login')">Log In</button>
+        </div>
+        <div class="land-stats-row">
+          <div class="land-stat-item"><div class="land-stat-num">7</div><div class="land-stat-label">Levels</div></div>
+          <div class="land-stat-item"><div class="land-stat-num">350+</div><div class="land-stat-label">Questions</div></div>
+          <div class="land-stat-item"><div class="land-stat-num" style="font-size:1.3rem;letter-spacing:-.02em">None</div><div class="land-stat-label">Prerequisites</div></div>
+          <div class="land-stat-item"><div class="land-stat-num">Free</div><div class="land-stat-label">Always</div></div>
+        </div>
+      </div>
+      <div class="land-preview">
+        <div class="preview-window">
+          <div class="preview-bar">
+            <div class="preview-dot preview-dot-r"></div>
+            <div class="preview-dot preview-dot-y"></div>
+            <div class="preview-dot preview-dot-g"></div>
+          </div>
+          <div class="preview-body">
+            <div class="preview-q">If f(x) = 3x² − 2x + 1, what is f'(x)?</div>
+            <div class="preview-opts">
+              <div class="preview-opt correct-ans"><span>A</span>6x − 2 ✓</div>
+              <div class="preview-opt"><span>B</span>3x − 2</div>
+              <div class="preview-opt"><span>C</span>6x²</div>
+              <div class="preview-opt"><span>D</span>6x + 1</div>
+            </div>
+            <div class="preview-solve">
+              <div class="preview-solve-label">✓ Correct — Here's why</div>
+              <div class="preview-solve-text">Power rule: d/dx[3x²] = 6x, d/dx[−2x] = −2, d/dx[1] = 0. So f'(x) = 6x − 2.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="land-features">
+    <div class="land-features-eyebrow">Everything you need</div>
+    <div class="land-features-h2">Built to actually help you learn,<br/>not just test you.</div>
+    <div class="land-features-sub">Every question comes with a full worked solution. Every wrong answer tells you exactly why. Practice as much as you want, at your own pace.</div>
+    <div class="features-grid">
+      <div class="feat-card"><div class="feat-icon">🎯</div><div class="feat-name">Adaptive Diagnostic</div><div class="feat-desc">10 questions that zero in on exactly where you are — from arithmetic to calculus. No guessing.</div></div>
+      <div class="feat-card"><div class="feat-icon">💡</div><div class="feat-name">Worked Solutions</div><div class="feat-desc">Every question shows a full step-by-step solution after you answer. You always leave knowing why.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔥</div><div class="feat-name">Daily Streak Quiz</div><div class="feat-desc">5 questions every day at your level. Build a streak, build a habit. Miss three, start again.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-name">Practice Mode</div><div class="feat-desc">Unlimited questions by level and topic. Pick what you're weak on and drill it until it clicks.</div></div>
+      <div class="feat-card"><div class="feat-icon">📋</div><div class="feat-name">Formula Cheat Sheet</div><div class="feat-desc">Every formula you need, organized by level and searchable. Your reference sheet for every session.</div></div>
+      <div class="feat-card"><div class="feat-icon">🃏</div><div class="feat-name">Flashcard Review</div><div class="feat-desc">Flip through concept cards to lock in definitions, theorems, and rules. Rate what you know.</div></div>
+      <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-name">Weak Spot Tracker</div><div class="feat-desc">Every wrong answer logs the topic. See your patterns, know exactly what to study next.</div></div>
+      <div class="feat-card"><div class="feat-icon">🗺️</div><div class="feat-name">Full Learning Path</div><div class="feat-desc">A clear map from where you are to Calculus II — with resources, timelines, and milestones.</div></div>
+      <div class="feat-card"><div class="feat-icon">⏱️</div><div class="feat-name">Study Timer</div><div class="feat-desc">Time your sessions. Track your weekly hours. Consistency is the whole game.</div></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="land-how">
+    <div class="land-how-inner">
+      <h2>Three steps, then you're learning.</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">Step 01</div>
+          <div class="step-title">Take the diagnostic</div>
+          <div class="step-body">10 adaptive questions across all levels find your exact starting point. Takes about 5 minutes. No account needed to start.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">Step 02</div>
+          <div class="step-title">See your path</div>
+          <div class="step-body">Your result shows exactly what level you're at, what resources to use, and a realistic timeline to reach every level above you.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">Step 03</div>
+          <div class="step-title">Show up daily</div>
+          <div class="step-body">5 questions a day at your level. Streak system keeps you consistent. Worked solutions make every session a real learning moment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="land-foot">
+    <div class="land-foot-logo">Sc<em>alar</em></div>
+    <div class="land-foot-text">Free forever · No ads · No credit card</div>
+    <button class="land-cta" style="padding:.7rem 1.4rem;font-size:.6rem" onclick="openModal('register')">Get Started Free →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DIAGNOSTIC
+══════════════════════════════════ -->
+<div class="screen" id="s-diagnostic">
+  <div id="s-diagnostic-inner" style="max-width:700px;margin:0 auto;padding:4rem 2.5rem 5rem">
+    <div class="progress-wrap">
+      <div class="prog-top">
+        <span class="prog-label" id="prog-label">Question 1 of 10</span>
+        <span class="prog-level" id="prog-level">Algebra</span>
+      </div>
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div class="diag-hint-wrap">
+      <button class="hint-btn" onclick="toggleDiagHint()">💡 <span>Show hint</span></button>
+      <div class="hint-box" id="diag-hint-box"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="solution-box" id="solution-box">
+      <div class="sol-verdict" id="sol-verdict"></div>
+      <div class="sol-explanation" id="sol-explanation"></div>
+      <div class="sol-steps" id="sol-steps"></div>
+      <button class="sol-next-btn" onclick="advanceDiagnostic()">Next Question →</button>
+    </div>
+    <div class="skip-row">
+      <button class="skip-btn" onclick="skipOne()">Skip Question</button>
+      <button class="skip-btn" onclick="skipAll()">Browse Resources →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     RESULT
+══════════════════════════════════ -->
+<div class="screen" id="s-result">
+  <div class="retake-banner" id="retake-banner">
+    <span class="retake-text">Viewing saved results — <strong id="retake-email"></strong></span>
+    <button class="retake-btn" onclick="startFresh()">Retake Diagnostic →</button>
+  </div>
+  <div class="result-hero">
+    <div class="result-hero-left">
+      <div class="r-eyebrow">Your Diagnostic Result</div>
+      <div class="r-level" id="r-level"></div>
+      <div class="r-score" id="r-score"></div>
+      <div class="r-desc" id="r-desc"></div>
+      <div class="r-action-row">
+        <button class="r-cta" onclick="openModal('register')" id="r-register-btn">Create Account →</button>
+        <button class="r-ghost" onclick="openModal('login')">Log In</button>
+        <button class="r-ghost" id="r-dashboard-btn" style="display:none" onclick="showDashboard()">Go to Dashboard →</button>
+      </div>
+    </div>
+    <div class="schedule-widget">
+      <div class="sw-title" onclick="toggleSchedule()"><span>Plan Your Schedule</span><span id="sw-arrow">▾</span></div>
+      <div class="sw-body" id="sw-body">
+        <div class="sw-field"><label>Start Date</label><input type="date" id="sw-start" oninput="calcSchedule()"/></div>
+        <div class="sw-field"><label>Study Days</label>
+          <div class="days-grid">
+            <button class="day-btn" data-d="0" onclick="toggleDay(this)">Su</button>
+            <button class="day-btn sel" data-d="1" onclick="toggleDay(this)">Mo</button>
+            <button class="day-btn sel" data-d="2" onclick="toggleDay(this)">Tu</button>
+            <button class="day-btn sel" data-d="3" onclick="toggleDay(this)">We</button>
+            <button class="day-btn sel" data-d="4" onclick="toggleDay(this)">Th</button>
+            <button class="day-btn" data-d="5" onclick="toggleDay(this)">Fr</button>
+            <button class="day-btn" data-d="6" onclick="toggleDay(this)">Sa</button>
+          </div>
+        </div>
+        <div class="sw-field"><label>Hours per Session</label>
+          <select id="sw-hours" onchange="calcSchedule()">
+            <option value="0.5">30 minutes</option>
+            <option value="1" selected>1 hour</option>
+            <option value="1.5">1.5 hours</option>
+            <option value="2">2 hours</option>
+            <option value="3">3 hours</option>
+          </select>
+        </div>
+        <div class="sw-result" id="sw-result" style="display:none">
+          <div class="sw-result-item"><span>Hours / Week</span><span id="sw-hrs-week">—</span></div>
+          <div class="sw-result-item"><span>Next Level</span><span id="sw-next">—</span></div>
+          <div class="sw-result-item"><span>Calculus Ready</span><span id="sw-calc">—</span></div>
+          <div class="sw-result-item"><span>Full Mastery</span><span id="sw-mit">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="projection-box" id="proj-box"></div>
+  <div class="journey-section"><p class="section-label">Your Full Path — Resources & Timeline</p><div id="journey-track"></div></div>
+</div>
+
+<!-- ══════════════════════════════════
+     DASHBOARD
+══════════════════════════════════ -->
+<div class="screen" id="s-dashboard">
+
+  <!-- TOPBAR -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <div class="dash-level-chip" id="tb-level-chip">⬡ Early Algebra</div>
+      <div class="dash-streak-chip" id="tb-streak-chip">🔥 0 days</div>
+    </div>
+    <div class="dash-topbar-xp">
+      <div class="dash-topbar-xp-label" id="tb-xp-label">0 XP</div>
+      <div class="dash-topbar-xp-track"><div class="dash-topbar-xp-fill" id="tb-xp-fill" style="width:0%"></div></div>
+    </div>
+    <button class="setting-btn2" onclick="openDashModal('modal-settings')" title="Settings">⚙️ Settings</button>
+  </div>
+
+  <!-- THREE COLUMN LAYOUT -->
+  <div class="dash-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="dash-sidebar">
+      <div class="dash-level-card">
+        <div class="dash-level-card-label">Current Level</div>
+        <div class="dash-level-card-name" id="sb-level-name">Early Algebra</div>
+        <div class="dash-level-bar"><div class="dash-level-bar-fill" id="sb-level-fill" style="width:14%"></div></div>
+      </div>
+      <div class="dash-sidebar-section">
+        <div class="dash-sidebar-label">Practice</div>
+        <button class="dash-sidebar-item" onclick="startDailyQuiz()"><span class="dash-sidebar-icon">🎯</span> Daily Quiz</button>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-practice')"><span class="dash-sidebar-icon">⚡</span> Practice Mode</button>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-flashcards')"><span class="dash-sidebar-icon">🃏</span> Flashcards</button>
+      </div>
+      <div class="dash-sidebar-section">
+        <div class="dash-sidebar-label">Reference</div>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-formulas')"><span class="dash-sidebar-icon">📋</span> Formula Sheet</button>
+        <button class="dash-sidebar-item" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()"><span class="dash-sidebar-icon">📚</span> Lessons</button>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-notes')"><span class="dash-sidebar-icon">📝</span> My Notes</button>
+      </div>
+      <div class="dash-sidebar-section">
+        <div class="dash-sidebar-label">Track</div>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-weakspots')"><span class="dash-sidebar-icon">🎯</span> Weak Spots</button>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-path')"><span class="dash-sidebar-icon">🗺️</span> Learning Path</button>
+        <button class="dash-sidebar-item" onclick="openDashModal('modal-timer')"><span class="dash-sidebar-icon">⏱️</span> Study Timer</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="dash-main">
+      <div class="dash-greet-section">
+        <div class="dash-greet-text" id="dash-greet">Good morning 👋</div>
+        <div class="dash-greet-sub" id="dash-greet-sub">Keep showing up. Every quiz counts.</div>
+      </div>
+      <div class="dash-week-strip" id="dash-week-strip"></div>
+
+  <!-- MAIN GRID -->
+  <div class="dash-grid">
+
+    <!-- DAILY QUIZ — hero, col 1-2 -->
+    <div class="tool-card tool-card-quiz" id="quiz-card-wrap">
+      <div class="quiz-card-emoji" id="quiz-emoji">🎯</div>
+      <div class="quiz-card-body">
+        <div class="quiz-card-title" id="quiz-card-title">Today's Quiz</div>
+        <div class="quiz-card-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak alive. Every wrong answer shows you why.</div>
+        <button class="quiz-card-btn" id="quiz-start-btn" onclick="startDailyQuiz()">Let's go →</button>
+      </div>
+    </div>
+
+    <!-- STREAK — tall right col, rows 1-2 -->
+    <div class="tool-card tool-card-streak">
+      <div class="tc-icon" style="font-size:1.3rem">🔥</div>
+      <div class="streak-big" id="streak-big-num">0</div>
+      <div class="streak-label">day streak</div>
+      <div class="streak-week-row" id="swr-dots">
+        <div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div>
+        <div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div><div class="swr-dot"></div>
+      </div>
+      <div class="tc-sub" id="streak-card-sub" style="margin-top:auto;padding-top:.75rem">Complete today's quiz to keep it going!</div>
+    </div>
+
+    <!-- PRACTICE — col 1, row 2 -->
+    <div class="tool-card tool-card-practice" onclick="openDashModal('modal-practice')">
+      <div class="tc-icon">⚡</div>
+      <div class="tc-title">Practice Mode</div>
+      <div class="tc-sub">Unlimited questions at any level. No streak pressure.</div>
+      <div class="tc-cta">Open practice →</div>
+    </div>
+
+    <!-- FLASHCARDS — col 2, row 2 -->
+    <div class="tool-card" onclick="openDashModal('modal-flashcards')">
+      <div class="tc-icon">🃏</div>
+      <div class="tc-title">Flashcards</div>
+      <div class="tc-sub">Flip through key concepts and formulas. Rate what you know.</div>
+      <div class="tc-cta">Flip cards →</div>
+    </div>
+
+    <!-- PATH — full width -->
+    <div class="tool-card tool-card-path" onclick="openDashModal('modal-path')">
+      <div class="tc-icon" style="font-size:1.3rem;flex-shrink:0">🗺️</div>
+      <div class="path-bar-wrap">
+        <div class="path-label-row">
+          <div class="tc-title">Your Learning Path</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)" id="path-progress-inline">Level 1 of 7 →</div>
+        </div>
+        <div class="path-bar-track">
+          <div id="path-mini-fill" class="path-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULA SHEET -->
+    <div class="tool-card tool-card-formulas" onclick="openDashModal('modal-formulas')">
+      <div class="tc-icon">📋</div>
+      <div class="tc-title">Formula Sheet</div>
+      <div class="tc-sub">Every formula, searchable and organized by level.</div>
+      <div class="tc-cta">Open sheet →</div>
+    </div>
+
+    <!-- WEAK SPOTS -->
+    <div class="tool-card" onclick="openDashModal('modal-weakspots')">
+      <div class="tc-icon">🎯</div>
+      <div class="tc-title">Weak Spots</div>
+      <div class="tc-sub" id="ws-card-sub">Topics you've missed. Fix these first.</div>
+      <div class="tc-cta">See weak spots →</div>
+    </div>
+
+    <!-- TIMER -->
+    <div class="tool-card" onclick="openDashModal('modal-timer')">
+      <div class="tc-icon">⏱️</div>
+      <div class="tc-title">Study Timer</div>
+      <div class="tc-sub">Track your sessions and weekly hours.</div>
+      <div class="tc-cta" id="timer-card-total">0h 0m this week →</div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="tool-card" onclick="openDashModal('modal-notes')">
+      <div class="tc-icon">📝</div>
+      <div class="tc-title">My Notes</div>
+      <div class="tc-sub">Personal notebook. Auto-saves per level.</div>
+      <div class="tc-cta">Open notes →</div>
+    </div>
+
+    <!-- LESSONS — col 1-2 -->
+    <div class="tool-card tool-card-lessons" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
+      <div class="tc-icon">📚</div>
+      <div class="tc-title">Lessons</div>
+      <div class="tc-sub">Step-by-step walkthroughs for every topic. Opens with your current theme.</div>
+      <div class="tc-cta">Open lessons ↗</div>
+    </div>
+
+  </div><!-- /dash-grid -->
+
+      <!-- BADGES -->
+      <div class="dash-badges-section" style="margin-top:1.5rem">
+        <div class="dash-section-label">Your Badges</div>
+        <div class="badges-row" id="dash-badges-row"></div>
+      </div>
+
+    </div><!-- /dash-main -->
+
+    <!-- RIGHT ASIDE -->
+    <div class="dash-aside">
+      <div>
+        <div class="dash-aside-label">This Week</div>
+        <div class="dash-week-mini" id="dash-week-aside"></div>
+      </div>
+      <div>
+        <div class="dash-aside-label">Stats</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <div class="dash-aside-stat">
+            <div class="dash-aside-stat-val" id="aside-streak-num">0</div>
+            <div class="dash-aside-stat-label">Day Streak</div>
+          </div>
+          <div class="dash-aside-stat">
+            <div class="dash-aside-stat-val" id="aside-level-num">1</div>
+            <div class="dash-aside-stat-label">Current Level</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="dash-aside-label">Resources</div>
+        <div class="dash-aside-resource" id="aside-resources"></div>
+      </div>
+    </div><!-- /dash-aside -->
+
+  </div><!-- /dash-layout -->
+
+  <!-- ── MODALS ────────────────────────────────────── -->
+
+  <!-- PRACTICE MODAL -->
+  <div class="dash-modal" id="modal-practice" onclick="if(event.target===this)closeDashModal('modal-practice')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⚡ Practice Mode</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-practice')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1rem;line-height:1.65">Pick a level. Unlimited questions. No streak, no pressure.</p>
+        <div class="prac-level-row" id="prac-level-row2"></div>
+        <div class="prac-q-card">
+          <div class="prac-q-text" id="prac-q2">Loading…</div>
+          <div class="opts" id="prac-opts2"></div>
+          <div class="solution-box" id="prac-sol2">
+            <div class="sol-verdict" id="prac-verdict2"></div>
+            <div class="sol-explanation" id="prac-exp2"></div>
+            <div class="sol-steps" id="prac-steps2"></div>
+            <button class="sol-next-btn" onclick="loadPracticeQ2()">Next Question →</button>
+          </div>
+        </div>
+        <div class="prac-stats-row">
+          <div class="pstat"><div class="pstat-label">Correct</div><div class="pstat-val green" id="p2-correct">0</div></div>
+          <div class="pstat"><div class="pstat-label">Attempted</div><div class="pstat-val" id="p2-attempted">0</div></div>
+          <div class="pstat"><div class="pstat-label">Accuracy</div><div class="pstat-val" id="p2-accuracy">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS MODAL -->
+  <div class="dash-modal" id="modal-flashcards" onclick="if(event.target===this)closeDashModal('modal-flashcards')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🃏 Flashcards</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-flashcards')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1rem">Click the card to flip it. Rate yourself honestly.</p>
+        <div class="formula-level-tabs" id="fc-level-tabs2"></div>
+        <div class="fc-nav-row">
+          <button class="fc-nav-btn2" onclick="fcPrev2()">← Prev</button>
+          <span class="fc-counter2" id="fc-counter2">1 / 5</span>
+          <button class="fc-nav-btn2" onclick="fcNext2()">Next →</button>
+        </div>
+        <div class="fc-card-outer" onclick="fcFlip2()">
+          <div class="fc-card-inner" id="fc-inner2">
+            <div class="fc-face2 fc-front-face">
+              <div class="fc-face-label">Concept — Click to reveal</div>
+              <div class="fc-face-content" id="fc-front2">—</div>
+              <div class="fc-tap-hint">👆 tap to flip</div>
+            </div>
+            <div class="fc-face2 fc-back2">
+              <div class="fc-face-label">Answer</div>
+              <div class="fc-face-content" id="fc-back2-text">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-rate-row">
+          <button class="fc-rate2 hard" onclick="fcRate2('hard')">😅 Hard — show again</button>
+          <button class="fc-rate2 easy" onclick="fcRate2('easy')">✓ Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULAS MODAL -->
+  <div class="dash-modal" id="modal-formulas" onclick="if(event.target===this)closeDashModal('modal-formulas')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">📋 Formula Sheet</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-formulas')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <input class="formula-search2" id="formula-search2" placeholder="Search… e.g. quadratic, slope, derivative" oninput="renderFormulas2()"/>
+        <div class="formula-level-tabs" id="formula-level-tabs2"></div>
+        <div id="formula-content2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEAK SPOTS MODAL -->
+  <div class="dash-modal" id="modal-weakspots" onclick="if(event.target===this)closeDashModal('modal-weakspots')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🎯 Weak Spots</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-weakspots')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <p style="font-size:.86rem;color:var(--text2);margin-bottom:1.25rem;line-height:1.65">Topics where you've missed the most questions. These are your highest-leverage study targets.</p>
+        <div id="ws-modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER MODAL -->
+  <div class="dash-modal" id="modal-timer" onclick="if(event.target===this)closeDashModal('modal-timer')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⏱️ Study Timer</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-timer')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <div class="timer-face2">
+          <div class="timer-digits2" id="timer-display2">00:00:00</div>
+          <div class="timer-status2" id="timer-status2">ready to start</div>
+        </div>
+        <div class="timer-btns2">
+          <button class="quiz-card-btn" style="padding:.65rem 1.2rem;font-size:.6rem" id="timer-btn-start2" onclick="timerStart2()">Start</button>
+          <button class="setting-btn2" id="timer-btn-stop2" onclick="timerStop2()" disabled>Stop</button>
+          <button class="setting-btn2" onclick="timerReset2()">Discard</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:1rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:1.25rem">
+          <span style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Total this week</span>
+          <span style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);letter-spacing:-.02em" id="timer-total2">0h 0m</span>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem">Sessions</div>
+        <div id="timer-log2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES MODAL -->
+  <div class="dash-modal" id="modal-notes" onclick="if(event.target===this)closeDashModal('modal-notes')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">📝 Notes</div>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <select id="notes-level-sel2" style="font-family:'DM Mono',monospace;font-size:.74rem;letter-spacing:.06em;padding:.28rem .55rem;background:var(--bg);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;border-radius:4px" onchange="switchNote2()">
+            <option value="0">Lvl 0</option><option value="1">Lvl 1</option><option value="2">Lvl 2</option>
+            <option value="3">Lvl 3</option><option value="4">Lvl 4</option><option value="5">Lvl 5</option><option value="6">Lvl 6</option>
+          </select>
+          <button class="dmb-close" onclick="closeDashModal('modal-notes')">✕</button>
+        </div>
+      </div>
+      <div class="dmb-body">
+        <textarea class="notes-area2" id="notes-area2" placeholder="Write anything — formulas, tips, examples…" oninput="autoSaveNote2()"></textarea>
+        <div class="notes-footer2">
+          <span class="notes-saved2" id="notes-saved2">Saved ✓</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.06em;color:var(--text3)" id="notes-chars2">0 chars</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATH MODAL -->
+  <div class="dash-modal" id="modal-path" onclick="if(event.target===this)closeDashModal('modal-path')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">🗺️ Your Learning Path</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-path')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <div style="margin-bottom:1.25rem">
+          <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.35rem">
+            <span id="path-modal-label">Level 1 of 7</span><span id="path-modal-pct">0%</span>
+          </div>
+          <div style="height:6px;background:var(--bg2);border-radius:99px;overflow:hidden">
+            <div id="path-modal-fill" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 1s ease"></div>
+          </div>
+        </div>
+        <div id="path-modal-stages" class="path-stages"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="dash-modal" id="modal-settings" onclick="if(event.target===this)closeDashModal('modal-settings')">
+    <div class="dash-modal-box">
+      <div class="dmb-header">
+        <div class="dmb-title">⚙️ Settings</div>
+        <button class="dmb-close" onclick="closeDashModal('modal-settings')">✕</button>
+      </div>
+      <div class="dmb-body">
+        <!-- account -->
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-bottom:.1rem">Account</div>
+        <div class="setting-row2"><div><div class="setting-name2">Email</div><div class="setting-val2" id="s2-email">—</div></div></div>
+        <div class="setting-row2"><div><div class="setting-name2">Password</div></div><button class="setting-btn2" onclick="toggleSub2('sp2-pw')">Change</button></div>
+        <div class="settings-sub2" id="sp2-pw">
+          <div style="display:flex;flex-direction:column;gap:.5rem;max-width:320px">
+            <input type="password" id="s2-cur-pw" placeholder="Current password" style="padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%;border-radius:4px"/>
+            <input type="password" id="s2-new-pw" placeholder="New password" style="padding:.5rem .75rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;width:100%;border-radius:4px"/>
+            <button class="quiz-card-btn" style="align-self:flex-start;padding:.55rem 1rem;font-size:.74rem;border-radius:4px" onclick="changePassword2()">Update</button>
+            <div id="s2-pw-msg" style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--accent)"></div>
+          </div>
+        </div>
+        <!-- level -->
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.1rem">Progress</div>
+        <div class="setting-row2"><div><div class="setting-name2">Level</div><div class="setting-val2" id="s2-level">—</div></div><button class="setting-btn2" onclick="toggleSub2('sp2-level')">Adjust</button></div>
+        <div class="settings-sub2" id="sp2-level">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.5rem 0">
+            <select id="s2-level-sel" style="font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.04em;padding:.4rem .6rem;background:var(--bg);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;border-radius:4px">
+              <option value="0">Lvl 0 — Arithmetic</option><option value="1">Lvl 1 — Algebra</option>
+              <option value="2">Lvl 2 — Adv. Algebra</option><option value="3">Lvl 3 — Geometry</option>
+              <option value="4">Lvl 4 — Pre-Calc</option><option value="5">Lvl 5 — Calc I</option>
+              <option value="6">Lvl 6 — Calc II+</option>
+            </select>
+            <button class="quiz-card-btn" style="padding:.5rem 1rem;font-size:.74rem;border-radius:4px" onclick="updateLevel2()">Save</button>
+          </div>
+        </div>
+        <div class="setting-row2"><div><div class="setting-name2">Diagnostic</div><div class="setting-val2">Retake to update your level</div></div><button class="setting-btn2" onclick="confirmRetake()">Retake</button></div>
+        <!-- appearance -->
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.6rem">Appearance</div>
+        <div class="theme-pills" id="s2-theme-pills" style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button class="theme-pill" data-t="" onclick="setThemePill('',this)"><div class="t-swatch" style="background:#2d5a27"></div>Forest</button>
+          <button class="theme-pill" data-t="slate" onclick="setThemePill('slate',this)"><div class="t-swatch" style="background:#1a56db"></div>Slate</button>
+          <button class="theme-pill" data-t="sand" onclick="setThemePill('sand',this)"><div class="t-swatch" style="background:#b45309"></div>Sand</button>
+          <button class="theme-pill" data-t="ink" onclick="setThemePill('ink',this)"><div class="t-swatch" style="background:#a8c5a0"></div>Ink</button>
+        </div>
+        <!-- danger -->
+        <div style="font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:.35rem;border-bottom:1px solid var(--border);margin-top:1.25rem;margin-bottom:.1rem">Danger Zone</div>
+        <div class="setting-row2"><div><div class="setting-name2">Reset Streak</div></div><button class="setting-btn2 danger" onclick="confirmResetStreak()">Reset</button></div>
+        <div class="setting-row2" style="border:none"><div><div class="setting-name2">Sign Out</div></div><button class="setting-btn2 danger" onclick="signOut()">Sign Out</button></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /s-dashboard -->
+
+
+
+<!-- ══════════════════════════════════
+     DAILY QUIZ
+══════════════════════════════════ -->
+<div class="screen" id="s-daily">
+  <div class="daily-shell">
+
+    <!-- TOP NAV -->
+    <div class="dq-topnav">
+      <button class="dq-back-btn" onclick="showDashboard()">← Dashboard</button>
+      <span class="dq-progress-info" id="dq-label">Question 1 of 5</span>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="dq-progress-bar">
+      <div class="dq-progress-fill" id="dq-fill" style="width:0%"></div>
+    </div>
+
+    <!-- LEVEL PILL -->
+    <div class="dq-level-pill" id="dq-level-tag">Early Algebra</div>
+
+    <!-- QUESTION -->
+    <div class="dq-question" id="dq-text"></div>
+
+    <!-- OPTIONS -->
+    <div class="dq-options" id="dq-opts"></div>
+
+    <!-- HINT -->
+    <div class="dq-hint-row">
+      <button class="dq-hint-toggle" id="dq-hint-btn" onclick="toggleDailyHint()">
+        💡 <span>Show hint</span>
+      </button>
+      <div class="dq-hint-content" id="dq-hint-box"></div>
+    </div>
+
+    <!-- SOLUTION PANEL (shown after answering) -->
+    <div class="dq-solution-panel" id="dq-solution">
+      <div class="dq-sol-header">
+        <div class="dq-sol-verdict" id="dq-sol-verdict"></div>
+      </div>
+      <div class="dq-sol-body">
+        <div class="dq-sol-explanation" id="dq-sol-body"></div>
+        <div class="dq-sol-steps-wrap" id="dq-sol-steps" style="display:none"></div>
+      </div>
+      <div class="dq-resources" id="dq-resources" style="display:none"></div>
+      <div style="padding:.85rem 1.1rem">
+        <button class="dq-next-btn" onclick="dqAdvance()" id="dq-next-btn">Next Question →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DAILY DONE -->
+<div class="screen" id="s-daily-done">
+  <div class="done-shell">
+
+    <div class="done-label">Today's Quiz</div>
+    <div class="done-score-row">
+      <div class="done-score-big" id="done-score-big">0</div>
+      <div class="done-score-denom">/5</div>
+    </div>
+    <div class="done-headline" id="done-title">Nice work.</div>
+    <div class="done-sub" id="done-sub">You passed today's quiz.</div>
+
+    <div class="done-streak-badge" id="done-streak" style="display:none">🔥 0 day streak</div>
+
+    <!-- Breakdown bars -->
+    <div class="done-breakdown" id="done-breakdown"></div>
+
+    <!-- Per-question review -->
+    <div class="done-review" id="done-review"></div>
+
+    <!-- Actions -->
+    <div class="done-actions">
+      <button class="done-btn-primary" onclick="showDashboard()">Back to Dashboard</button>
+      <button class="done-btn-ghost" onclick="openDashModal('modal-practice');showDashboard()">Practice More →</button>
+    </div>
+
+    <!-- Recommended resources based on level -->
+    <div class="done-resources-section" id="done-resources-section"></div>
+
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const STAGES = [
+  { name:'Arithmetic & Pre-Algebra', desc:'Whole numbers, fractions, decimals, percentages, ratios, basic expressions.', resources:[{type:'video',name:'Khan Academy — Pre-Algebra',url:'https://khanacademy.org/math/pre-algebra'},{type:'video',name:'Professor Leonard on YouTube',url:'https://youtube.com/c/ProfessorLeonard'}]},
+  { name:'Early Algebra', desc:'Variables, linear equations, inequalities, graphing, slope, systems, intro to quadratics.', resources:[{type:'course',name:'Khan Academy — Algebra 1',url:'https://khanacademy.org/math/algebra'},{type:'book',name:'AoPS — Intro to Algebra',url:'https://artofproblemsolving.com/store/item/intro-algebra'}]},
+  { name:'Advanced Algebra', desc:'Polynomials, rational expressions, complex numbers, logarithms, exponential functions, sequences.', resources:[{type:'course',name:'Khan Academy — Algebra 2',url:'https://khanacademy.org/math/algebra2'},{type:'video',name:'3Blue1Brown — YouTube',url:'https://youtube.com/c/3blue1brown'}]},
+  { name:'Geometry', desc:'Angles, triangles, similarity, Pythagorean theorem, circles, area, volume, coordinate geometry.', resources:[{type:'course',name:'Khan Academy — Geometry',url:'https://khanacademy.org/math/geometry'},{type:'tool',name:'GeoGebra — Interactive Tool',url:'https://geogebra.org'}]},
+  { name:'Pre-Calculus', desc:'Trig functions, unit circle, identities, polar coordinates, conic sections, limits, continuity.', resources:[{type:'course',name:'Khan Academy — Precalculus',url:'https://khanacademy.org/math/precalculus'},{type:'notes',name:"Paul's Online Math Notes",url:'https://tutorial.math.lamar.edu'}]},
+  { name:'Calculus I', desc:'Limits, derivatives, differentiation rules, related rates, optimization, introduction to integration.', resources:[{type:'video',name:'3B1B — Essence of Calculus',url:'https://youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr'},{type:'course',name:'MIT OCW — Calculus',url:'https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/'}]},
+  { name:'Calculus II & Beyond', desc:'Integration techniques, sequences & series, convergence, Taylor series, intro multivariable & linear algebra.', resources:[{type:'video',name:'Professor Leonard — Calc 2',url:'https://youtube.com/c/ProfessorLeonard'},{type:'course',name:'MIT OCW — Multivariable Calculus',url:'https://ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/'}]},
+];
+const HOURS_TO_NEXT = [40,80,100,80,60,80,0];
+
+// Formulas database
+const FORMULAS = {
+  0:[
+    {cat:'Fractions',items:[{math:'a/b + c/d = (ad+bc)/bd',name:'Add fractions with unlike denominators'},{math:'a/b × c/d = ac/bd',name:'Multiply fractions'},{math:'a/b ÷ c/d = a/b × d/c',name:'Divide fractions — flip and multiply'}]},
+    {cat:'Percentages',items:[{math:'% = (part/whole) × 100',name:'Convert to percent'},{math:'part = (% / 100) × whole',name:'Find the part'},{math:'change% = (new−old)/old × 100',name:'Percent change'}]},
+    {cat:'Order of Operations',items:[{math:'P → E → M/D → A/S',name:'PEMDAS — left to right for ties'},{math:'(2+3)×4 = 20, not 14',name:'Parentheses first example'}]},
+  ],
+  1:[
+    {cat:'Linear Equations',items:[{math:'y = mx + b',name:'Slope-intercept form'},{math:'m = (y₂−y₁)/(x₂−x₁)',name:'Slope from two points'},{math:'y − y₁ = m(x − x₁)',name:'Point-slope form'}]},
+    {cat:'Systems of Equations',items:[{math:'Substitute y from eq1 into eq2',name:'Substitution method'},{math:'Add/subtract equations to eliminate variable',name:'Elimination method'}]},
+    {cat:'Quadratics',items:[{math:'x = (−b ± √(b²−4ac)) / 2a',name:'Quadratic formula'},{math:'b²−4ac > 0: 2 real roots; = 0: 1; < 0: none',name:'Discriminant rules'},{math:'(x+p)(x+q) = x²+(p+q)x+pq',name:'FOIL expansion'}]},
+  ],
+  2:[
+    {cat:'Logarithms',items:[{math:'logₐ(x) = y ↔ aʸ = x',name:'Log definition'},{math:'log(ab) = log(a) + log(b)',name:'Product rule'},{math:'log(a/b) = log(a) − log(b)',name:'Quotient rule'},{math:'log(aⁿ) = n·log(a)',name:'Power rule'},{math:'logₐ(b) = log(b)/log(a)',name:'Change of base'}]},
+    {cat:'Exponentials',items:[{math:'aᵐ × aⁿ = aᵐ⁺ⁿ',name:'Product rule'},{math:'aᵐ / aⁿ = aᵐ⁻ⁿ',name:'Quotient rule'},{math:'(aᵐ)ⁿ = aᵐⁿ',name:'Power rule'}]},
+    {cat:'Sequences',items:[{math:'aₙ = a₁ + (n−1)d',name:'Arithmetic sequence nth term'},{math:'aₙ = a₁ × rⁿ⁻¹',name:'Geometric sequence nth term'},{math:'S = a₁(1−rⁿ)/(1−r)',name:'Geometric series sum'}]},
+  ],
+  3:[
+    {cat:'Triangles',items:[{math:'a² + b² = c²',name:'Pythagorean theorem (right triangle)'},{math:'Area = ½bh',name:'Triangle area'},{math:'A + B + C = 180°',name:'Angle sum'},{math:'sin A/a = sin B/b = sin C/c',name:'Law of sines'},{math:'c² = a² + b² − 2ab·cos C',name:'Law of cosines'}]},
+    {cat:'Circles',items:[{math:'C = 2πr',name:'Circumference'},{math:'A = πr²',name:'Area'},{math:'Arc = rθ (θ in radians)',name:'Arc length'}]},
+    {cat:'Polygons & 3D',items:[{math:'V = lwh',name:'Box volume'},{math:'V = πr²h',name:'Cylinder volume'},{math:'V = (4/3)πr³',name:'Sphere volume'},{math:'V = (1/3)Bh',name:'Pyramid/cone volume'}]},
+  ],
+  4:[
+    {cat:'Unit Circle',items:[{math:'sin²θ + cos²θ = 1',name:'Pythagorean identity'},{math:'sin(π/6)=½, cos(π/6)=√3/2',name:'30° values'},{math:'sin(π/4)=cos(π/4)=√2/2',name:'45° values'},{math:'sin(π/3)=√3/2, cos(π/3)=½',name:'60° values'}]},
+    {cat:'Trig Identities',items:[{math:'tan θ = sin θ / cos θ',name:'Tangent'},{math:'sin(A±B) = sinA cosB ± cosA sinB',name:'Sum/difference formulas'},{math:'sin(2θ) = 2 sin θ cos θ',name:'Double angle — sine'},{math:'cos(2θ) = cos²θ − sin²θ',name:'Double angle — cosine'}]},
+    {cat:'Limits',items:[{math:'lim(x→a) f(x) = L',name:'Limit notation'},{math:'lim(x→0) sin(x)/x = 1',name:'Important trig limit'},{math:'lim(x→∞) 1/x = 0',name:'Limit at infinity'}]},
+  ],
+  5:[
+    {cat:'Derivatives',items:[{math:"d/dx[xⁿ] = nxⁿ⁻¹",name:'Power rule'},{math:"d/dx[f·g] = f'g + fg`",name:'Product rule'},{math:"d/dx[f/g] = (f'g − fg`)/g²",name:'Quotient rule'},{math:"d/dx[f(g(x))] = f'(g(x))·g'(x)",name:'Chain rule'}]},
+    {cat:'Common Derivatives',items:[{math:"d/dx[sin x] = cos x",name:'Sine'},{math:"d/dx[cos x] = −sin x",name:'Cosine'},{math:"d/dx[eˣ] = eˣ",name:'Exponential'},{math:"d/dx[ln x] = 1/x",name:'Natural log'}]},
+    {cat:'Integration',items:[{math:"∫xⁿ dx = xⁿ⁺¹/(n+1) + C",name:'Power rule for integrals'},{math:"∫ₐᵇ f(x)dx = F(b) − F(a)",name:'Fundamental Theorem (Part 2)'},{math:"∫eˣ dx = eˣ + C",name:'Exponential integral'}]},
+  ],
+  6:[
+    {cat:'Integration Techniques',items:[{math:"∫u dv = uv − ∫v du",name:'Integration by parts'},{math:"∫sin²x dx = x/2 − sin(2x)/4 + C",name:'Trig power reduction'},{math:"Partial fractions: decompose before integrating",name:'Partial fractions method'}]},
+    {cat:'Series',items:[{math:"∑aₙ converges if lim aₙ = 0 (necessary not sufficient)",name:'Divergence test'},{math:"|r| < 1: geometric series converges to a/(1−r)",name:'Geometric series convergence'},{math:"f(x) = Σ f⁽ⁿ⁾(a)/n! (x−a)ⁿ",name:'Taylor series'}]},
+    {cat:'Linear Algebra',items:[{math:"det[a b; c d] = ad − bc",name:'2×2 determinant'},{math:"Ax = b → x = A⁻¹b (if invertible)",name:'Matrix equation solution'},{math:"|v| = √(x²+y²+z²)",name:'Vector magnitude'}]},
+  ],
+};
+
+// Flashcard sets
+const FLASHCARD_SETS = {
+  0:[
+    {front:'What is a fraction?',back:'A number representing part of a whole: numerator/denominator. e.g. 3/4 = 3 out of 4 equal parts.'},
+    {front:'How do you find a percentage?',back:'percentage = (part ÷ whole) × 100'},
+    {front:'PEMDAS stands for?',back:'Parentheses, Exponents, Multiplication, Division, Addition, Subtraction — the order of operations.'},
+    {front:'What is a prime number?',back:'A number with exactly 2 factors: 1 and itself. e.g. 2, 3, 5, 7, 11, 13…'},
+    {front:'LCM vs GCF?',back:'LCM = Least Common Multiple (smallest shared multiple). GCF = Greatest Common Factor (largest shared factor).'},
+  ],
+  1:[
+    {front:'Slope-intercept form',back:'y = mx + b, where m = slope and b = y-intercept.'},
+    {front:'Slope formula from two points',back:'m = (y₂ − y₁) / (x₂ − x₁)'},
+    {front:'What is the quadratic formula?',back:'x = (−b ± √(b²−4ac)) / 2a — solves any ax²+bx+c=0.'},
+    {front:'What does the discriminant tell you?',back:'b²−4ac > 0: two real roots. = 0: one repeated root. < 0: no real roots (complex).'},
+    {front:'How to solve a two-step equation?',back:'Undo addition/subtraction first, then multiplication/division. Keep both sides equal.'},
+    {front:'What is a function?',back:'A rule where every input (x) gives exactly one output (y). Written f(x).'},
+  ],
+  2:[
+    {front:'log product rule',back:'log(ab) = log(a) + log(b)'},
+    {front:'log power rule',back:'log(aⁿ) = n·log(a)'},
+    {front:'Change of base formula',back:'logₐ(b) = log(b) / log(a)'},
+    {front:'What is ln?',back:'Natural log = logₑ, where e ≈ 2.718. ln(e) = 1.'},
+    {front:'Geometric series sum formula',back:'S = a₁(1 − rⁿ) / (1 − r), valid when |r| < 1 for infinite series: S = a₁/(1−r)'},
+  ],
+  3:[
+    {front:'Pythagorean theorem',back:'a² + b² = c², where c is the hypotenuse of a right triangle.'},
+    {front:'Area of a circle',back:'A = πr²'},
+    {front:'Volume of a sphere',back:'V = (4/3)πr³'},
+    {front:'Law of Sines',back:'sin A / a = sin B / b = sin C / c'},
+    {front:'Sum of interior angles of an n-gon',back:'(n − 2) × 180°'},
+  ],
+  4:[
+    {front:'The Pythagorean trig identity',back:'sin²θ + cos²θ = 1 (the most important trig identity)'},
+    {front:'sin and cos at 45°',back:'sin(45°) = cos(45°) = √2/2 ≈ 0.707'},
+    {front:'sin and cos at 30° and 60°',back:'sin 30°=½, cos 30°=√3/2 | sin 60°=√3/2, cos 60°=½'},
+    {front:'Double angle formula for sine',back:'sin(2θ) = 2 sin θ cos θ'},
+    {front:'What is a radian?',back:'Angle where arc length = radius. 2π radians = 360°. π radians = 180°.'},
+  ],
+  5:[
+    {front:'Power rule for derivatives',back:"d/dx[xⁿ] = nxⁿ⁻¹. Bring the exponent down, reduce power by 1."},
+    {front:'Chain rule',back:"d/dx[f(g(x))] = f'(g(x)) · g'(x). Derivative of outside × derivative of inside."},
+    {front:'Product rule',back:"d/dx[f·g] = f'g + fg`"},
+    {front:'Fundamental Theorem of Calculus',back:'∫ₐᵇ f(x)dx = F(b) − F(a), where F is the antiderivative of f.'},
+    {front:'Derivative of sin x',back:"d/dx[sin x] = cos x"},
+    {front:'Derivative of eˣ',back:"d/dx[eˣ] = eˣ (it's its own derivative!)"},
+  ],
+  6:[
+    {front:'Integration by parts formula',back:'∫u dv = uv − ∫v du. Use LIATE to choose u: Log, Inverse trig, Algebraic, Trig, Exponential.'},
+    {front:'Geometric series convergence',back:'∑arⁿ converges if |r| < 1. Sum = a/(1−r).'},
+    {front:'2×2 determinant',back:'det[a b; c d] = ad − bc'},
+    {front:"Taylor series definition",back:"f(x) = Σ f⁽ⁿ⁾(a)/n! · (x−a)ⁿ — approximates any smooth function."},
+    {front:'What is an improper integral?',back:'An integral with infinite limits or undefined integrand. Evaluate as a limit.'},
+  ],
+};
+
+// Built-in practice questions (client-side for offline practice)
+const PRACTICE_QS = {
+  0:[
+    {q:'Simplify: 3/4 + 1/8',opts:['7/8','4/12','1/2','5/8'],ans:0,explanation:'Common denominator is 8. 3/4 = 6/8. So 6/8 + 1/8 = 7/8.',steps:['3/4 = 6/8','6/8 + 1/8 = 7/8'],hint:'Convert 3/4 to eighths first.'},
+    {q:'What is 15% of 80?',opts:['10','12','15','20'],ans:1,explanation:'15% = 0.15. 0.15 × 80 = 12.',steps:['15% = 15/100 = 0.15','0.15 × 80 = 12'],hint:'Convert the percent to a decimal first.'},
+    {q:'Evaluate: 2 + 3 × 4 − 1',opts:['11','19','13','24'],ans:2,explanation:'Multiplication first: 3×4=12. Then left to right: 2+12−1=13.',steps:['3 × 4 = 12','2 + 12 − 1 = 13'],hint:'Multiply before you add or subtract.'},
+    {q:'What is the GCF of 24 and 36?',opts:['4','6','12','24'],ans:2,explanation:'Factors of 24: 1,2,3,4,6,8,12,24. Factors of 36: 1,2,3,4,6,9,12,18,36. Greatest common is 12.',steps:['24 = 2³ × 3','36 = 2² × 3²','GCF = 2² × 3 = 12'],hint:'List factors of both numbers.'},
+    {q:'Convert 0.375 to a fraction in simplest form.',opts:['3/7','375/1000','3/8','37/100'],ans:2,explanation:'0.375 = 375/1000. Divide top and bottom by 125: 3/8.',steps:['0.375 = 375/1000','GCF of 375 and 1000 is 125','375÷125 / 1000÷125 = 3/8'],hint:'Write as a fraction over 1000, then simplify.'},
+  ],
+  1:[
+    {q:'Solve for x: 3x − 7 = 14',opts:['x = 7','x = 3','x = 2.3','x = 21'],ans:0,explanation:'Add 7: 3x = 21. Divide by 3: x = 7.',steps:['3x − 7 = 14','3x = 21','x = 7'],hint:'Add 7 to both sides first.'},
+    {q:'What is the slope of the line through (2, 3) and (5, 9)?',opts:['1','2','3','6'],ans:1,explanation:'m = (9−3)/(5−2) = 6/3 = 2.',steps:['Δy = 9 − 3 = 6','Δx = 5 − 2 = 3','m = 6/3 = 2'],hint:'Use rise over run.'},
+    {q:'Factor: x² + 5x + 6',opts:['(x+2)(x+3)','(x+1)(x+6)','(x+5)(x+1)','(x−2)(x−3)'],ans:0,explanation:'Find two numbers that multiply to 6 and add to 5: 2 and 3.',steps:['Need p·q = 6 and p+q = 5','2 × 3 = 6 and 2+3 = 5','(x+2)(x+3)'],hint:'Find two numbers that multiply to 6 and add to 5.'},
+    {q:'Solve: 2x + 3 = x − 5',opts:['x = −8','x = 8','x = 2','x = −2'],ans:0,explanation:'Subtract x: x + 3 = −5. Subtract 3: x = −8.',steps:['2x + 3 = x − 5','x + 3 = −5','x = −8'],hint:'Get all x terms to one side.'},
+    {q:'For f(x) = 2x² − 3, what is f(4)?',opts:['13','29','29','−3'],ans:1,explanation:'f(4) = 2(16) − 3 = 32 − 3 = 29.',steps:['f(4) = 2(4²) − 3','= 2(16) − 3','= 32 − 3 = 29'],hint:'Substitute x = 4 and compute.'},
+  ],
+  2:[
+    {q:'Evaluate: log₂(64)',opts:['4','5','6','8'],ans:2,explanation:'2⁶ = 64, so log₂(64) = 6.',steps:['2¹=2, 2²=4, 2³=8, 2⁴=16, 2⁵=32, 2⁶=64','So log₂(64) = 6'],hint:'Ask: 2 to what power equals 64?'},
+    {q:'Simplify: log(100) + log(10)',opts:['2','3','30','log(1000)'],ans:1,explanation:'log(100) = 2, log(10) = 1. Sum = 3. Also equals log(1000) — same thing.',steps:['log(100) = log(10²) = 2','log(10) = 1','2 + 1 = 3'],hint:'log without base means log₁₀.'},
+    {q:'What is the 8th term of the arithmetic sequence 3, 7, 11, 15, …?',opts:['31','27','35','29'],ans:0,explanation:'d = 4. a₈ = 3 + (8−1)×4 = 3 + 28 = 31.',steps:['Common difference d = 7−3 = 4','a₈ = a₁ + (n−1)d = 3 + 7×4','= 3 + 28 = 31'],hint:'Find the common difference first.'},
+    {q:'Solve: 2ˣ = 32',opts:['x = 4','x = 5','x = 6','x = 16'],ans:1,explanation:'32 = 2⁵, so x = 5.',steps:['2¹=2, 2²=4, 2³=8, 2⁴=16, 2⁵=32','So 2ˣ = 2⁵ → x = 5'],hint:'Express 32 as a power of 2.'},
+  ],
+  3:[
+    {q:'A right triangle has legs 5 and 12. What is the hypotenuse?',opts:['17','13','15','√119'],ans:1,explanation:'5²+12²=25+144=169=13². Hypotenuse=13.',steps:['a²+b²=c²','5²+12²=c²','25+144=169','c=√169=13'],hint:'Use the Pythagorean theorem.'},
+    {q:'What is the area of a circle with radius 7?',opts:['14π','49π','7π','98π'],ans:1,explanation:'A = πr² = π(7²) = 49π.',steps:['A = πr²','A = π × 7²','A = 49π'],hint:'Area formula is πr².'},
+    {q:'The sum of interior angles of a hexagon is:',opts:['540°','720°','900°','360°'],ans:1,explanation:'(n−2)×180 = (6−2)×180 = 4×180 = 720°.',steps:['Formula: (n−2)×180°','(6−2)×180° = 4×180° = 720°'],hint:'Use (n−2)×180.'},
+  ],
+  4:[
+    {q:'What is sin(π/6)?',opts:['√3/2','1/2','√2/2','1'],ans:1,explanation:'π/6 = 30°. sin(30°) = 1/2.',steps:['π/6 radians = 30°','sin(30°) = 1/2 (memorize from unit circle)'],hint:'π/6 = 30°.'},
+    {q:'Simplify: sin²x + cos²x',opts:['0','1','2','sin(2x)'],ans:1,explanation:'This is the Pythagorean identity. Always equals 1.',steps:['sin²x + cos²x = 1','This is the fundamental trig identity'],hint:'This is a famous trig identity.'},
+    {q:'Convert 3π/4 radians to degrees.',opts:['120°','135°','150°','270°'],ans:1,explanation:'3π/4 × (180/π) = 3×180/4 = 540/4 = 135°.',steps:['Multiply by 180/π','3π/4 × 180/π = 3×45 = 135°'],hint:'Multiply radians by 180/π.'},
+  ],
+  5:[
+    {q:"If f(x) = x⁴, what is f'(x)?",opts:['x³','4x³','4x⁴','x⁵/5'],ans:1,explanation:'Power rule: d/dx[x⁴] = 4x³.',steps:['Power rule: d/dx[xⁿ] = nxⁿ⁻¹','d/dx[x⁴] = 4x⁴⁻¹ = 4x³'],hint:'Bring down the exponent, reduce it by 1.'},
+    {q:'What is the derivative of sin(3x)?',opts:['cos(3x)','3cos(3x)','-cos(3x)','-3cos(3x)'],ans:1,explanation:'Chain rule: d/dx[sin(u)] = cos(u)·u′. Here u=3x, u′=3. Answer: 3cos(3x).',steps:['Chain rule: d/dx[sin(u)] = cos(u)·u′','u = 3x → u′ = 3','Answer = cos(3x) · 3 = 3cos(3x)'],hint:'Use chain rule — derivative of outside times derivative of inside.'},
+    {q:'Evaluate ∫₀¹ 2x dx',opts:['0','1','2','4'],ans:1,explanation:'Antiderivative of 2x is x². F(1)−F(0) = 1−0 = 1.',steps:['∫2x dx = x² + C','Apply FTC: F(1) − F(0)','1² − 0² = 1'],hint:'Find the antiderivative, then evaluate at bounds.'},
+  ],
+  6:[
+    {q:'∫ x·eˣ dx using integration by parts equals:',opts:['eˣ + C','xeˣ − eˣ + C','xeˣ + eˣ + C','x²eˣ/2 + C'],ans:1,explanation:'u=x, dv=eˣdx. uv−∫v du = xeˣ−∫eˣdx = xeˣ−eˣ+C.',steps:['Choose u=x, dv=eˣdx','Then du=dx, v=eˣ','∫u dv = uv − ∫v du = xeˣ − ∫eˣdx','= xeˣ − eˣ + C'],hint:'Use integration by parts: LIATE.'},
+    {q:'The geometric series 1 + 1/2 + 1/4 + ⋯ converges to:',opts:['1','2','3','4'],ans:1,explanation:'a=1, r=1/2. Sum = a/(1−r) = 1/(1/2) = 2.',steps:['First term a = 1, ratio r = 1/2','|r| < 1 so it converges','Sum = a/(1−r) = 1/(1−1/2) = 1/(1/2) = 2'],hint:'Use S = a/(1−r) for infinite geometric series.'},
+  ],
+};
+
+const HINTS = {
+  0:['Try finding a common denominator.','Remember: PEMDAS. Multiply before adding.','Convert to a common unit first.','Factor to find the GCF.'],
+  1:['Isolate the variable — undo operations in reverse.','Slope = rise/run.','Think: what two numbers multiply AND add to those values?','Get all x on one side, numbers on the other.'],
+  2:['Ask: base to what power = argument?','Remember log rules: log(ab) = log a + log b.','Use aₙ = a₁ + (n−1)d for arithmetic sequences.','Write both sides as the same base.'],
+  3:['a² + b² = c² for right triangles.','Area and circumference use r, not diameter.','Sum of interior angles = (n−2)×180°.'],
+  4:['Memorize the unit circle: 30°, 45°, 60°.','sin²+cos²=1 is always useful.','Multiply radians by 180/π for degrees.'],
+  5:['Power rule: bring down exponent, reduce by 1.','Chain rule: derivative of outer × derivative of inner.','Antiderivative of xⁿ is xⁿ⁺¹/(n+1).'],
+  6:['LIATE for IBP: Log, Inverse trig, Algebraic, Trig, Exponential.','|r|<1 for geometric series to converge.','Taylor series: sum of f⁽ⁿ⁾(a)/n! · (x−a)ⁿ.'],
+};
+
+const BADGES_DEF = [
+  {id:'first_quiz',label:'First Quiz',icon:'🎯',desc:'Complete your first daily quiz'},
+  {id:'streak_3',label:'3-Day Streak',icon:'🔥',desc:'3 days in a row'},
+  {id:'streak_7',label:'Week Warrior',icon:'⚡',desc:'7-day streak'},
+  {id:'practice_10',label:'Reps',icon:'💪',desc:'Complete 10 practice questions'},
+  {id:'flashcard_fan',label:'Flashcard Fan',icon:'🃏',desc:'Flip through a full deck'},
+  {id:'perfect_quiz',label:'Perfect',icon:'⭐',desc:'5/5 on a daily quiz'},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentUser = null, authMode = 'register';
+let sessionId = Math.random().toString(36).slice(2);
+let qCount=0,correct=0,wrong=0,currentLevel=1,userLevel=1,userEmail='';
+let MAX_Q = 10;
+let dailyQuestions=[], dailyIndex=0, dailyCorrect=0;
+let currentDailyLevel = 1;
+let dailyResults = []; // per-question results for breakdown
+let dailyConfidence = []; // per-question confidence
+let diagHintOpen=false, dailyHintOpen=false;
+let canvasRunning = false;
+
+// Practice state
+let pracLevel = 1, pracPool = [], pracIdx = 0;
+let pracCorrectCount = 0, pracAttempted = 0;
+
+// Flashcard state
+let fcSet = [], fcIndex = 0, fcIsFlipped = false;
+let fcHardQueue = [];
+
+// Timer state
+let timerInterval = null, timerStartTime = 0, timerElapsed = 0, timerRunning = false;
+
+// ── TOKEN ─────────────────────────────────────────────────────────────────────
+const getToken = () => localStorage.getItem('apexmath_token');
+const setToken = t => t ? localStorage.setItem('apexmath_token',t) : localStorage.removeItem('apexmath_token');
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function animateCount(id,from,to,dur){
+  const el=document.getElementById(id);if(!el)return;
+  const start=performance.now();
+  (function step(now){
+    const t=Math.min((now-start)/dur,1);
+    const e=1-Math.pow(1-t,3);
+    el.textContent=Math.round(from+(to-from)*e);
+    if(t<1)requestAnimationFrame(step);
+  })(performance.now());
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function openModal(mode){ authMode=mode; document.getElementById('modal-overlay').classList.add('open'); updateModalUI(); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+function toggleAuthMode(){ authMode = authMode==='register'?'login':'register'; updateModalUI(); }
+function updateModalUI(){
+  const isReg = authMode==='register';
+  document.getElementById('modal-title').textContent = isReg?'Create Account':'Welcome Back';
+  document.getElementById('modal-sub').textContent = isReg?'Join free. No credit card. Start learning today.':'Log in to your account.';
+  document.getElementById('auth-submit-btn').textContent = isReg?'Create Account':'Log In';
+  document.getElementById('modal-switch').innerHTML = isReg?'Already have an account? <span onclick="toggleAuthMode()">Log in</span>':'No account yet? <span onclick="toggleAuthMode()">Register</span>';
+  document.getElementById('auth-err').classList.remove('show');
+}
+async function submitAuth(){
+  const email=document.getElementById('auth-email').value.trim();
+  const password=document.getElementById('auth-password').value;
+  const errEl=document.getElementById('auth-err');
+  if(!email||!password){errEl.textContent='Please fill in both fields.';errEl.classList.add('show');return;}
+  try{
+    const res=await fetch(authMode==='register'?'/auth/register':'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const data=await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Something went wrong.';errEl.classList.add('show');return;}
+    setToken(data.token);
+    closeModal();
+    checkAuth();
+  }catch(e){errEl.textContent='Connection error. Try again.';errEl.classList.add('show');}
+}
+function signOut(){ setToken(null); currentUser=null; updateNavForUser(null); showScreen('s-landing'); }
+function updateNavForUser(user){
+  document.getElementById('nav-auth-area').style.display=user?'none':'flex';
+  document.getElementById('nav-user-area').style.display=user?'flex':'none';
+  if(user) document.getElementById('nav-user-tag').textContent=user.email.split('@')[0];
+}
+async function checkAuth(){
+  const t=getToken(); if(!t){updateNavForUser(null);showScreen('s-landing');return;}
+  try{
+    const res=await fetch('/auth/me',{headers:{Authorization:`Bearer ${t}`}});
+    if(!res.ok){setToken(null);updateNavForUser(null);showScreen('s-landing');return;}
+    const data=await res.json();
+    currentUser=data.user;
+    updateNavForUser(currentUser);
+    const saved=localStorage.getItem('apexmath_result');
+    if(saved){const rd=JSON.parse(saved);if(rd.email===currentUser.email){showDashboard();return;}}
+    showDashboard();
+  }catch(e){showScreen('s-landing');}
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function toggleThemeDrop(btn){ document.getElementById('theme-drop').classList.toggle('open'); }
+document.addEventListener('click',e=>{ if(!e.target.closest('.theme-wrap')) document.getElementById('theme-drop').classList.remove('open'); });
+function setTheme(t,btn){
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('apexmath_theme',t);
+  document.querySelectorAll('.theme-opt').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('theme-drop').classList.remove('open');
+  document.querySelectorAll('.theme-pill').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+}
+function setThemePill(t,btn){ setTheme(t,null); document.querySelectorAll('.theme-pill').forEach(b=>b.classList.toggle('active',b.dataset.t===t)); }
+function toggleSettingsSub(id){ const el=document.getElementById(id); el.classList.toggle('open'); }
+
+// ── LANDING CANVAS ─────────────────────────────────────────────────────────────
+let _landRafId=null;
+function startLandCanvas(){
+  const canvas=document.getElementById('land-canvas');
+  if(!canvas||canvas._started)return; canvas._started=true;
+  const ctx=canvas.getContext('2d');
+  const SYMS=['∫','∑','∂','π','∞','∇','∆','α','β','λ','θ','σ','dx','dy','lim','f(x)','→','⟹','∈','∀','∃','d/dx','x²','aⁿ'];
+  let W,H,pts=[];
+  function resize(){
+    const hero=canvas.parentElement; if(!hero)return;
+    W=canvas.width=hero.offsetWidth; H=canvas.height=hero.offsetHeight;
+  }
+  function mkPt(){return{x:Math.random()*W,y:Math.random()*H,s:SYMS[Math.floor(Math.random()*SYMS.length)],sz:10+Math.random()*10,op:0.03+Math.random()*0.07,vx:(Math.random()-.5)*.12,vy:-0.08-Math.random()*.15,life:0,maxLife:350+Math.random()*350};}
+  function init(){ resize(); pts=Array.from({length:35},(_,i)=>{const p=mkPt();p.y=(i/35)*H;p.life=Math.random()*p.maxLife;return p;}); }
+  function draw(){
+    if(!canvas.isConnected){ cancelAnimationFrame(_landRafId); _landRafId=null; return; }
+    ctx.clearRect(0,0,W,H);
+    pts.forEach((p,i)=>{
+      p.x+=p.vx; p.y+=p.vy; p.life++;
+      let a=p.op;
+      if(p.life<50)a*=p.life/50;
+      if(p.life>p.maxLife-50)a*=(p.maxLife-p.life)/50;
+      ctx.globalAlpha=a;
+      ctx.fillStyle='#7dbb78';
+      ctx.font=`300 ${p.sz}px 'DM Mono',monospace`;
+      ctx.fillText(p.s,p.x,p.y);
+      if(p.life>=p.maxLife||p.y<-20||p.x<-50||p.x>W+50)pts[i]={...mkPt(),y:H+10,life:0};
+    });
+    ctx.globalAlpha=1;
+    _landRafId=requestAnimationFrame(draw);
+  }
+  init(); draw();
+  window.addEventListener('resize',()=>{ resize(); pts.forEach(p=>{p.x=Math.min(p.x,W);p.y=Math.min(p.y,H);}); });
+}
+
+// ── DASHBOARD CANVAS ─────────────────────────────────────────────────────────
+function startDashCanvas(){
+  const canvas=document.getElementById('dash-canvas');
+  if(!canvas||canvas._started)return; canvas._started=true;
+  const ctx=canvas.getContext('2d');
+  const SYMS=['dx','∂f','∑','∫','lim','→','∞','π','∆x','f\'(x)','eˣ','x²','sin','cos','log','∇','∆','θ','aⁿ','∀','∃'];
+  let W,H,pts=[],mX=-999,mY=-999;
+  function resize(){const hero=document.getElementById('dash-hero');if(!hero)return;W=canvas.width=hero.offsetWidth;H=canvas.height=hero.offsetHeight;}
+  function mkPt(){return{x:Math.random()*W,y:Math.random()*H,s:SYMS[Math.floor(Math.random()*SYMS.length)],sz:9+Math.random()*8,op:0.04+Math.random()*0.07,vx:(Math.random()-.5)*.13,vy:-0.1-Math.random()*.18,life:0,maxLife:380+Math.random()*380};}
+  function init(){resize();pts=Array.from({length:38},(_,i)=>{const p=mkPt();p.y=(i/38)*H;p.life=Math.random()*p.maxLife;return p;});}
+  let _dashRafId=null;
+  function draw(){
+    if(!canvas.isConnected){ cancelAnimationFrame(_dashRafId); _dashRafId=null; return; }
+    ctx.clearRect(0,0,W,H);
+    pts.forEach((p,i)=>{
+      const ddx=p.x-mX,ddy=p.y-mY,dd=Math.sqrt(ddx*ddx+ddy*ddy);
+      if(dd<100&&dd>0){p.vx+=(ddx/dd)*.035;p.vy+=(ddy/dd)*.035;}
+      p.vx*=.99;p.vy*=.99;
+      p.x+=p.vx;p.y+=p.vy;p.life++;
+      let a=p.op;
+      if(p.life<60)a*=p.life/60;
+      if(p.life>p.maxLife-60)a*=(p.maxLife-p.life)/60;
+      ctx.globalAlpha=a;
+      ctx.fillStyle='#6af06a';
+      ctx.font=`300 ${p.sz}px 'DM Mono',monospace`;
+      ctx.fillText(p.s,p.x,p.y);
+      if(p.life>=p.maxLife||p.y<-20||p.x<-60||p.x>W+60)pts[i]={...mkPt(),y:H+10,life:0};
+    });
+    ctx.globalAlpha=1;
+    _dashRafId=requestAnimationFrame(draw);
+  }
+  init();draw();
+  window.addEventListener('resize',init);
+  const hero=document.getElementById('dash-hero');
+  if(hero){
+    hero.addEventListener('mousemove',e=>{const r=hero.getBoundingClientRect();mX=e.clientX-r.left;mY=e.clientY-r.top;});
+    hero.addEventListener('mouseleave',()=>{mX=-999;mY=-999;});
+  }
+}
+
+// ── DIAGNOSTIC ────────────────────────────────────────────────────────────────
+let diagHintVisible = false;
+let currentDiagQuestion = null;
+let diagAnswered = false;
+
+function handleLogoClick(){ if(currentUser) showDashboard(); else showScreen('s-landing'); }
+
+async function startDiagnostic(){
+  qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;sessionId=Math.random().toString(36).slice(2);
+  showScreen('s-diagnostic');
+  diagHintVisible=false;
+  document.getElementById('diag-hint-box').classList.remove('show');
+  loadQuestion();
+}
+
+async function loadQuestion(){
+  diagAnswered = false;
+  document.getElementById('solution-box').classList.remove('show');
+  document.getElementById('diag-hint-box').classList.remove('show');
+  diagHintVisible=false;
+  document.getElementById('opts').innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:.7rem;color:var(--text3);padding:1rem 0;letter-spacing:.08em">Loading…</div>';
+  document.getElementById('q-text').textContent='';
+  try{
+    const res=await fetch('/question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId,currentLevel,correct,wrong})});
+    const data=await res.json();
+    if(data.done||qCount>=MAX_Q){showResult();return;}
+    currentLevel=data.level;
+    currentDiagQuestion=data.question;
+    renderQuestion(data.question,data.levelName);
+  }catch(e){document.getElementById('q-text').textContent='Error loading. Please refresh.';}
+}
+
+function renderQuestion(q,levelName){
+  qCount++;
+  document.getElementById('prog-label').textContent=`Question ${qCount} of ${MAX_Q}`;
+  document.getElementById('prog-level').textContent=levelName;
+  document.getElementById('pfill').style.width=`${(qCount/MAX_Q)*100}%`;
+  const qt=document.getElementById('q-text');
+  qt.style.animation='none'; qt.textContent=q.q; void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
+  const hint = q.hint || (HINTS[currentLevel]||HINTS[1])[Math.floor(Math.random()*(HINTS[currentLevel]||HINTS[1]).length)];
+  document.getElementById('diag-hint-box').textContent = hint;
+  const optsEl=document.getElementById('opts'); optsEl.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='opt';
+    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    btn.onclick=()=>handleDiagAnswer(i,q.ans,optsEl,q);
+    optsEl.appendChild(btn);
+  });
+}
+
+function handleDiagAnswer(chosen,correct_ans,optsEl,q){
+  if(diagAnswered)return; diagAnswered=true;
+  const isCorrect=chosen===correct_ans;
+  if(isCorrect)correct++;else wrong++;
+  optsEl.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===correct_ans)b.classList.add('correct');
+    if(i===chosen&&!isCorrect)b.classList.add('wrong');
+  });
+  // Show solution
+  const sb=document.getElementById('solution-box');
+  sb.className='solution-box show'+(isCorrect?'':' wrong-solution');
+  document.getElementById('sol-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
+  document.getElementById('sol-verdict').className='sol-verdict '+(isCorrect?'right':'wrong');
+  document.getElementById('sol-explanation').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  const stepsEl=document.getElementById('sol-steps');
+  if(q.steps&&q.steps.length){
+    stepsEl.style.display='flex';
+    stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');
+  }else{stepsEl.style.display='none';}
+}
+
+function advanceDiagnostic(){ if(qCount>=MAX_Q)showResult();else loadQuestion(); }
+
+function toggleDiagHint(){
+  diagHintVisible=!diagHintVisible;
+  document.getElementById('diag-hint-box').classList.toggle('show',diagHintVisible);
+}
+function skipOne(){qCount++;if(qCount>=MAX_Q){showResult();return;}loadQuestion();}
+function skipAll(){userLevel=currentLevel;const rd={level:userLevel,score:correct,total:MAX_Q,email:userEmail};saveResult(rd);renderResult(rd,false);}
+
+// ── RESULT ────────────────────────────────────────────────────────────────────
+async function showResult(){
+  userLevel=currentLevel;
+  const rd={level:userLevel,score:correct,total:MAX_Q,email:userEmail};
+  saveResult(rd);renderResult(rd,false);
+  try{await fetch('/result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:userEmail,level:userLevel,levelName:STAGES[userLevel].name,score:correct,total:MAX_Q})});}catch(e){}
+}
+
+function saveResult(data){ try{localStorage.setItem('apexmath_result',JSON.stringify(data));}catch(e){} }
+
+function renderResult(data,showRetake){
+  showScreen('s-result');
+  const stage=STAGES[data.level];
+  document.getElementById('r-level').textContent=stage.name;
+  document.getElementById('r-score').textContent=`${data.score}/${data.total} correct · Diagnostic complete`;
+  document.getElementById('r-desc').textContent=stage.desc;
+  const rb=document.getElementById('retake-banner');
+  if(showRetake&&data.email){rb.classList.add('show');document.getElementById('retake-email').textContent=data.email;}
+  else rb.classList.remove('show');
+  if(currentUser){document.getElementById('r-register-btn').style.display='none';document.getElementById('r-dashboard-btn').style.display='inline-block';}
+  else{document.getElementById('r-register-btn').style.display='inline-block';document.getElementById('r-dashboard-btn').style.display='none';}
+  renderJourney(data.level,document.getElementById('journey-track'));
+  const hrs=(HOURS_TO_NEXT[data.level]||0);
+  document.getElementById('proj-box').textContent=hrs>0?`At 1 hour/day, 5 days/week, you could reach the next level in approximately ${Math.round(hrs/5)} weeks. Consistent, focused practice compounds fast.`:`You've reached the highest level tracked. Focus on deepening mastery and tackling competition math.`;
+}
+
+function startFresh(){qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;showScreen('s-diagnostic');loadQuestion();}
+
+function renderJourney(level,track){
+  track.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const isCurrent=i===level,isNext=i===level+1,isDone=i<level;
+    const dotIcon=isDone?'✓':'';
+    const dotClass=isDone?'done':isCurrent?'current':'';
+    const el=document.createElement('div');
+    el.className='journey-stage'+(isCurrent?' is-current':'')+(isNext?' is-next':'');
+    el.innerHTML=`<div class="stage-dot ${dotClass}">${dotIcon}</div>
+      <div class="stage-content">
+        <div class="stage-header">
+          <div class="stage-name${isCurrent?' cl':''}">${s.name}${isCurrent?' — You Are Here':''}</div>
+          <div class="stage-tags">
+            ${isCurrent?'<span class="tag ct">Current Level</span>':''}${isNext?'<span class="tag nt">Up Next</span>':''}
+            <span class="tag tt">${isDone?'Completed':`~${Math.round(HOURS_TO_NEXT[i]/5)} weeks at 1hr/day`}</span>
+          </div>
+        </div>
+        ${isNext?'<div class="next-callout">⟶ <strong>Up next.</strong> This is where you\'re headed after your current level.</div>':''}
+        <div class="stage-desc">${s.desc}</div>
+        <div class="resources">${s.resources.map(r=>`<div class="resource-row"><span class="res-type ${r.type}">${r.type}</span><span class="res-name">${r.name}</span><a class="res-link" href="${r.url}" target="_blank" rel="noopener">Visit →</a></div>`).join('')}</div>
+      </div>`;
+    track.appendChild(el);
+    setTimeout(()=>el.classList.add('visible'),i*80);
+  });
+}
+
+// schedule widget
+function toggleSchedule(){const b=document.getElementById('sw-body');b.classList.toggle('open');if(b.classList.contains('open')&&document.getElementById('sw-start').value)calcSchedule();}
+function toggleDay(btn){btn.classList.toggle('sel');calcSchedule();}
+function calcSchedule(){
+  const startVal=document.getElementById('sw-start').value;if(!startVal)return;
+  const days=[...document.querySelectorAll('.day-btn.sel')].length;
+  const hrs=parseFloat(document.getElementById('sw-hours').value);
+  const hrsPerWeek=days*hrs;
+  const hoursLeft=HOURS_TO_NEXT[userLevel]||0;
+  const weeksToNext=hrsPerWeek>0?Math.ceil(hoursLeft/hrsPerWeek):99;
+  const totalHours=HOURS_TO_NEXT.reduce((a,b)=>a+b,0);
+  const weeksToCalc=hrsPerWeek>0?Math.ceil(totalHours/hrsPerWeek):999;
+  const addWeeks=(date,w)=>{const d=new Date(date);d.setDate(d.getDate()+w*7);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});};
+  document.getElementById('sw-hrs-week').textContent=hrsPerWeek.toFixed(1)+' hrs';
+  document.getElementById('sw-next').textContent=addWeeks(startVal,weeksToNext);
+  document.getElementById('sw-calc').textContent=addWeeks(startVal,weeksToNext+Math.ceil(60/hrsPerWeek));
+  document.getElementById('sw-mit').textContent=addWeeks(startVal,weeksToCalc);
+  document.getElementById('sw-result').style.display='block';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+// ── MODAL SYSTEM ─────────────────────────────────────────────────────────────
+function openDashModal(id){
+  const m=document.getElementById(id);
+  if(!m)return;
+  m.classList.add('open');
+  document.body.style.overflow='hidden';
+  // Init content
+  if(id==='modal-weakspots') renderWeakSpots2();
+  if(id==='modal-timer') { renderTimerLog2(); renderTimerTotal2(); }
+  if(id==='modal-flashcards') initFcModal();
+  if(id==='modal-formulas') initFormulaModal();
+  if(id==='modal-practice') initPracticeModal();
+  if(id==='modal-path') renderPathModal();
+  if(id==='modal-notes') loadNote2();
+}
+function closeDashModal(id){
+  const m=document.getElementById(id); if(!m)return;
+  m.classList.remove('open'); document.body.style.overflow='';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function showDashboard(){
+  showScreen('s-dashboard');
+
+  try{
+    const res=await fetch('/dashboard',{headers:{Authorization:`Bearer ${getToken()}`}});
+    const data=await res.json();
+    const{user,streak,completedToday,passedToday}=data;
+    const totalQ=data.totalQuizzes||0;
+
+    // Greeting
+    const hr=new Date().getHours();
+    const name=user.email.split('@')[0];
+    const greetMsg=hr<12?`Good morning, ${name}! ☀️`:hr<17?`Hey ${name}! 👋`:`Evening, ${name}! 🌙`;
+    document.getElementById('dash-greet').textContent=greetMsg;
+    const streakLine=streak>=7?`🔥 You're on fire! Keep it going.`:streak>=3?`${streak} days in a row — you're building something real.`:streak===1?`Day 1. The streak starts now.`:`Complete today's quiz to start a streak!`;
+    document.getElementById('dash-greet-sub').textContent=streakLine;
+
+    // Topbar
+    document.getElementById('tb-level-chip').textContent='⬡ '+user.level_name;
+    const sc=document.getElementById('tb-streak-chip');
+    sc.textContent='🔥 '+streak+' day'+(streak!==1?'s':'');
+    sc.className='dash-streak-chip'+(streak>=3?' on-fire':'');
+
+    // XP bar
+    const xp=(totalQ*10+(streak*5))%100;
+    document.getElementById('tb-xp-label').textContent=xp+' XP';
+    setTimeout(()=>{document.getElementById('tb-xp-fill').style.width=xp+'%';},300);
+
+    // Streak week dots
+    const swrDots=document.querySelectorAll('.swr-dot');
+    swrDots.forEach((d,i)=>d.classList.toggle('lit',i<Math.min(streak,7)));
+
+    // Week strip (kept for compat)
+    renderWeekStrip(data.weekDays||[]);
+    // Aside week
+    renderAsideWeek(data.weekDays||[]);
+
+    // Sidebar level
+    const sbName=document.getElementById('sb-level-name');
+    if(sbName)sbName.textContent=user.level_name;
+    const sbFill=document.getElementById('sb-level-fill');
+    if(sbFill)sbFill.style.width=Math.round((user.level/6)*100)+'%';
+
+    // Aside stats
+    const asStreak=document.getElementById('aside-streak-num');
+    if(asStreak)asStreak.textContent=streak;
+    const asLevel=document.getElementById('aside-level-num');
+    if(asLevel)asLevel.textContent=user.level+1;
+
+    // Aside resources
+    const asRes=document.getElementById('aside-resources');
+    if(asRes){
+      const resources=(STAGES[user.level]?.resources)||[];
+      const typeIcons={'video':'▶️','course':'📖','book':'📚','tool':'🛠️','notes':'📝'};
+      asRes.innerHTML=resources.map(r=>`<a class="dash-aside-res-link" href="${r.url}" target="_blank" rel="noopener"><span class="dash-aside-res-icon">${typeIcons[r.type]||'🔗'}</span>${r.name}</a>`).join('');
+    }
+
+    // Streak card
+    document.getElementById('streak-big-num').textContent=streak;
+    document.getElementById('streak-card-sub').textContent=completedToday&&passedToday?`Locked in for today ✓`:completedToday?`Tried today, keep at it!`:`Take today's quiz to keep it!`;
+
+    // Quiz card
+    if(completedToday&&passedToday){
+      document.getElementById('quiz-emoji').textContent='✅';
+      document.getElementById('quiz-card-title').textContent="Today's done!";
+      document.getElementById('quiz-card-sub').textContent='You nailed it. Streak locked in. Come back tomorrow.';
+      const qbtn=document.getElementById('quiz-start-btn');
+      qbtn.style.display='none';
+      const badge=document.getElementById('quiz-done-badge-el')||(() => {
+        const b=document.createElement('div');b.className='quiz-done-badge';b.id='quiz-done-badge-el';
+        document.getElementById('quiz-card-wrap').querySelector('.quiz-card-body').appendChild(b);return b;
+      })();
+      badge.textContent='🔥 '+streak+' day streak — see you tomorrow';
+    } else if(completedToday&&!passedToday){
+      document.getElementById('quiz-emoji').textContent='💪';
+      document.getElementById('quiz-card-title').textContent='Give it another shot';
+      document.getElementById('quiz-card-sub').textContent='You need 3/5 to keep your streak. You can do this.';
+      document.getElementById('quiz-start-btn').textContent='Try Again →';
+      document.getElementById('quiz-start-btn').disabled=false;
+    } else {
+      document.getElementById('quiz-emoji').textContent='🎯';
+      document.getElementById('quiz-card-title').textContent="Today's Quiz";
+    document.getElementById('quiz-start-btn').textContent=`Let's go →`;
+      document.getElementById('quiz-start-btn').disabled=false;
+    }
+
+    // Weak spots card
+    const ws=getWeakSpots();
+    const wsCount=Object.keys(ws).length;
+    document.getElementById('ws-card-sub').textContent=wsCount>0?`${wsCount} topics tracked — tap to see what to work on`:`No weak spots yet. Complete quizzes and they'll show here.`;
+
+    // Path progress (mini bar)
+    userLevel=user.level;
+    const pathPct=Math.round((user.level/(STAGES.length-1))*100);
+    document.getElementById('path-mini-fill').style.width=pathPct+'%';
+    document.getElementById('path-progress-inline').textContent='Level '+(user.level+1)+' of '+STAGES.length+' →';
+
+    // Timer total
+    renderTimerTotal2();
+    const tc=document.getElementById('timer-card-total');
+    if(tc) tc.textContent=document.getElementById('timer-total2')?.textContent||'0h 0m'+' this week →';
+
+    // Badges
+    renderBadges2(streak,totalQ,passedToday&&dailyCorrect===5);
+
+    // Settings modal values
+    document.getElementById('s2-email').textContent=user.email;
+    document.getElementById('s2-level').textContent=user.level_name;
+    document.getElementById('s2-level-sel').value=user.level;
+
+    // Notes default level
+    document.getElementById('notes-level-sel2').value=user.level;
+
+    // Practice
+    pracLevel=user.level;
+    pracCorrectCount=0; pracAttempted=0;
+
+    // Theme pills
+    const t=localStorage.getItem('apexmath_theme')||'';
+    document.querySelectorAll('.theme-pill').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+
+    setTimeout(startDashCanvas,150);
+
+  }catch(e){console.error('Dashboard error',e);}
+}
+
+function renderWeekStrip(passedDays){
+  // legacy strip hidden via CSS — aside handles display now
+  renderAsideWeek(passedDays);
+}
+
+function renderAsideWeek(passedDays){
+  const wrap=document.getElementById('dash-week-aside'); if(!wrap)return;
+  wrap.innerHTML='';
+  const dayLabels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today=new Date();
+  for(let i=6;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    const isToday=i===0, isDone=passedDays.includes(key);
+    const row=document.createElement('div'); row.className='week-pip-row';
+    const pip=document.createElement('div');
+    pip.className='week-pip-mini'+(isDone?' done':isToday?' today':'');
+    pip.textContent=isDone?'✓':isToday?'·':'';
+    const label=document.createElement('div');
+    label.className='week-pip-date'+(isToday?' today-label':'');
+    label.textContent=isToday?'Today':dayLabels[d.getDay()];
+    row.appendChild(pip); row.appendChild(label);
+    wrap.appendChild(row);
+  }
+}
+
+function renderBadges2(streak,totalQ,perfect){
+  const earned=new Set(JSON.parse(localStorage.getItem('apexmath_badges')||'[]'));
+  if(totalQ>=1)earned.add('first_quiz');
+  if(streak>=3)earned.add('streak_3');
+  if(streak>=7)earned.add('streak_7');
+  if(totalQ>=10)earned.add('practice_10');
+  if(perfect)earned.add('perfect_quiz');
+  localStorage.setItem('apexmath_badges',JSON.stringify([...earned]));
+  const wrap=document.getElementById('dash-badges-row'); if(!wrap)return; wrap.innerHTML='';
+  BADGES_DEF.forEach(b=>{
+    const el=document.createElement('div');
+    el.className='badge-pill'+(earned.has(b.id)?' earned':'');
+    el.title=b.desc;
+    el.innerHTML=`<span class="badge-emoji">${b.icon}</span>${b.label}`;
+    wrap.appendChild(el);
+  });
+}
+
+// keep old renderBadges for any legacy calls
+function renderBadges(streak,totalQ,perfect){ renderBadges2(streak,totalQ,perfect); }
+
+// ── PRACTICE MODAL ────────────────────────────────────────────────────────────
+let p2Level=1, p2Pool=[], p2Idx=0, p2Correct=0, p2Attempted=0;
+
+function initPracticeModal(){
+  const row=document.getElementById('prac-level-row2'); if(!row||row.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='prac-lvl-btn'+(i===pracLevel?' active':'');
+    btn.textContent='Level '+i;
+    btn.onclick=()=>{
+      document.querySelectorAll('.prac-lvl-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); p2Level=i; p2Pool=[]; p2Idx=0; loadPracticeQ2();
+    };
+    row.appendChild(btn);
+  });
+  p2Level=pracLevel; loadPracticeQ2();
+}
+
+function loadPracticeQ2(){
+  const pool=PRACTICE_QS[p2Level]||PRACTICE_QS[1];
+  if(!pool||!pool.length)return;
+  if(!p2Pool.length||p2Idx>=p2Pool.length){p2Pool=[...pool].sort(()=>Math.random()-.5);p2Idx=0;}
+  const q=p2Pool[p2Idx++];
+  document.getElementById('prac-sol2').classList.remove('show','wrong-solution');
+  document.getElementById('prac-q2').textContent=q.q;
+  const optsEl=document.getElementById('prac-opts2'); optsEl.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='opt';
+    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    btn.onclick=()=>{
+      const isC=i===q.ans; p2Attempted++;
+      if(isC)p2Correct++; else trackWrongAnswer(STAGES[p2Level]?.name||'General');
+      optsEl.querySelectorAll('.opt').forEach((b,j)=>{b.classList.add('disabled');if(j===q.ans)b.classList.add('correct');if(j===i&&!isC)b.classList.add('wrong');});
+      const sol=document.getElementById('prac-sol2');
+      sol.className='solution-box show'+(isC?'':' wrong-solution');
+      document.getElementById('prac-verdict2').textContent=isC?'✓ Correct!':'✗ Incorrect';
+      document.getElementById('prac-verdict2').className='sol-verdict '+(isC?'right':'wrong');
+      document.getElementById('prac-exp2').textContent=q.explanation||`Correct: ${q.opts[q.ans]}`;
+      const st=document.getElementById('prac-steps2');
+      if(q.steps){st.style.display='flex';st.innerHTML=q.steps.map((s,k)=>`<div class="sol-step"><strong>Step ${k+1}:</strong> ${s}</div>`).join('');}else st.style.display='none';
+      document.getElementById('p2-correct').textContent=p2Correct;
+      document.getElementById('p2-attempted').textContent=p2Attempted;
+      document.getElementById('p2-accuracy').textContent=Math.round(p2Correct/p2Attempted*100)+'%';
+      if(p2Attempted>=10){const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');if(!b.includes('practice_10')){b.push('practice_10');localStorage.setItem('apexmath_badges',JSON.stringify(b));}}
+    };
+    optsEl.appendChild(btn);
+  });
+}
+
+// ── FLASHCARD MODAL ──────────────────────────────────────────────────────────
+let fc2Set=[], fc2Idx=0, fc2Flipped=false, fc2Level=1;
+
+function initFcModal(){
+  const tabs=document.getElementById('fc-level-tabs2'); if(!tabs||tabs.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='flvl-btn'+(i===userLevel?' active':'');
+    btn.textContent='L'+i;
+    btn.onclick=()=>{document.querySelectorAll('#fc-level-tabs2 .flvl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');fc2Level=i;loadFcSet2();};
+    tabs.appendChild(btn);
+  });
+  fc2Level=userLevel; loadFcSet2();
+}
+
+function loadFcSet2(){
+  fc2Set=[...(FLASHCARD_SETS[fc2Level]||[])].sort(()=>Math.random()-.5);
+  fc2Idx=0; fc2Flipped=false;
+  document.getElementById('fc-inner2').classList.remove('flipped');
+  renderFc2();
+  const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');
+  if(!b.includes('flashcard_fan')){b.push('flashcard_fan');localStorage.setItem('apexmath_badges',JSON.stringify(b));}
+}
+
+function renderFc2(){
+  if(!fc2Set.length)return;
+  const c=fc2Set[fc2Idx];
+  document.getElementById('fc-front2').textContent=c.front;
+  document.getElementById('fc-back2-text').textContent=c.back;
+  document.getElementById('fc-counter2').textContent=`${fc2Idx+1} / ${fc2Set.length}`;
+  fc2Flipped=false; document.getElementById('fc-inner2').classList.remove('flipped');
+}
+
+function fcFlip2(){fc2Flipped=!fc2Flipped;document.getElementById('fc-inner2').classList.toggle('flipped',fc2Flipped);}
+function fcNext2(){fc2Idx=(fc2Idx+1)%fc2Set.length;renderFc2();}
+function fcPrev2(){fc2Idx=(fc2Idx-1+fc2Set.length)%fc2Set.length;renderFc2();}
+function fcRate2(r){if(r==='hard'){const c=fc2Set.splice(fc2Idx,1)[0];fc2Set.push(c);if(fc2Idx>=fc2Set.length)fc2Idx=0;renderFc2();}else fcNext2();}
+
+// ── FORMULA MODAL ─────────────────────────────────────────────────────────────
+let fm2Level=1;
+function initFormulaModal(){
+  const tabs=document.getElementById('formula-level-tabs2'); if(!tabs||tabs.children.length)return;
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button'); btn.className='flvl-btn'+(i===userLevel?' active':'');
+    btn.textContent='L'+i;
+    btn.onclick=()=>{document.querySelectorAll('#formula-level-tabs2 .flvl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');fm2Level=i;renderFormulas2();};
+    tabs.appendChild(btn);
+  });
+  fm2Level=userLevel; renderFormulas2();
+}
+function renderFormulas2(){
+  const search=(document.getElementById('formula-search2')?.value||'').toLowerCase().trim();
+  const cats=FORMULAS[fm2Level]||[];
+  const wrap=document.getElementById('formula-content2'); if(!wrap)return; wrap.innerHTML='';
+  cats.forEach(cat=>{
+    const items=search?cat.items.filter(f=>f.math.toLowerCase().includes(search)||f.name.toLowerCase().includes(search)):cat.items;
+    if(!items.length)return;
+    const div=document.createElement('div'); div.className='formula-cat2';
+    div.innerHTML=`<div class="fcat-title">${cat.cat}</div>`+items.map(f=>`<div class="fitem"><div class="fitem-math">${f.math}</div><div class="fitem-name">${f.name}</div></div>`).join('');
+    wrap.appendChild(div);
+  });
+  if(!wrap.children.length) wrap.innerHTML=`<div style="color:var(--text3);font-size:.84rem;padding:1rem 0">No formulas found${search?' for "'+search+'"':''}</div>`;
+}
+
+// ── WEAK SPOTS MODAL ──────────────────────────────────────────────────────────
+function renderWeakSpots2(){
+  const ws=getWeakSpots();
+  const entries=Object.entries(ws).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const wrap=document.getElementById('ws-modal-content'); if(!wrap)return;
+  if(!entries.length){
+    wrap.innerHTML='<div style="text-align:center;padding:2rem 1rem;color:var(--text3);font-size:.86rem;line-height:1.7"><div style="font-size:2rem;margin-bottom:.75rem">🎯</div>No data yet. Complete quizzes and your weak spots will appear here.</div>';
+    return;
+  }
+  const max=entries[0][1];
+  wrap.innerHTML=entries.map(([topic,count])=>{
+    const pct=Math.round((count/max)*100);
+    const color=pct>60?'var(--red)':'var(--accent)';
+    return`<div class="ws-item2"><div class="ws-top2"><span>${topic}</span><span class="ws-count2">missed ${count}×</span></div><div class="ws-bar-bg2"><div class="ws-bar-fill2" style="width:${pct}%;background:${color}"></div></div></div>`;
+  }).join('');
+}
+// keep old renderWeakSpots
+function renderWeakSpots(){ renderWeakSpots2(); }
+
+// ── PATH MODAL ────────────────────────────────────────────────────────────────
+function renderPathModal(){
+  const pct=Math.round((userLevel/(STAGES.length-1))*100);
+  document.getElementById('path-modal-label').textContent='Level '+(userLevel+1)+' of '+STAGES.length;
+  document.getElementById('path-modal-pct').textContent=pct+'%';
+  setTimeout(()=>{document.getElementById('path-modal-fill').style.width=pct+'%';},100);
+  const wrap=document.getElementById('path-modal-stages'); if(!wrap)return; wrap.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const isCurrent=i===userLevel,isDone=i<userLevel;
+    const el=document.createElement('div'); el.className='ps-item';
+    const dot=document.createElement('div');
+    dot.className='ps-dot'+(isDone?' done':isCurrent?' current':'');
+    dot.textContent=isDone?'✓':'';
+    const body=document.createElement('div'); body.style.flex='1';
+    let tags='';
+    if(isCurrent) tags+=`<span class="ps-tag here">You are here</span>`;
+    if(i===userLevel+1) tags+=`<span class="ps-tag" style="color:var(--gold,#92700a);border-color:rgba(146,112,10,.25)">Up next</span>`;
+    tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+Math.round(HOURS_TO_NEXT[i]/5)+' weeks'}</span>`;
+    body.innerHTML=`<div class="ps-name${isCurrent?' current-level':''}">${s.name}</div><div style="margin-bottom:.3rem">${tags}</div><div class="ps-desc">${s.desc}</div>`;
+    el.appendChild(dot); el.appendChild(body);
+    wrap.appendChild(el);
+  });
+}
+
+// ── TIMER MODAL ───────────────────────────────────────────────────────────────
+let t2Interval=null, t2StartTime=0, t2Elapsed=0, t2Running=false;
+function timerStart2(){
+  if(t2Running)return; t2Running=true; t2StartTime=Date.now()-t2Elapsed;
+  t2Interval=setInterval(timerTick2,1000);
+  document.getElementById('timer-btn-start2').disabled=true;
+  document.getElementById('timer-btn-stop2').disabled=false;
+  document.getElementById('timer-status2').textContent='running…';
+  document.getElementById('timer-digits2').classList.add('running');
+}
+function timerStop2(){
+  if(!t2Running)return; t2Running=false; clearInterval(t2Interval);
+  t2Elapsed=Date.now()-t2StartTime;
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  sessions.push({date:new Date().toLocaleDateString(),dur:t2Elapsed});
+  localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
+  t2Elapsed=0;
+  document.getElementById('timer-btn-start2').disabled=false;
+  document.getElementById('timer-btn-stop2').disabled=true;
+  document.getElementById('timer-status2').textContent='session saved ✓';
+  document.getElementById('timer-digits2').classList.remove('running');
+  renderTimerTotal2(); renderTimerLog2();
+}
+function timerReset2(){
+  t2Running=false; clearInterval(t2Interval); t2Elapsed=0;
+  document.getElementById('timer-digits2').textContent='00:00:00';
+  document.getElementById('timer-btn-start2').disabled=false;
+  document.getElementById('timer-btn-stop2').disabled=true;
+  document.getElementById('timer-status2').textContent='ready to start';
+  document.getElementById('timer-digits2').classList.remove('running');
+}
+function timerTick2(){
+  t2Elapsed=Date.now()-t2StartTime;
+  const s=Math.floor(t2Elapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  document.getElementById('timer-digits2').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+function renderTimerTotal2(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<7*24*3600*1000).reduce((a,s)=>a+s.dur,0);
+  const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
+  const txt=`${h}h ${m}m`;
+  const el=document.getElementById('timer-total2');if(el)el.textContent=txt;
+  const tc=document.getElementById('timer-card-total');if(tc)tc.textContent=txt+' this week →';
+}
+function renderTimerLog2(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const log=document.getElementById('timer-log2'); if(!log)return;
+  if(!sessions.length){log.innerHTML='<div style="font-size:.84rem;color:var(--text3)">No sessions yet.</div>';return;}
+  log.innerHTML=sessions.slice(-8).reverse().map(s=>{
+    const m=Math.floor(s.dur/60000),sec=Math.floor((s.dur%60000)/1000);
+    return`<div class="timer-log-item"><span>${s.date}</span><span class="timer-log-dur2">${m}m ${sec}s</span></div>`;
+  }).join('');
+}
+
+// ── NOTES MODAL ───────────────────────────────────────────────────────────────
+function loadNote2(){
+  const level=document.getElementById('notes-level-sel2')?.value||userLevel;
+  const a=document.getElementById('notes-area2'); if(!a)return;
+  a.value=localStorage.getItem('apexmath_note_'+level)||'';
+  document.getElementById('notes-chars2').textContent=a.value.length+' chars';
+}
+function autoSaveNote2(){
+  const level=document.getElementById('notes-level-sel2').value;
+  const v=document.getElementById('notes-area2').value;
+  localStorage.setItem('apexmath_note_'+level,v);
+  document.getElementById('notes-chars2').textContent=v.length+' chars';
+  const s=document.getElementById('notes-saved2'); s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),2000);
+}
+function switchNote2(){loadNote2();}
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────────
+function toggleSub2(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
+async function changePassword2(){
+  const cur=document.getElementById('s2-cur-pw').value, nw=document.getElementById('s2-new-pw').value;
+  if(!cur||!nw){document.getElementById('s2-pw-msg').textContent='Fill both fields.';return;}
+  try{
+    const res=await fetch('/auth/change-password',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({currentPassword:cur,newPassword:nw})});
+    const data=await res.json();
+    document.getElementById('s2-pw-msg').textContent=res.ok?'Password updated!':data.error||'Error.';
+  }catch(e){document.getElementById('s2-pw-msg').textContent='Connection error.';}
+}
+async function updateLevel2(){
+  const level=parseInt(document.getElementById('s2-level-sel').value);
+  try{
+    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
+    if(res.ok){closeDashModal('modal-settings');userLevel=level;showDashboard();}
+  }catch(e){}
+}
+
+// keep legacy names working
+function timerStart(){timerStart2();}
+function timerStop(){timerStop2();}
+function timerReset(){timerReset2();}
+function timerTick(){timerTick2();}
+function renderTimerTotal(){renderTimerTotal2();}
+function renderTimerLog(){renderTimerLog2();}
+function changePassword(){changePassword2();}
+async function updateLevel(){
+  const level=parseInt(document.getElementById('settings-level-select')?.value||document.getElementById('s2-level-sel').value);
+  try{
+    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
+    if(res.ok){userLevel=level;showDashboard();}
+  }catch(e){}
+}
+function switchDTab(name,btn){
+  // Legacy - open modals instead for new UI
+  const map={practice:'modal-practice',formulas:'modal-formulas',flashcards:'modal-flashcards',weakspots:'modal-weakspots',timer:'modal-timer',notes:'modal-notes',path:'modal-path',settings:'modal-settings'};
+  if(map[name]) openDashModal(map[name]);
+}
+function renderDashJourney(level){ userLevel=level; }
+
+// ── DAILY QUIZ ────────────────────────────────────────────────────────────────
+let currentDailyQ = null;
+let dailyAnswered = false;
+
+async function startDailyQuiz(){
+  try{
+    const res=await fetch('/daily/questions',{headers:{Authorization:`Bearer ${getToken()}`}});
+    const data=await res.json();
+    dailyQuestions=data.questions; currentDailyLevel=data.level;
+    dailyIndex=0; dailyCorrect=0; dailyResults=[]; dailyConfidence=[];
+    document.getElementById('dq-level-tag').textContent=STAGES[data.level]?.name||'';
+    showScreen('s-daily');
+    renderDailyQuestion();
+  }catch(e){alert('Error loading quiz.');}
+}
+
+function setConfidence(val){
+  dailyConfidence[dailyIndex]=val;
+  document.getElementById('conf-sure').classList.toggle('selected',val==='sure');
+  document.getElementById('conf-unsure').classList.toggle('selected',val==='unsure');
+}
+
+function renderDailyQuestion(){
+  dailyAnswered=false;
+  const q=dailyQuestions[dailyIndex];
+  currentDailyQ=q;
+  document.getElementById('dq-label').textContent=`Question ${dailyIndex+1} of 5`;
+  document.getElementById('dq-fill').style.width=`${(dailyIndex/5)*100}%`;
+  const qt=document.getElementById('dq-text');
+  qt.style.animation='none'; qt.textContent=q.q; void qt.offsetWidth; qt.style.animation='fadeUp .3s ease forwards';
+  // Hint
+  const hint=q.hint||(HINTS[currentDailyLevel]||HINTS[1])[Math.floor(Math.random()*(HINTS[currentDailyLevel]||HINTS[1]).length)];
+  document.getElementById('dq-hint-box').textContent=hint;
+  document.getElementById('dq-hint-box').classList.remove('show');
+  dailyHintOpen=false;
+  // Hide solution
+  const sol=document.getElementById('dq-solution');
+  sol.classList.remove('show','dq-sol-wrong');
+  // Build options
+  const optsEl=document.getElementById('dq-opts'); optsEl.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='dq-opt';
+    btn.innerHTML=`<span class="dq-opt-letter">${l}</span><span class="dq-opt-text">${q.opts[i]}</span>`;
+    btn.onclick=()=>handleDailyAnswer(i,q.ans,optsEl,q);
+    optsEl.appendChild(btn);
+  });
+}
+
+function handleDailyAnswer(chosen,correct_ans,optsEl,q){
+  if(dailyAnswered)return; dailyAnswered=true;
+  const isCorrect=chosen===correct_ans;
+  if(isCorrect)dailyCorrect++;
+  else{
+    const topic=q.topic||STAGES[currentDailyLevel]?.name||'General';
+    trackWrongAnswer(topic);
+  }
+  dailyResults.push({isCorrect,chosen,correct_ans,q});
+  optsEl.querySelectorAll('.dq-opt').forEach((b,i)=>{
+    b.classList.add('dq-disabled');
+    if(i===correct_ans)b.classList.add('dq-correct');
+    if(i===chosen&&!isCorrect)b.classList.add('dq-wrong');
+  });
+  // Show solution panel
+  const sol=document.getElementById('dq-solution');
+  sol.classList.add('show');
+  if(!isCorrect)sol.classList.add('dq-sol-wrong');
+  const verdict=document.getElementById('dq-sol-verdict');
+  verdict.textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
+  verdict.className='dq-sol-verdict '+(isCorrect?'right':'wrong');
+  document.getElementById('dq-sol-body').textContent=q.explanation||`The correct answer is ${['A','B','C','D'][correct_ans]}: ${q.opts[correct_ans]}.`;
+  // Steps
+  const stepsEl=document.getElementById('dq-sol-steps');
+  if(q.steps&&q.steps.length){
+    stepsEl.style.display='flex';
+    stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="dq-sol-step"><span class="dq-sol-step-num">step ${i+1}</span>${s}</div>`).join('');
+  }else stepsEl.style.display='none';
+  // Inline resources (on wrong answers especially)
+  const resEl=document.getElementById('dq-resources');
+  const resources=(STAGES[currentDailyLevel]?.resources)||[];
+  if(!isCorrect&&resources.length){
+    resEl.style.display='flex';
+    const typeIcons={'video':'▶','course':'📖','book':'📚','tool':'🛠','notes':'📝'};
+    resEl.innerHTML=`<div class="dq-resources-label">Review this topic</div>`+
+      resources.map(r=>`<a class="dq-resource-link" href="${r.url}" target="_blank" rel="noopener">
+        <span class="dq-resource-type">${r.type}</span>
+        <span class="dq-resource-name">${r.name}</span>
+        <span class="dq-resource-arrow">↗</span>
+      </a>`).join('');
+  }else resEl.style.display='none';
+  // Change next button text on last question
+  const nextBtn=document.getElementById('dq-next-btn');
+  if(nextBtn)nextBtn.textContent=dailyIndex>=4?'See Results →':'Next Question →';
+}
+
+function dqAdvance(){
+  dailyIndex++;
+  if(dailyIndex>=5)finishDailyQuiz();
+  else renderDailyQuestion();
+}
+
+function toggleDailyHint(){
+  dailyHintOpen=!dailyHintOpen;
+  document.getElementById('dq-hint-box').classList.toggle('show',dailyHintOpen);
+  const btn=document.getElementById('dq-hint-btn');
+  if(btn)btn.querySelector('span').textContent=dailyHintOpen?'Hide hint':'Show hint';
+}
+
+async function finishDailyQuiz(){
+  const passed=dailyCorrect>=3;
+  let streak=0;
+  try{
+    const res=await fetch('/daily/complete',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({score:dailyCorrect})});
+    const data=await res.json(); streak=data.streak||0;
+  }catch(e){}
+  showScreen('s-daily-done');
+  document.getElementById('dq-fill').style.width='100%';
+
+  // Score + headline
+  document.getElementById('done-score-big').textContent=dailyCorrect;
+  let headline, sub;
+  if(dailyCorrect===5){headline='Perfect score.';sub='A flawless quiz. Your streak is locked in.';}
+  else if(passed){headline='Nice work.';sub=`${dailyCorrect}/5 — streak locked in. Come back tomorrow.`;}
+  else{headline='Not quite.';sub='You need 3 or more to keep your streak. Review the explanations below and try again tomorrow.';}
+  document.getElementById('done-title').textContent=headline;
+  document.getElementById('done-sub').textContent=sub;
+
+  // Streak badge
+  const streakBadge=document.getElementById('done-streak');
+  if(passed&&streak>0){
+    streakBadge.style.display='inline-flex';
+    streakBadge.textContent=`🔥 ${streak} day streak`;
+  }else streakBadge.style.display='none';
+
+  // Breakdown bars
+  const bd=document.getElementById('done-breakdown'); bd.innerHTML='';
+  dailyResults.forEach(r=>{
+    const el=document.createElement('div');
+    el.className='done-q'+(r.isCorrect?' passed':' failed');
+    bd.appendChild(el);
+  });
+
+  // Per-question review
+  const rev=document.getElementById('done-review'); rev.innerHTML='';
+  dailyResults.forEach((r,i)=>{
+    const el=document.createElement('div'); el.className='done-review-item';
+    el.innerHTML=`<div class="done-review-num">Q${i+1}</div>
+      <div class="done-review-q">${r.q?.q||''}</div>
+      <div class="done-review-icon">${r.isCorrect?'✓':'✗'}</div>`;
+    rev.appendChild(el);
+  });
+
+  // Resources section at bottom
+  const resources=(STAGES[currentDailyLevel]?.resources)||[];
+  const resSection=document.getElementById('done-resources-section');
+  if(resources.length){
+    const typeIcons={'video':'▶️','course':'📖','book':'📚','tool':'🛠️','notes':'📝'};
+    const typeDescs={'video':'Watch & learn','course':'Full course','book':'Textbook','tool':'Interactive','notes':'Reference notes'};
+    resSection.innerHTML=`
+      <div class="done-resources-title">Keep going — study resources</div>
+      <div class="done-resources-sub">Handpicked for your current level: <strong>${STAGES[currentDailyLevel]?.name}</strong></div>
+      <div class="done-resource-grid">${resources.map(r=>`
+        <a class="done-resource-card" href="${r.url}" target="_blank" rel="noopener">
+          <div class="done-resource-icon">${typeIcons[r.type]||'🔗'}</div>
+          <div class="done-resource-info">
+            <div class="done-resource-name">${r.name}</div>
+            <div class="done-resource-desc">${typeDescs[r.type]||'Resource'}</div>
+          </div>
+          <div class="done-resource-cta">Open ↗</div>
+        </a>`).join('')}
+      </div>`;
+  }else resSection.innerHTML='';
+
+  // Badges
+  const badges=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');
+  if(!badges.includes('first_quiz')){badges.push('first_quiz');localStorage.setItem('apexmath_badges',JSON.stringify(badges));}
+  if(dailyCorrect===5&&!badges.includes('perfect_quiz')){badges.push('perfect_quiz');localStorage.setItem('apexmath_badges',JSON.stringify(badges));}
+}
+
+// ── PRACTICE MODE ─────────────────────────────────────────────────────────────
+function buildPracticeTabs(userLvl){
+  const wrap=document.getElementById('prac-level-tabs'); wrap.innerHTML='';
+  STAGES.forEach((_,i)=>{
+    const btn=document.createElement('button');
+    btn.className='prac-tab'+(i===userLvl?' active':'');
+    btn.textContent='Level '+i;
+    btn.onclick=()=>{
+      document.querySelectorAll('.prac-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      pracLevel=i; pracIdx=0; pracPool=[];
+      loadPracticeQuestion();
+    };
+    wrap.appendChild(btn);
+  });
+  pracLevel=userLvl;
+}
+
+function loadPracticeQuestion(){
+  const pool=PRACTICE_QS[pracLevel]||PRACTICE_QS[1];
+  if(!pool||!pool.length)return;
+  if(!pracPool.length||pracIdx>=pracPool.length){pracPool=[...pool].sort(()=>Math.random()-.5);pracIdx=0;}
+  const q=pracPool[pracIdx++];
+  document.getElementById('prac-solution').classList.remove('show','wrong-solution');
+  document.getElementById('prac-q').textContent=q.q;
+  const optsEl=document.getElementById('prac-opts'); optsEl.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const btn=document.createElement('button'); btn.className='opt';
+    btn.innerHTML=`<span class="opt-letter">${l}</span>${q.opts[i]}`;
+    btn.onclick=()=>handlePracticeAnswer(i,q,optsEl);
+    optsEl.appendChild(btn);
+  });
+  document.getElementById('prac-accuracy').textContent=pracAttempted>0?Math.round(pracCorrectCount/pracAttempted*100)+'%':'—';
+}
+
+function handlePracticeAnswer(chosen,q,optsEl){
+  const isCorrect=chosen===q.ans;
+  pracAttempted++;
+  if(isCorrect)pracCorrectCount++;
+  else trackWrongAnswer(STAGES[pracLevel]?.name||'General');
+  optsEl.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.ans)b.classList.add('correct');
+    if(i===chosen&&!isCorrect)b.classList.add('wrong');
+  });
+  const sol=document.getElementById('prac-solution');
+  sol.className='solution-box show'+(isCorrect?'':' wrong-solution');
+  document.getElementById('prac-verdict').textContent=isCorrect?'✓ Correct!':'✗ Incorrect';
+  document.getElementById('prac-verdict').className='sol-verdict '+(isCorrect?'right':'wrong');
+  document.getElementById('prac-explanation').textContent=q.explanation||`Correct: ${q.opts[q.ans]}`;
+  const stepsEl=document.getElementById('prac-steps');
+  if(q.steps){stepsEl.style.display='flex';stepsEl.innerHTML=q.steps.map((s,i)=>`<div class="sol-step"><strong>Step ${i+1}:</strong> ${s}</div>`).join('');}
+  else stepsEl.style.display='none';
+  document.getElementById('prac-correct').textContent=pracCorrectCount;
+  document.getElementById('prac-attempted').textContent=pracAttempted;
+  document.getElementById('prac-accuracy').textContent=Math.round(pracCorrectCount/pracAttempted*100)+'%';
+  // Badge check
+  if(pracAttempted>=10){const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');if(!b.includes('practice_10')){b.push('practice_10');localStorage.setItem('apexmath_badges',JSON.stringify(b));}}
+}
+
+// ── FORMULAS ──────────────────────────────────────────────────────────────────
+function renderFormulas(){
+  const level=parseInt(document.getElementById('formula-level-select').value)||0;
+  const search=(document.getElementById('formula-search').value||'').toLowerCase().trim();
+  const cats=FORMULAS[level]||[];
+  const wrap=document.getElementById('formula-content'); wrap.innerHTML='';
+  cats.forEach(cat=>{
+    const items=search?cat.items.filter(f=>f.math.toLowerCase().includes(search)||f.name.toLowerCase().includes(search)):cat.items;
+    if(!items.length)return;
+    const div=document.createElement('div'); div.className='formula-cat';
+    div.innerHTML=`<div class="formula-cat-title">${cat.cat}</div>`+items.map(f=>`<div class="formula-item"><div class="formula-math">${f.math}</div><div class="formula-name">${f.name}</div></div>`).join('');
+    wrap.appendChild(div);
+  });
+  if(!wrap.children.length) wrap.innerHTML=`<div style="color:var(--text3);font-size:.86rem;padding:1.5rem 0">No formulas found for "${search}"</div>`;
+}
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────────────
+function loadFlashcardSet(){
+  const level=parseInt(document.getElementById('fc-set-select').value)||0;
+  fcSet=[...(FLASHCARD_SETS[level]||[])].sort(()=>Math.random()-.5);
+  fcIndex=0; fcIsFlipped=false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderFlashcard();
+  // badge
+  const b=JSON.parse(localStorage.getItem('apexmath_badges')||'[]');
+  if(!b.includes('flashcard_fan')){b.push('flashcard_fan');localStorage.setItem('apexmath_badges',JSON.stringify(b));}
+}
+function renderFlashcard(){
+  if(!fcSet.length)return;
+  const card=fcSet[fcIndex];
+  document.getElementById('fc-front-text').textContent=card.front;
+  document.getElementById('fc-back-text').textContent=card.back;
+  document.getElementById('fc-counter').textContent=`${fcIndex+1} / ${fcSet.length}`;
+  fcIsFlipped=false;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+function flipCard(){fcIsFlipped=!fcIsFlipped;document.getElementById('flashcard').classList.toggle('flipped',fcIsFlipped);}
+function nextCard(){fcIndex=(fcIndex+1)%fcSet.length;renderFlashcard();}
+function prevCard(){fcIndex=(fcIndex-1+fcSet.length)%fcSet.length;renderFlashcard();}
+function rateCard(rating){
+  if(rating==='hard'){
+    // Put current card back in pool near the end
+    const card=fcSet.splice(fcIndex,1)[0];
+    fcSet.push(card);
+    if(fcIndex>=fcSet.length)fcIndex=0;
+    renderFlashcard();
+  }else{
+    nextCard();
+  }
+}
+
+// ── WEAK SPOTS ────────────────────────────────────────────────────────────────
+function getWeakSpots(){try{return JSON.parse(localStorage.getItem('apexmath_weakspots'))||{};}catch(e){return{};}}
+function trackWrongAnswer(topic){const ws=getWeakSpots();ws[topic]=(ws[topic]||0)+1;localStorage.setItem('apexmath_weakspots',JSON.stringify(ws));}
+function renderWeakSpots(){
+  const ws=getWeakSpots();
+  const entries=Object.entries(ws).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const list=document.getElementById('ws-list'),empty=document.getElementById('ws-empty');
+  if(!entries.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const max=entries[0][1];
+  list.innerHTML=entries.map(([topic,count])=>{
+    const pct=Math.round((count/max)*100);
+    const color=pct>60?'var(--red)':'var(--accent)';
+    return`<div class="ws-item"><div class="ws-top"><span class="ws-topic">${topic}</span><span class="ws-count">missed ${count}×</span></div><div class="ws-bar-bg"><div class="ws-bar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+  }).join('');
+}
+
+// ── TIMER ─────────────────────────────────────────────────────────────────────
+function timerStart(){
+  if(timerRunning)return;
+  timerRunning=true; timerStartTime=Date.now()-timerElapsed;
+  timerInterval=setInterval(timerTick,1000);
+  document.getElementById('timer-start-btn').disabled=true;
+  document.getElementById('timer-stop-btn').disabled=false;
+  document.getElementById('timer-status').textContent='running…';
+  document.getElementById('timer-display').classList.add('running');
+}
+function timerStop(){
+  if(!timerRunning)return;
+  timerRunning=false; clearInterval(timerInterval);
+  timerElapsed=Date.now()-timerStartTime;
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  sessions.push({date:new Date().toLocaleDateString(),dur:timerElapsed});
+  localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
+  timerElapsed=0;
+  document.getElementById('timer-start-btn').disabled=false;
+  document.getElementById('timer-stop-btn').disabled=true;
+  document.getElementById('timer-status').textContent='session saved';
+  document.getElementById('timer-display').classList.remove('running');
+  renderTimerTotal(); renderTimerLog();
+}
+function timerReset(){
+  timerRunning=false; clearInterval(timerInterval); timerElapsed=0;
+  document.getElementById('timer-display').textContent='00:00:00';
+  document.getElementById('timer-start-btn').disabled=false;
+  document.getElementById('timer-stop-btn').disabled=true;
+  document.getElementById('timer-status').textContent='ready to start';
+  document.getElementById('timer-display').classList.remove('running');
+}
+function timerTick(){
+  timerElapsed=Date.now()-timerStartTime;
+  const s=Math.floor(timerElapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  document.getElementById('timer-display').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+function renderTimerTotal(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const weekMs=7*24*3600*1000;
+  const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<weekMs).reduce((a,s)=>a+s.dur,0);
+  const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
+  const txt=`${h}h ${m}m`;
+  const el=document.getElementById('timer-total');if(el)el.textContent=txt;
+  const dic=document.getElementById('dic-study-time');if(dic)dic.textContent=txt;
+}
+function renderTimerLog(){
+  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
+  const log=document.getElementById('timer-log');if(!log)return;
+  if(!sessions.length){log.innerHTML='<div style="font-size:.84rem;color:var(--text3);padding:1rem 0">No sessions yet.</div>';return;}
+  log.innerHTML=sessions.slice(-10).reverse().map(s=>{
+    const m=Math.floor(s.dur/60000),secs=Math.floor((s.dur%60000)/1000);
+    return`<div class="timer-log-row"><span class="timer-log-date">${s.date}</span><span class="timer-log-dur">${m}m ${secs}s</span></div>`;
+  }).join('');
+}
+
+// ── NOTES ─────────────────────────────────────────────────────────────────────
+function loadNote(level){const a=document.getElementById('notes-area');if(a)a.value=localStorage.getItem('apexmath_note_'+level)||'';document.getElementById('notes-count').textContent=(a?.value.length||0)+' chars';}
+function autoSaveNote(){
+  const level=document.getElementById('notes-level-select').value;
+  const v=document.getElementById('notes-area').value;
+  localStorage.setItem('apexmath_note_'+level,v);
+  document.getElementById('notes-count').textContent=v.length+' chars';
+  const savedEl=document.getElementById('notes-saved');savedEl.classList.add('show');
+  setTimeout(()=>savedEl.classList.remove('show'),2000);
+}
+function switchNotesLevel(){const level=document.getElementById('notes-level-select').value;loadNote(level);}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+async function changePassword(){
+  const cur=document.getElementById('sp-cur-pw').value,nw=document.getElementById('sp-new-pw').value;
+  if(!cur||!nw){document.getElementById('sp-pw-msg').textContent='Please fill both fields.';return;}
+  try{
+    const res=await fetch('/auth/change-password',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({currentPassword:cur,newPassword:nw})});
+    const data=await res.json();
+    document.getElementById('sp-pw-msg').textContent=res.ok?'Password updated!':data.error||'Error.';
+  }catch(e){document.getElementById('sp-pw-msg').textContent='Error.';}
+}
+async function updateLevel(){
+  const level=parseInt(document.getElementById('settings-level-select').value);
+  try{
+    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
+    if(res.ok){userLevel=level;showDashboard();}
+  }catch(e){}
+}
+function confirmRetake(){if(confirm('Retake the diagnostic? Your current level will be updated.'))startFresh();}
+async function confirmResetStreak(){
+  if(!confirm('Reset your streak to 0?'))return;
+  try{await fetch('/auth/reset-streak',{method:'POST',headers:{Authorization:`Bearer ${getToken()}`}});showDashboard();}catch(e){}
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('apexmath_theme')||'';
+  document.documentElement.setAttribute('data-theme',saved);
+  document.querySelectorAll('.theme-opt').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes("'"+saved+"'"))b.classList.add('active');
+  });
+  checkAuth();
+  // Start landing canvas after brief delay
+  setTimeout(startLandCanvas, 300);
+})();
+</script>
+</body>
+</html>
