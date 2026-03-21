@@ -267,408 +267,386 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* ──────────────────────────────────────
    DASHBOARD — Scrollable, fun, no tabs
 ────────────────────────────────────── */
-/* ════════════════════════════════════════
-   DASHBOARD — clean modern redesign
-════════════════════════════════════════ */
-#s-dashboard{background:var(--bg);min-height:100vh}
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD — bento layout, full width, no bullshit
+═══════════════════════════════════════════════════════════ */
+#s-dashboard{background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
 
-/* Top bar */
-/* ══════════════════════════════════════════════
-   DASHBOARD — redesigned
-══════════════════════════════════════════════ */
-
-/* TOPBAR */
+/* ── TOPBAR ── */
 .dash-topbar{
   position:sticky;top:0;z-index:150;
   background:var(--bg);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.65rem 1.5rem;gap:1rem;
+  display:flex;align-items:center;gap:1rem;
+  padding:.55rem 1.5rem;
 }
-.dash-topbar-left{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+.dash-topbar-left{display:flex;align-items:center;gap:.5rem;flex:1}
 .dash-level-chip{
-  display:inline-flex;align-items:center;gap:.35rem;
   font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--accent);border:1.5px solid var(--accent-mid);background:var(--accent-light);
-  padding:.26rem .7rem;border-radius:4px;white-space:nowrap;
+  color:var(--accent);border:1px solid var(--accent-mid);background:var(--accent-light);
+  padding:.22rem .65rem;border-radius:3px;white-space:nowrap;
 }
 .dash-streak-chip{
-  display:inline-flex;align-items:center;gap:.35rem;
-  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.06em;
-  color:var(--text);border:1.5px solid var(--border);background:var(--surface);
-  padding:.26rem .65rem;border-radius:4px;font-weight:500;
+  font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.04em;
+  color:var(--text2);border:1px solid var(--border);background:var(--surface);
+  padding:.22rem .6rem;border-radius:3px;
 }
-.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.3);background:rgba(255,120,0,.05);color:#c85000}
-
-/* XP bar */
-.dash-topbar-xp{display:flex;align-items:center;gap:.6rem;flex:1;max-width:180px;margin:0 .5rem}
-.dash-topbar-xp-track{flex:1;height:3px;background:var(--bg2);border-radius:2px;overflow:hidden}
-.dash-topbar-xp-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.dash-streak-chip.on-fire{border-color:rgba(255,120,0,.25);color:#c85000;background:rgba(255,120,0,.04)}
+.dash-topbar-xp{display:flex;align-items:center;gap:.5rem;flex:0 0 140px}
+.dash-topbar-xp-track{flex:1;height:2px;background:var(--bg2);border-radius:1px;overflow:hidden}
+.dash-topbar-xp-fill{height:100%;background:var(--accent);border-radius:1px;transition:width 1.2s ease}
 .dash-topbar-xp-label{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
-.dash-topbar-right{display:flex;align-items:center;gap:.3rem;flex-shrink:0}
+.dash-topbar-right{display:flex;align-items:center;gap:.25rem}
 .dash-nav-icon-btn{
-  width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
-  background:none;cursor:pointer;font-size:.9rem;
+  width:30px;height:30px;border-radius:5px;border:1px solid var(--border);
+  background:none;cursor:pointer;font-size:.85rem;
   display:flex;align-items:center;justify-content:center;
   transition:background .15s,border-color .15s;color:var(--text2);
 }
 .dash-nav-icon-btn:hover{background:var(--bg2);border-color:var(--text3)}
 
-/* SCROLL CONTAINER */
-.dash-scroll{overflow-y:auto;height:calc(100vh - 48px)}
-.dash-inner{
-  padding-left:2rem;padding-right:2rem;
-  padding-top:2rem;padding-bottom:6rem;
-  display:flex;flex-direction:column;gap:2.5rem;
-}
+/* ── MAIN SCROLL ── */
+.dash-scroll{flex:1;overflow-y:auto}
+.dash-inner{padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
 
-/* SECTION WRAPPER */
-.dash-section{display:flex;flex-direction:column;gap:1rem}
-.dash-section-header{
-  display:flex;align-items:baseline;justify-content:space-between;
-  padding-bottom:.1rem;
-}
-.dash-section-title{
-  font-family:'DM Serif Display',serif;
-  font-size:1.15rem;letter-spacing:-.02em;color:var(--text);
-}
-.dash-section-sub{font-size:.78rem;color:var(--text3)}
-.dash-section-link{
-  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;
-  transition:opacity .15s;
-}
-.dash-section-link:hover{opacity:.7}
-
-/* GREET */
-.dash-greet-row{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  margin-bottom:.25rem;
-}
-.dash-greet-text{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(1.6rem,3vw,2.2rem);
-  letter-spacing:-.035em;color:var(--text);line-height:1.1;
-  margin-bottom:.2rem;
-}
-.dash-greet-sub{font-size:.84rem;color:var(--text2);line-height:1.6}
-.dash-today-date{
-  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--text3);text-align:right;line-height:1.6;
-}
-
-/* TODAY GRID */
-.dash-today-grid{
+/* ── BENTO GRID ── */
+.db-grid{
   display:grid;
-  grid-template-columns:1fr minmax(220px,280px) minmax(200px,240px);
+  grid-template-columns:1fr 1fr 1fr 260px;
+  grid-template-rows:auto auto;
   gap:1rem;
-  align-items:stretch;
 }
 
-/* BASE CARD */
-.dcard{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:1.4rem;
-  transition:transform .2s ease, box-shadow .2s ease, border-color .2s;
-  position:relative;overflow:hidden;
-  animation:dashCardIn .45s cubic-bezier(.22,1,.36,1) both;
-}
-@keyframes dashCardIn{
-  from{opacity:0;transform:translateY(20px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.dcard:hover:not(.dcard-quiz){
-  transform:translateY(-2px);
-  box-shadow:0 6px 24px rgba(0,0,0,.07);
-  border-color:var(--accent-mid);
-}
-
-/* QUIZ HERO CARD */
-.dcard-quiz{
-  background:linear-gradient(135deg,#0a1a0a 0%,#0f2410 55%,#142a14 100%);
-  border:1px solid rgba(45,90,39,.5);
+/* ── BASE CELL ── */
+.db-cell{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  transition:border-color .2s,box-shadow .2s,transform .2s;
   cursor:pointer;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:1rem;padding:1.75rem 1.75rem;
-  min-height:160px;
 }
-.dcard-quiz:hover{
+.db-cell:hover{
+  border-color:var(--accent-mid);
+  box-shadow:0 4px 20px rgba(0,0,0,.07);
+  transform:translateY(-1px);
+}
+.db-cell.no-hover:hover{transform:none;box-shadow:none;border-color:var(--border);cursor:default}
+
+/* ── QUIZ CELL — spans 3 cols, row 1 ── */
+.db-quiz{
+  grid-column:1/4;
+  background:linear-gradient(135deg,#091509 0%,#0e220e 50%,#122812 100%);
+  border-color:rgba(45,90,39,.4);
+  display:flex;align-items:stretch;
+  min-height:200px;
+  cursor:pointer;
+}
+.db-quiz:hover{
+  border-color:rgba(45,90,39,.7);
+  box-shadow:0 8px 32px rgba(45,90,39,.18);
   transform:translateY(-2px);
-  box-shadow:0 12px 40px rgba(45,90,39,.22),0 4px 12px rgba(0,0,0,.15);
-  border-color:rgba(45,90,39,.75);
 }
-.dcard-quiz-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse at 80% 50%, rgba(45,90,39,.18) 0%, transparent 70%);
-  pointer-events:none;
+.db-quiz-left{
+  flex:1;padding:2rem 2rem 1.75rem;
+  display:flex;flex-direction:column;justify-content:space-between;
 }
-.dcard-quiz-inner{flex:1;min-width:0;position:relative;z-index:1}
-.dcard-quiz-eyebrow{
-  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.16em;
-  text-transform:uppercase;color:rgba(168,197,160,.6);margin-bottom:.4rem;
+.db-quiz-right{
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem;font-size:4rem;
+  filter:drop-shadow(0 4px 20px rgba(45,90,39,.5));
+  animation:quizFloat 4s ease-in-out infinite;
 }
-.dcard-quiz-title{
-  font-family:'DM Serif Display',serif;font-size:1.4rem;
-  letter-spacing:-.025em;color:#fff;margin-bottom:.35rem;line-height:1.15;
+@keyframes quizFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
 }
-.dcard-quiz-sub{
-  font-size:.8rem;color:rgba(255,255,255,.4);line-height:1.65;margin-bottom:1.1rem;
-  max-width:320px;
+.db-quiz-eyebrow{
+  font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(168,197,160,.45);margin-bottom:.6rem;
 }
-.dcard-quiz-btn{
-  display:inline-flex;align-items:center;gap:.55rem;
-  padding:.65rem 1.35rem;background:var(--accent);color:#fff;border:none;
-  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
-  cursor:pointer;border-radius:7px;
-  transition:all .2s;position:relative;overflow:hidden;
+.db-quiz-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  letter-spacing:-.04em;color:#fff;line-height:1.05;margin-bottom:.5rem;
 }
-.dcard-quiz-btn::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
-  transform:translateX(-100%);transition:transform .5s;
+.db-quiz-meta{
+  font-size:.78rem;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:1.5rem;
+  max-width:340px;
 }
-.dcard-quiz-btn:hover::before{transform:translateX(100%)}
-.dcard-quiz-btn:hover{box-shadow:0 0 20px rgba(45,90,39,.6);transform:translateY(-1px)}
-.dcard-quiz-btn:disabled{opacity:.35;cursor:default;transform:none;box-shadow:none}
-.dcard-quiz-arrow{transition:transform .2s}
-.dcard-quiz-btn:hover .dcard-quiz-arrow{transform:translateX(3px)}
-.dcard-quiz-emoji{
-  font-size:3.5rem;flex-shrink:0;
-  filter:drop-shadow(0 4px 16px rgba(45,90,39,.5));
-  position:relative;z-index:1;
-  animation:floatEmoji 3s ease-in-out infinite;
+.db-quiz-footer{display:flex;align-items:center;gap:1rem}
+.db-quiz-btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.65rem 1.5rem;
+  background:var(--accent);color:#fff;border:none;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;border-radius:6px;
+  transition:all .2s;overflow:hidden;position:relative;
 }
-@keyframes floatEmoji{
-  0%,100%{transform:translateY(0) rotate(-2deg)}
-  50%{transform:translateY(-6px) rotate(2deg)}
+.db-quiz-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-100%);transition:transform .45s}
+.db-quiz-btn:hover::after{transform:translateX(100%)}
+.db-quiz-btn:hover{box-shadow:0 0 22px rgba(45,90,39,.55);transform:translateY(-1px)}
+.db-quiz-btn:disabled{opacity:.3;cursor:default;transform:none;box-shadow:none}
+.db-quiz-stat{
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;
+  color:rgba(168,197,160,.45);
 }
-.quiz-done-badge{
-  display:inline-flex;align-items:center;gap:.4rem;
-  font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;
-  text-transform:uppercase;color:#a8c5a0;
-  padding:.3rem .75rem;border:1px solid rgba(45,90,39,.3);
-  background:rgba(45,90,39,.15);border-radius:4px;
-}
+.db-quiz-stat strong{color:rgba(168,197,160,.8);font-weight:500}
 
-/* STREAK CARD */
-.dcard-streak{
-  display:flex;flex-direction:column;gap:.85rem;
-  background:linear-gradient(160deg,#fffaf4 0%,#fff3e3 100%);
-  border-color:rgba(200,100,0,.15);cursor:default;
+/* ── STREAK CELL — row 1, col 4 ── */
+.db-streak{
+  grid-column:4;grid-row:1;
+  background:linear-gradient(160deg,#fffaf4,#fff3e2);
+  border-color:rgba(200,100,0,.12);
+  display:flex;flex-direction:column;
+  padding:1.5rem;gap:.75rem;
+  cursor:default;
 }
-[data-theme="ink"] .dcard-streak{
-  background:linear-gradient(160deg,#201c16 0%,#1c1810 100%);
-  border-color:rgba(200,120,20,.2);
+[data-theme="ink"] .db-streak{
+  background:linear-gradient(160deg,#201c16,#1b1710);
+  border-color:rgba(200,120,20,.18);
 }
-.dcard-streak-top{display:flex;align-items:center;gap:.85rem}
-.dcard-streak-fire{font-size:1.8rem;filter:drop-shadow(0 2px 8px rgba(255,140,0,.4))}
-.dcard-streak-num{
-  font-family:'DM Serif Display',serif;font-size:3rem;
-  letter-spacing:-.05em;color:#b85a00;line-height:1;
+.db-streak:hover{transform:none;box-shadow:none;border-color:rgba(200,100,0,.12)}
+.db-streak-num{
+  font-family:'DM Serif Display',serif;
+  font-size:3.8rem;letter-spacing:-.06em;color:#b85a00;line-height:1;
 }
-[data-theme="ink"] .dcard-streak-num{color:#d4822a}
-.dcard-streak-label{
-  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;
-  text-transform:uppercase;color:rgba(184,90,0,.5);margin-top:.1rem;
+[data-theme="ink"] .db-streak-num{color:#d4822a}
+.db-streak-lbl{
+  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(184,90,0,.4);
 }
-[data-theme="ink"] .dcard-streak-label{color:rgba(220,140,60,.45)}
-
-/* Week heatmap inside streak card */
-.dcard-week-heatmap{display:flex;gap:.3rem;align-items:center}
-.dwhm-day{
-  display:flex;flex-direction:column;align-items:center;gap:.2rem;flex:1;
-}
-.dwhm-pip{
-  width:100%;aspect-ratio:1;border-radius:4px;
-  background:var(--bg2);border:1px solid var(--border);
+.db-heatmap{display:flex;gap:.3rem;margin-top:auto}
+.db-hm-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.db-hm-pip{
+  width:100%;aspect-ratio:1;border-radius:3px;
+  background:rgba(184,90,0,.1);
   transition:all .3s;
   display:flex;align-items:center;justify-content:center;
-  font-size:.5rem;
+  font-size:.5rem;color:transparent;
 }
-.dwhm-pip.done{background:var(--accent);border-color:var(--accent);color:#fff}
-.dwhm-pip.today{border-color:var(--accent);border-width:2px}
-.dwhm-pip.today-done{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px var(--accent-light)}
-.dwhm-label{font-family:'DM Mono',monospace;font-size:.42rem;letter-spacing:.06em;color:var(--text3);text-transform:uppercase}
-.dwhm-label.today-lbl{color:var(--accent)}
+.db-hm-pip.done{background:#b85a00;color:rgba(255,255,255,.8)}
+.db-hm-pip.today{background:rgba(184,90,0,.25);outline:2px solid rgba(184,90,0,.5);outline-offset:-2px}
+.db-hm-pip.today.done{background:#b85a00;outline:2px solid #b85a00}
+.db-hm-day{font-family:'DM Mono',monospace;font-size:.38rem;letter-spacing:.04em;color:rgba(184,90,0,.35);text-transform:uppercase}
+.db-streak-caption{font-size:.73rem;color:rgba(184,90,0,.55);line-height:1.5;margin-top:.25rem}
+[data-theme="ink"] .db-streak-caption{color:rgba(220,150,70,.5)}
 
-.dcard-streak-sub{font-size:.76rem;color:rgba(184,90,0,.65);line-height:1.55;margin-top:auto}
-[data-theme="ink"] .dcard-streak-sub{color:rgba(220,160,80,.6)}
-
-/* LEVEL CARD */
-.dcard-level{cursor:pointer;display:flex;flex-direction:column;gap:.6rem}
-.dcard-level-eyebrow{
-  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--accent);
-}
-.dcard-level-name{
-  font-family:'DM Serif Display',serif;font-size:1.05rem;
-  letter-spacing:-.02em;color:var(--text);line-height:1.2;
-}
-.dcard-level-stages{
-  display:flex;gap:.3rem;margin:.1rem 0;
-}
-.dls-pip{
-  flex:1;height:5px;border-radius:2px;
-  background:var(--bg2);transition:background .4s ease;
-}
-.dls-pip.done{background:var(--accent)}
-.dls-pip.current{background:var(--accent);opacity:.5}
-
-.dcard-level-bar-wrap{display:flex;align-items:center;gap:.6rem}
-.dcard-level-bar{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
-.dcard-level-bar-fill{
-  height:100%;background:linear-gradient(90deg,var(--accent),rgba(100,200,80,.7));
-  border-radius:2px;width:0%;transition:width 1.1s cubic-bezier(.22,1,.36,1);
-}
-.dcard-level-pct{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;color:var(--text3)}
-
-/* CTA label */
-.dcard-cta{
-  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--accent);margin-top:auto;
-  transition:letter-spacing .2s;
-}
-.dcard:hover .dcard-cta{letter-spacing:.15em}
-
-/* TRAIN GRID */
-.dash-train-grid{
+/* ── TOOL CELLS — row 2 ── */
+.db-tools{
+  grid-column:1/4;
   display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
 }
-@media(min-width:1400px){
-  .dash-train-grid{grid-template-columns:repeat(4,1fr)}
-  .dash-stats-row{grid-template-columns:repeat(4,1fr)}
+.db-tool{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.25rem 1.1rem;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s;
+  display:flex;flex-direction:column;gap:.5rem;
 }
-.dcard-tool{
-  cursor:pointer;display:flex;flex-direction:column;gap:.5rem;
-  padding:1.25rem 1.1rem;
+.db-tool:hover{
+  border-color:var(--accent-mid);
+  box-shadow:0 4px 20px rgba(0,0,0,.07);
+  transform:translateY(-2px);
 }
-.dcard-tool-icon{font-size:1.6rem;line-height:1}
-.dcard-tool-name{
-  font-family:'DM Serif Display',serif;font-size:.95rem;
-  letter-spacing:-.01em;color:var(--text);
+.db-tool-icon{font-size:1.5rem;line-height:1}
+.db-tool-name{
+  font-family:'DM Serif Display',serif;
+  font-size:.95rem;letter-spacing:-.01em;color:var(--text);
 }
-.dcard-tool-desc{font-size:.76rem;color:var(--text2);line-height:1.55;flex:1}
-
-/* WEAK SPOTS INLINE */
-.dcard-weakspots{cursor:pointer;padding:1.25rem}
-.dcard-weakspots:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.07);border-color:var(--accent-mid)}
-.ws-inline-empty{font-size:.84rem;color:var(--text3);padding:.5rem 0;line-height:1.65}
-.ws-inline-list{display:flex;flex-direction:column;gap:.6rem}
-.ws-inline-item{
-  display:flex;align-items:center;gap:.85rem;
-}
-.ws-inline-bar-wrap{flex:1;display:flex;flex-direction:column;gap:.25rem}
-.ws-inline-label{display:flex;justify-content:space-between;align-items:center}
-.ws-inline-topic{font-size:.82rem;color:var(--text)}
-.ws-inline-count{
-  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;
-  color:var(--text3);
-}
-.ws-inline-track{height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
-.ws-inline-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.22,1,.36,1)}
-.ws-inline-lesson{
+.db-tool-hint{font-size:.73rem;color:var(--text3);line-height:1.45;flex:1}
+.db-tool-cta{
   font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--accent);
-  border:1px solid var(--accent-mid);background:var(--accent-light);
-  padding:.2rem .45rem;border-radius:3px;text-decoration:none;
-  white-space:nowrap;flex-shrink:0;
-  transition:background .15s;
+  text-transform:uppercase;color:var(--accent);margin-top:.25rem;
+  transition:letter-spacing .2s;
 }
-.ws-inline-lesson:hover{background:var(--accent-mid)}
+.db-tool:hover .db-tool-cta{letter-spacing:.15em}
 
-/* STATS ROW */
-.dash-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.dcard-stat{
-  display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;
-  padding:1.1rem 1.2rem;
+/* ── RIGHT COLUMN — row 2, col 4 ── */
+.db-right{
+  grid-column:4;grid-row:2;
+  display:flex;flex-direction:column;gap:1rem;
 }
-.dcard-stat-val{
-  font-family:'DM Serif Display',serif;font-size:2.2rem;
-  letter-spacing:-.04em;color:var(--text);line-height:1;
+
+/* Level card */
+.db-level{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.1rem;cursor:pointer;
+  transition:border-color .2s,transform .2s;
 }
-.dcard-stat-label{
-  font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+.db-level:hover{border-color:var(--accent-mid);transform:translateY(-1px)}
+.db-level-eyebrow{
+  font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:.3rem;
+}
+.db-level-name{
+  font-family:'DM Serif Display',serif;font-size:1rem;
+  letter-spacing:-.02em;color:var(--text);margin-bottom:.65rem;
+}
+.db-level-pips{display:flex;gap:.2rem;margin-bottom:.5rem}
+.db-level-pip{flex:1;height:3px;border-radius:1px;background:var(--bg2);transition:background .4s}
+.db-level-pip.done{background:var(--accent)}
+.db-level-pip.current{background:var(--accent);opacity:.45}
+.db-level-foot{display:flex;justify-content:space-between;align-items:center}
+.db-level-pct{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.06em;color:var(--text3)}
+.db-level-link{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+
+/* Stats mini */
+.db-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:.5rem;
+}
+.db-stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:.75rem;
+}
+.db-stat-val{
+  font-family:'DM Serif Display',serif;font-size:1.6rem;
+  letter-spacing:-.04em;color:var(--text);line-height:1;margin-bottom:.15rem;
+}
+.db-stat-lbl{
+  font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--text3);
 }
 
-/* BADGES */
-.dash-section-badges{}
-.dash-badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
+/* ── WEAK SPOTS CELL — below tools, spans 3 cols ── */
+.db-weakspots{
+  grid-column:1/4;grid-row:3;
+  padding:1.1rem 1.25rem;cursor:pointer;
+}
+.db-ws-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:.85rem;
+}
+.db-ws-title{
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);
+}
+.db-ws-link{
+  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);
+}
+.db-ws-empty{font-size:.82rem;color:var(--text3)}
+.db-ws-list{display:flex;flex-direction:column;gap:.5rem}
+.db-ws-row{display:flex;align-items:center;gap:.75rem}
+.db-ws-topic{font-size:.82rem;color:var(--text);min-width:140px;flex-shrink:0}
+.db-ws-bar-wrap{flex:1;position:relative}
+.db-ws-bar-bg{height:3px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.db-ws-bar-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.db-ws-count{
+  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;
+  color:var(--text3);flex-shrink:0;min-width:50px;text-align:right;
+}
+.db-ws-study{
+  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent-mid);background:var(--accent-light);
+  padding:.14rem .4rem;border-radius:2px;text-decoration:none;
+  white-space:nowrap;flex-shrink:0;transition:background .15s;
+}
+.db-ws-study:hover{background:var(--accent-mid)}
 
-/* BOTTOM NAV (mobile) */
+/* ── BADGES ── */
+.db-badges{
+  grid-column:4;grid-row:3;
+  padding:1.1rem;cursor:default;
+}
+.db-badges:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.db-badges-title{
+  font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:.65rem;
+}
+.db-badges-wrap{display:flex;flex-wrap:wrap;gap:.35rem}
+.badge-pill{
+  display:inline-flex;align-items:center;gap:.3rem;
+  padding:.3rem .65rem;border-radius:999px;
+  border:1px solid var(--border);background:var(--bg2);
+  font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);transition:all .2s;
+}
+.badge-pill.earned{
+  border-color:var(--accent-mid);background:var(--accent-light);color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-light);
+}
+@keyframes badgePop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.badge-emoji{font-size:.8rem}
+
+/* ── BOTTOM NAV (mobile only) ── */
 .dash-bottom-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;
   background:var(--bg);border-top:1px solid var(--border);
-  padding:.5rem .5rem calc(.5rem + env(safe-area-inset-bottom));
-  z-index:200;
-  gap:.2rem;
+  padding:.45rem .5rem calc(.45rem + env(safe-area-inset-bottom));
+  z-index:200;gap:.15rem;
 }
 .dbn-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:.18rem;
   background:none;border:none;cursor:pointer;
-  font-family:'DM Mono',monospace;font-size:.45rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);padding:.4rem .2rem;border-radius:6px;
+  font-family:'DM Mono',monospace;font-size:.42rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);padding:.35rem .2rem;border-radius:5px;
   transition:color .15s,background .15s;
 }
-.dbn-item span:first-child{font-size:1.15rem}
+.dbn-item span:first-child{font-size:1.1rem}
 .dbn-item.active,.dbn-item:hover{color:var(--accent);background:var(--accent-light)}
 
-/* Stagger animations for sections */
-.dash-section:nth-child(1) .dcard{animation-delay:calc(var(--i,0)*60ms + 50ms)}
-.dash-section:nth-child(2) .dcard{animation-delay:calc(var(--i,0)*50ms + 250ms)}
-.dash-section:nth-child(3) .dcard{animation-delay:350ms}
-.dash-section:nth-child(4) .dcard{animation-delay:calc(var(--i,0)*40ms + 400ms)}
-.dash-section:nth-child(5) .dcard{animation-delay:480ms}
-
-/* Legacy compatibility stubs (referenced from old JS still in use) */
-.dash-layout,.dash-sidebar,.dash-main,.dash-aside,
-.dash-week-strip,.dash-grid,.tool-card-path,
-.path-bar-wrap,.path-bar-track,.path-bar-fill,
-.tool-card,.tc-icon,.tc-title,.tc-sub,.tc-cta,
-.streak-big,.streak-label,.streak-week-row,.swr-dot,
-.dash-aside-label,.dash-aside-stat,.dash-aside-stat-val,.dash-aside-stat-label,
-.dash-aside-resource,.dash-aside-res-link,.dash-aside-res-icon,
-.dash-week-mini,.week-pip-row,.week-pip-mini,.week-pip-date,
-.dash-greet-section,.dash-section-label,.badges-row,
-.dash-badges-section{display:none!important}
-
-/* RESPONSIVE */
+/* ── RESPONSIVE ── */
 @media(max-width:1100px){
-  .dash-today-grid{grid-template-columns:1fr 240px}
-  .dcard-level{display:none}
+  .db-grid{grid-template-columns:1fr 1fr 220px}
+  .db-quiz{grid-column:1/3}
+  .db-tools{grid-column:1/3;grid-template-columns:repeat(2,1fr)}
+  .db-weakspots{grid-column:1/3}
+  .db-badges{grid-column:3}
 }
-@media(max-width:860px){
-  .dash-today-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
-  .dcard-quiz{grid-column:1/-1}
-  .dcard-level{display:none}
-  .dash-train-grid{grid-template-columns:1fr 1fr}
-  .dash-stats-row{grid-template-columns:1fr 1fr}
+@media(max-width:760px){
+  .db-grid{grid-template-columns:1fr 1fr}
+  .db-quiz{grid-column:1/-1;min-height:160px}
+  .db-quiz-right{display:none}
+  .db-streak{grid-column:1;grid-row:2}
+  .db-tools{grid-column:1/-1;grid-template-columns:repeat(2,1fr)}
+  .db-weakspots{grid-column:1/-1}
+  .db-badges{grid-column:1/-1;grid-row:auto}
+  .db-right{grid-column:2;grid-row:2}
 }
-@media(max-width:580px){
-  .dash-inner{padding:1rem 1rem 5rem}
-  .dash-today-grid{grid-template-columns:1fr}
-  .dash-train-grid{grid-template-columns:1fr 1fr}
-  .dash-stats-row{grid-template-columns:1fr 1fr}
-  .dcard-quiz{min-height:auto;padding:1.4rem 1.25rem}
-  .dcard-quiz-emoji{font-size:2.5rem}
+@media(max-width:520px){
+  .dash-inner{padding:1rem}
+  .db-grid{grid-template-columns:1fr}
+  .db-quiz,.db-streak,.db-tools,.db-weakspots,.db-badges,.db-right{grid-column:1;grid-row:auto}
+  .db-tools{display:grid;grid-template-columns:1fr 1fr}
+  .db-stats{grid-template-columns:1fr 1fr}
   .dash-bottom-nav{display:flex}
-  .dash-topbar-right .dash-nav-icon-btn:not(:last-child){display:none}
+  .dash-topbar-right .dash-nav-icon-btn:nth-child(-n+2){display:none}
 }
-.badge-pill{
-  display:flex;align-items:center;gap:.4rem;
-  padding:.4rem .9rem;border-radius:99px;
-  border:1.5px solid var(--border);background:var(--bg2);
-  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);transition:all .25s;cursor:default;
+
+/* ── ENTRANCE ANIMATIONS ── */
+.db-cell,.db-tool,.db-level,.db-stat,.db-weakspots{
+  animation:dbIn .4s cubic-bezier(.22,1,.36,1) both;
 }
-.badge-pill.earned{
-  border-color:var(--accent-mid);background:var(--accent-light);
-  color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-light);
+.db-quiz{animation-delay:.04s}
+.db-streak{animation-delay:.08s}
+.db-tools .db-tool:nth-child(1){animation-delay:.12s}
+.db-tools .db-tool:nth-child(2){animation-delay:.16s}
+.db-tools .db-tool:nth-child(3){animation-delay:.20s}
+.db-tools .db-tool:nth-child(4){animation-delay:.24s}
+.db-level{animation-delay:.13s}
+.db-stat:nth-child(1){animation-delay:.16s}
+.db-stat:nth-child(2){animation-delay:.19s}
+.db-stat:nth-child(3){animation-delay:.22s}
+.db-stat:nth-child(4){animation-delay:.25s}
+.db-weakspots{animation-delay:.28s}
+.db-badges{animation-delay:.30s}
+@keyframes dbIn{
+  from{opacity:0;transform:translateY(16px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
 }
-.badge-pill.earned.new-badge{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes badgePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
-.badge-emoji{font-size:.85rem}
+
+/* ── LEGACY STUBS (keep hidden, some JS still writes to these) ── */
+.dash-layout,.dash-sidebar,.dash-main,.dash-aside,
+.dash-week-strip,.dash-grid,.dash-greet-section,
+.tool-card,.streak-big,.streak-label,.streak-week-row,.swr-dot,
+.dash-aside-stat,.dash-aside-resource,.dash-week-mini,
+.dash-badges-section,.badges-row,.dash-section-label,
+.dcard,.dcard-quiz,.dcard-streak,.dcard-level,.dcard-tool,
+.dcard-stat,.dcard-weakspots,.dash-today-grid,
+.dash-train-grid,.dash-stats-row,.dash-section,
+.ws-inline-list,.ws-inline-state{display:none!important}
 
 /* MODAL OVERLAY for sub-screens inside dashboard */
 .dash-modal{
@@ -2249,7 +2227,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 ══════════════════════════════════ -->
 <div class="screen" id="s-dashboard">
 
-  <!-- ── TOPBAR ── -->
+  <!-- TOPBAR -->
   <div class="dash-topbar">
     <div class="dash-topbar-left">
       <div class="dash-level-chip" id="tb-level-chip">⬡ Early Algebra</div>
@@ -2266,162 +2244,132 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
     </div>
   </div>
 
-  <!-- ── MAIN SCROLL AREA ── -->
+  <!-- MAIN -->
   <div class="dash-scroll">
   <div class="dash-inner">
 
-    <!-- ══ SECTION 1: TODAY ══ -->
-    <section class="dash-section" id="dash-today-section">
-
-      <!-- Greeting -->
-      <div class="dash-greet-row">
-        <div>
-          <div class="dash-greet-text" id="dash-greet">Good morning</div>
-          <div class="dash-greet-sub" id="dash-greet-sub">Ready to train?</div>
-        </div>
-        <div class="dash-today-date" id="dash-today-date"></div>
+    <!-- greeting row -->
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:clamp(1.3rem,2.5vw,1.8rem);letter-spacing:-.03em;color:var(--text);line-height:1.1" id="dash-greet">Good morning</div>
+        <div style="font-size:.78rem;color:var(--text3);margin-top:.2rem" id="dash-greet-sub">Ready?</div>
       </div>
+      <div style="font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:right;line-height:1.7" id="dash-today-date"></div>
+    </div>
 
-      <!-- Today row: quiz hero + streak + week heatmap -->
-      <div class="dash-today-grid">
+    <!-- bento grid -->
+    <div class="db-grid">
 
-        <!-- QUIZ HERO -->
-        <div class="dcard dcard-quiz" id="quiz-card-wrap">
-          <div class="dcard-quiz-bg" aria-hidden="true"></div>
-          <div class="dcard-quiz-inner">
-            <div class="dcard-quiz-eyebrow" id="quiz-eyebrow">Daily Quiz</div>
-            <div class="dcard-quiz-title" id="quiz-card-title">Today's Quiz</div>
-            <div class="dcard-quiz-sub" id="quiz-card-sub">5 questions · Get 3+ right to keep your streak. Every wrong answer shows you why.</div>
-            <div class="dcard-quiz-actions">
-              <button class="dcard-quiz-btn" id="quiz-start-btn" onclick="startDailyQuiz()">
-                <span id="quiz-btn-label">Let's go</span>
-                <span class="dcard-quiz-arrow">→</span>
-              </button>
-            </div>
+      <!-- QUIZ — 3 cols, row 1 -->
+      <div class="db-cell db-quiz" id="quiz-card-wrap" onclick="document.getElementById('quiz-start-btn').click()">
+        <div class="db-quiz-left">
+          <div>
+            <div class="db-quiz-eyebrow" id="quiz-eyebrow">Daily Quiz</div>
+            <div class="db-quiz-title" id="quiz-card-title">Today's Quiz</div>
+            <div class="db-quiz-meta" id="quiz-card-sub">5 questions · get 3+ right to keep your streak</div>
           </div>
-          <div class="dcard-quiz-emoji" id="quiz-emoji" aria-hidden="true">🎯</div>
-        </div>
-
-        <!-- STREAK + WEEK MINI -->
-        <div class="dcard dcard-streak">
-          <div class="dcard-streak-top">
-            <span class="dcard-streak-fire">🔥</span>
-            <div>
-              <div class="dcard-streak-num" id="streak-big-num">0</div>
-              <div class="dcard-streak-label">day streak</div>
-            </div>
+          <div class="db-quiz-footer">
+            <button class="db-quiz-btn" id="quiz-start-btn" onclick="event.stopPropagation();startDailyQuiz()">
+              <span id="quiz-btn-label">Start</span>
+              <span id="quiz-arrow-span">→</span>
+            </button>
+            <div class="db-quiz-stat" id="quiz-streak-inline"></div>
           </div>
-          <div class="dcard-week-heatmap" id="dcard-week-heatmap"></div>
-          <div class="dcard-streak-sub" id="streak-card-sub">Complete today's quiz!</div>
         </div>
+        <div class="db-quiz-right" id="quiz-emoji" aria-hidden="true">🎯</div>
+      </div>
 
-        <!-- LEVEL PROGRESS -->
-        <div class="dcard dcard-level" onclick="openDashModal('modal-path')">
-          <div class="dcard-level-eyebrow">Current level</div>
-          <div class="dcard-level-name" id="dcard-level-name">Early Algebra</div>
-          <div class="dcard-level-stages" id="dcard-level-stages"></div>
-          <div class="dcard-level-bar-wrap">
-            <div class="dcard-level-bar">
-              <div class="dcard-level-bar-fill" id="dcard-level-fill"></div>
-            </div>
-            <span class="dcard-level-pct" id="dcard-level-pct">0%</span>
+      <!-- STREAK — col 4, row 1 -->
+      <div class="db-cell db-streak no-hover">
+        <div class="db-streak-num" id="streak-big-num">0</div>
+        <div class="db-streak-lbl">day streak</div>
+        <div class="db-heatmap" id="db-heatmap"></div>
+        <div class="db-streak-caption" id="streak-card-sub">Complete today's quiz!</div>
+      </div>
+
+      <!-- TOOLS — cols 1-3, row 2 -->
+      <div class="db-tools">
+        <div class="db-tool" onclick="openDashModal('modal-practice')">
+          <div class="db-tool-icon">⚡</div>
+          <div class="db-tool-name">Practice</div>
+          <div class="db-tool-hint">Any level, any topic</div>
+          <div class="db-tool-cta">Open →</div>
+        </div>
+        <div class="db-tool" onclick="openDashModal('modal-flashcards')">
+          <div class="db-tool-icon">🃏</div>
+          <div class="db-tool-name">Flashcards</div>
+          <div class="db-tool-hint">Flip · rate · repeat</div>
+          <div class="db-tool-cta">Open →</div>
+        </div>
+        <div class="db-tool" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
+          <div class="db-tool-icon">📚</div>
+          <div class="db-tool-name">Lessons</div>
+          <div class="db-tool-hint">Step-by-step explanations</div>
+          <div class="db-tool-cta">Open ↗</div>
+        </div>
+        <div class="db-tool" onclick="openDashModal('modal-formulas')">
+          <div class="db-tool-icon">📋</div>
+          <div class="db-tool-name">Formulas</div>
+          <div class="db-tool-hint">Searchable by level</div>
+          <div class="db-tool-cta">Open →</div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN — col 4, row 2 -->
+      <div class="db-right">
+        <!-- level card -->
+        <div class="db-level" onclick="openDashModal('modal-path')">
+          <div class="db-level-eyebrow">Level</div>
+          <div class="db-level-name" id="dcard-level-name">Early Algebra</div>
+          <div class="db-level-pips" id="dcard-level-stages"></div>
+          <div style="height:2px;background:var(--bg2);border-radius:1px;overflow:hidden;margin-bottom:.4rem"><div id="dcard-level-fill" style="height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1.1s ease"></div></div>
+          <div class="db-level-foot">
+            <span class="db-level-pct" id="dcard-level-pct">0%</span>
+            <span class="db-level-link">Path →</span>
           </div>
-          <div class="dcard-cta">View full path →</div>
         </div>
-
-      </div>
-    </section>
-
-    <!-- ══ SECTION 2: TRAIN ══ -->
-    <section class="dash-section">
-      <div class="dash-section-header">
-        <div class="dash-section-title">Train</div>
-        <div class="dash-section-sub">Unlimited practice, no pressure</div>
-      </div>
-      <div class="dash-train-grid">
-
-        <div class="dcard dcard-tool" onclick="openDashModal('modal-practice')">
-          <div class="dcard-tool-icon">⚡</div>
-          <div class="dcard-tool-name">Practice Mode</div>
-          <div class="dcard-tool-desc">Any level, any topic. Drill until it clicks.</div>
-          <div class="dcard-cta">Open →</div>
-        </div>
-
-        <div class="dcard dcard-tool" onclick="openDashModal('modal-flashcards')">
-          <div class="dcard-tool-icon">🃏</div>
-          <div class="dcard-tool-name">Flashcards</div>
-          <div class="dcard-tool-desc">Flip concept cards. Rate what you know.</div>
-          <div class="dcard-cta">Open →</div>
-        </div>
-
-        <div class="dcard dcard-tool" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
-          <div class="dcard-tool-icon">📚</div>
-          <div class="dcard-tool-name">Lessons</div>
-          <div class="dcard-tool-desc">Step-by-step walkthroughs for every topic.</div>
-          <div class="dcard-cta">Open ↗</div>
-        </div>
-
-        <div class="dcard dcard-tool" onclick="openDashModal('modal-formulas')">
-          <div class="dcard-tool-icon">📋</div>
-          <div class="dcard-tool-name">Formula Sheet</div>
-          <div class="dcard-tool-desc">Every formula, searchable by level.</div>
-          <div class="dcard-cta">Open →</div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ══ SECTION 3: WEAK SPOTS (inline preview) ══ -->
-    <section class="dash-section">
-      <div class="dash-section-header">
-        <div class="dash-section-title">Weak Spots</div>
-        <button class="dash-section-link" onclick="openDashModal('modal-weakspots')">See all →</button>
-      </div>
-      <div class="dcard dcard-weakspots" id="ws-inline-card">
-        <div class="ws-inline-loading" id="ws-inline-state">
-          <div class="ws-inline-empty">Complete quizzes — your weak topics will appear here.</div>
-        </div>
-        <div class="ws-inline-list" id="ws-inline-list"></div>
-      </div>
-    </section>
-
-    <!-- ══ SECTION 4: STATS ROW ══ -->
-    <section class="dash-section">
-      <div class="dash-section-header">
-        <div class="dash-section-title">Stats</div>
-      </div>
-      <div class="dash-stats-row">
-        <div class="dcard dcard-stat">
-          <div class="dcard-stat-val" id="stat-streak">0</div>
-          <div class="dcard-stat-label">Day streak</div>
-        </div>
-        <div class="dcard dcard-stat">
-          <div class="dcard-stat-val" id="stat-quizzes">0</div>
-          <div class="dcard-stat-label">Quizzes done</div>
-        </div>
-        <div class="dcard dcard-stat">
-          <div class="dcard-stat-val" id="stat-level">1</div>
-          <div class="dcard-stat-label">of 7 levels</div>
-        </div>
-        <div class="dcard dcard-stat" onclick="openDashModal('modal-timer')" style="cursor:pointer">
-          <div class="dcard-stat-val" id="stat-hours">0h</div>
-          <div class="dcard-stat-label">This week</div>
+        <!-- stats 2x2 -->
+        <div class="db-stats">
+          <div class="db-stat">
+            <div class="db-stat-val" id="stat-streak">0</div>
+            <div class="db-stat-lbl">Streak</div>
+          </div>
+          <div class="db-stat">
+            <div class="db-stat-val" id="stat-quizzes">0</div>
+            <div class="db-stat-lbl">Quizzes</div>
+          </div>
+          <div class="db-stat">
+            <div class="db-stat-val" id="stat-level">1</div>
+            <div class="db-stat-lbl">Level</div>
+          </div>
+          <div class="db-stat" onclick="openDashModal('modal-timer')" style="cursor:pointer">
+            <div class="db-stat-val" id="stat-hours">0h</div>
+            <div class="db-stat-lbl">This week</div>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- ══ SECTION 5: BADGES ══ -->
-    <section class="dash-section dash-section-badges">
-      <div class="dash-section-header">
-        <div class="dash-section-title">Badges</div>
+      <!-- WEAK SPOTS — cols 1-3, row 3 -->
+      <div class="db-cell db-weakspots" onclick="openDashModal('modal-weakspots')">
+        <div class="db-ws-head">
+          <span class="db-ws-title">Weak Spots</span>
+          <span class="db-ws-link">See all →</span>
+        </div>
+        <div id="ws-inline-state"><div class="db-ws-empty">Complete quizzes — weak topics appear here.</div></div>
+        <div class="db-ws-list" id="ws-inline-list" style="display:none"></div>
       </div>
-      <div class="dash-badges-row" id="dash-badges-row"></div>
-    </section>
 
+      <!-- BADGES — col 4, row 3 -->
+      <div class="db-cell db-badges no-hover">
+        <div class="db-badges-title">Badges</div>
+        <div class="db-badges-wrap" id="dash-badges-row"></div>
+      </div>
+
+    </div><!-- /db-grid -->
   </div><!-- /dash-inner -->
   </div><!-- /dash-scroll -->
 
-  <!-- ── BOTTOM NAV (mobile) ── -->
+  <!-- BOTTOM NAV -->
   <nav class="dash-bottom-nav">
     <button class="dbn-item active" onclick="showDashboard()"><span>🏠</span><span>Home</span></button>
     <button class="dbn-item" onclick="startDailyQuiz()"><span>🎯</span><span>Quiz</span></button>
@@ -3795,6 +3743,10 @@ async function showDashboard(){
     // ── STREAK CARD ──
     const snEl = document.getElementById('streak-big-num');
     if(snEl){ snEl.textContent='0'; animateCount('streak-big-num',0,streak,800); }
+    // Quiz streak inline stat
+    const qsi = document.getElementById('quiz-streak-inline');
+    if(qsi && streak > 0) qsi.innerHTML = `<strong>${streak}</strong> day streak`;
+
     document.getElementById('streak-card-sub').textContent =
       completedToday&&passedToday ? 'Locked in ✓' :
       completedToday ? 'Tried today — get 3/5 next time' :
@@ -3810,6 +3762,9 @@ async function showDashboard(){
     setTimeout(()=>{ document.getElementById('dcard-level-fill').style.width = pct+'%'; }, 400);
     document.getElementById('dcard-level-pct').textContent = pct+'%';
     // Level pip stages
+    // Level bar (new design uses pips + separate bar)
+    const levelBarFill = document.getElementById('dcard-level-fill');
+    if(levelBarFill) setTimeout(()=>{ levelBarFill.style.width = pct+'%'; }, 400);
     const pipsEl = document.getElementById('dcard-level-stages');
     if(pipsEl){
       pipsEl.innerHTML = STAGES.map((_,i)=>`<div class="dls-pip${i<user.level?' done':i===user.level?' current':''}"></div>`).join('');
@@ -3864,7 +3819,7 @@ async function showDashboard(){
 }
 
 function renderWeekHeatmap(weekDays){
-  const wrap = document.getElementById('dcard-week-heatmap'); if(!wrap)return;
+  const wrap = document.getElementById('db-heatmap'); if(!wrap)return;
   wrap.innerHTML='';
   const dayLabels=['S','M','T','W','T','F','S'];
   const today = new Date();
@@ -3874,12 +3829,12 @@ function renderWeekHeatmap(weekDays){
     const isToday = i===0;
     const entry = weekDays.find?.(w=>w.date===key);
     const isDone = entry?.passed || (Array.isArray(weekDays)&&weekDays.includes?.(key));
-    const div = document.createElement('div'); div.className='dwhm-day';
+    const div = document.createElement('div'); div.className='db-hm-col';
     const pip = document.createElement('div');
-    pip.className='dwhm-pip'+(isDone&&isToday?' today-done':isDone?' done':isToday?' today':'');
+    pip.className='db-hm-pip'+(isDone&&isToday?' today done':isDone?' done':isToday?' today':'');
     pip.textContent = isDone?'✓':'';
     const lbl = document.createElement('div');
-    lbl.className='dwhm-label'+(isToday?' today-lbl':'');
+    lbl.className='db-hm-day';
     lbl.textContent = dayLabels[d.getDay()];
     div.appendChild(pip); div.appendChild(lbl);
     wrap.appendChild(div);
