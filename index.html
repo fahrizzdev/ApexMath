@@ -316,8 +316,8 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* SCROLL CONTAINER */
 .dash-scroll{overflow-y:auto;height:calc(100vh - 48px)}
 .dash-inner{
-  max-width:880px;margin:0 auto;
-  padding:2rem 1.5rem 6rem;
+  padding-left:2rem;padding-right:2rem;
+  padding-top:2rem;padding-bottom:6rem;
   display:flex;flex-direction:column;gap:2.5rem;
 }
 
@@ -359,7 +359,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* TODAY GRID */
 .dash-today-grid{
   display:grid;
-  grid-template-columns:1fr 220px 200px;
+  grid-template-columns:1fr minmax(220px,280px) minmax(200px,240px);
   gap:1rem;
   align-items:stretch;
 }
@@ -531,7 +531,11 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 
 /* TRAIN GRID */
 .dash-train-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+}
+@media(min-width:1400px){
+  .dash-train-grid{grid-template-columns:repeat(4,1fr)}
+  .dash-stats-row{grid-template-columns:repeat(4,1fr)}
 }
 .dcard-tool{
   cursor:pointer;display:flex;flex-direction:column;gap:.5rem;
@@ -572,7 +576,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ws-inline-lesson:hover{background:var(--accent-mid)}
 
 /* STATS ROW */
-.dash-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem}
+.dash-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
 .dcard-stat{
   display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;
   padding:1.1rem 1.2rem;
@@ -629,19 +633,24 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .dash-badges-section{display:none!important}
 
 /* RESPONSIVE */
+@media(max-width:1100px){
+  .dash-today-grid{grid-template-columns:1fr 240px}
+  .dcard-level{display:none}
+}
 @media(max-width:860px){
   .dash-today-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
   .dcard-quiz{grid-column:1/-1}
+  .dcard-level{display:none}
   .dash-train-grid{grid-template-columns:1fr 1fr}
   .dash-stats-row{grid-template-columns:1fr 1fr}
 }
 @media(max-width:580px){
-  .dash-inner{padding:1.25rem 1rem 5rem}
+  .dash-inner{padding:1rem 1rem 5rem}
   .dash-today-grid{grid-template-columns:1fr}
   .dash-train-grid{grid-template-columns:1fr 1fr}
   .dash-stats-row{grid-template-columns:1fr 1fr}
   .dcard-quiz{min-height:auto;padding:1.4rem 1.25rem}
-  .dcard-quiz-emoji{font-size:2.8rem}
+  .dcard-quiz-emoji{font-size:2.5rem}
   .dash-bottom-nav{display:flex}
   .dash-topbar-right .dash-nav-icon-btn:not(:last-child){display:none}
 }
