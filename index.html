@@ -1845,58 +1845,394 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 <!-- ══════════════════════════════════
      RESULT
 ══════════════════════════════════ -->
+<style>
+/* ── RESULT PAGE ─────────────────────────────────────────────── */
+#s-result {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.result-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Retake banner */
+.retake-banner {
+  display: none;
+  background: var(--gold-light);
+  border: 1px solid rgba(146,112,10,.25);
+  padding: .65rem 1.25rem;
+  font-size: .82rem;
+  color: var(--text2);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.retake-banner.show { display: flex; }
+.retake-btn {
+  font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gold); background: none;
+  border: 1px solid rgba(146,112,10,.35); padding: .3rem .75rem; cursor: pointer;
+  border-radius: 3px; white-space: nowrap;
+}
+.retake-btn:hover { background: var(--gold-light); }
+
+/* ── HERO ROW ── */
+.result-hero-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Result hero card — dark like the quiz card */
+.result-hero-card {
+  background: linear-gradient(140deg, #0a1a0a 0%, #0f2410 60%, #152b15 100%);
+  border: 1px solid rgba(45,90,39,.5);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: dashCardIn .5s cubic-bezier(.22,1,.36,1) both;
+}
+.result-hero-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 90% 20%, rgba(45,90,39,.2) 0%, transparent 65%);
+  pointer-events: none;
+}
+.result-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(168,197,160,.5);
+  margin-bottom: .85rem;
+}
+.result-level-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: -.035em; line-height: 1.1;
+  color: #fff; margin-bottom: .4rem;
+}
+.result-level-name em { color: #a8c5a0; font-style: normal; }
+.result-score-line {
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(168,197,160,.5); margin-bottom: 1rem;
+}
+.result-desc {
+  font-size: .85rem; color: rgba(255,255,255,.45); line-height: 1.75;
+  margin-bottom: 1.5rem; max-width: 320px;
+}
+.result-actions { display: flex; gap: .65rem; flex-wrap: wrap; }
+.result-btn-primary {
+  padding: .7rem 1.5rem;
+  background: var(--accent); color: #fff; border: none;
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .12em;
+  text-transform: uppercase; cursor: pointer; border-radius: 7px;
+  transition: all .2s; position: relative; overflow: hidden;
+}
+.result-btn-primary::before {
+  content: '';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
+  transform:translateX(-100%);transition:transform .5s;
+}
+.result-btn-primary:hover::before{transform:translateX(100%)}
+.result-btn-primary:hover { box-shadow: 0 0 18px rgba(45,90,39,.5); transform: translateY(-1px); }
+.result-btn-ghost {
+  padding: .7rem 1.2rem;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.5);
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em;
+  text-transform: uppercase; cursor: pointer; border-radius: 7px; transition: all .2s;
+}
+.result-btn-ghost:hover { border-color: rgba(168,197,160,.4); color: rgba(168,197,160,.8); }
+
+/* Stat cluster inside hero */
+.result-stat-cluster {
+  display: flex; gap: 1.25rem; margin-top: 1.5rem;
+  padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.08);
+}
+.result-stat { text-align: left; }
+.result-stat-val {
+  font-family: 'DM Serif Display', serif; font-size: 1.8rem;
+  letter-spacing: -.04em; line-height: 1; color: #a8c5a0; margin-bottom: .15rem;
+}
+.result-stat-lbl {
+  font-family: 'DM Mono', monospace; font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(168,197,160,.4);
+}
+.result-stat-div { width: 1px; background: rgba(255,255,255,.08); align-self: stretch; }
+
+/* ── DAILY GOAL CARD ── */
+.result-goal-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.75rem;
+  display: flex; flex-direction: column; gap: 1rem;
+  animation: dashCardIn .5s cubic-bezier(.22,1,.36,1) .1s both;
+}
+.result-goal-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--accent);
+}
+.result-goal-headline {
+  font-family: 'DM Serif Display', serif; font-size: 1.2rem;
+  letter-spacing: -.02em; color: var(--text); line-height: 1.3;
+}
+.result-goal-headline em { color: var(--accent); font-style: normal; }
+.result-goal-body { font-size: .84rem; color: var(--text2); line-height: 1.7; }
+
+/* Progress milestone pills */
+.result-milestones { display: flex; flex-direction: column; gap: .5rem; }
+.result-milestone {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .65rem .85rem;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  transition: border-color .15s, background .15s;
+}
+.result-milestone:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+.result-milestone-icon { font-size: 1rem; flex-shrink: 0; }
+.result-milestone-text { flex: 1; font-size: .82rem; color: var(--text2); line-height: 1.5; }
+.result-milestone-text strong { color: var(--text); font-weight: 500; }
+.result-milestone-badge {
+  font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid var(--accent-mid); background: var(--accent-light);
+  padding: .2rem .5rem; border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+}
+
+/* ── PATH SECTION ── */
+.result-path-section { animation: dashCardIn .5s cubic-bezier(.22,1,.36,1) .2s both; }
+.result-path-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.result-path-title {
+  font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+  letter-spacing: -.02em; color: var(--text);
+}
+.result-path-sub { font-size: .78rem; color: var(--text3); }
+
+/* Horizontal stage track */
+.result-stage-track {
+  display: flex; align-items: flex-start; gap: 0;
+  overflow-x: auto; padding-bottom: .5rem;
+  scrollbar-width: none;
+}
+.result-stage-track::-webkit-scrollbar { display: none; }
+.result-stage-node {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; min-width: 80px; position: relative;
+  cursor: pointer;
+}
+.result-stage-node + .result-stage-node::before {
+  content: '';
+  position: absolute; top: 16px; right: calc(50% + 16px);
+  left: calc(-50% + 16px);
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+  transition: background .4s ease;
+}
+.result-stage-node.done + .result-stage-node::before { background: var(--accent); }
+.result-stage-node.current + .result-stage-node::before { background: linear-gradient(90deg,var(--accent),var(--border)); }
+
+.result-stage-pip {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--bg2); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; z-index: 1; position: relative;
+  transition: all .3s ease;
+  flex-shrink: 0;
+}
+.result-stage-node.done .result-stage-pip {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.result-stage-node.current .result-stage-pip {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  box-shadow: 0 0 0 5px var(--accent-mid);
+}
+.result-stage-node.next .result-stage-pip {
+  border-color: var(--accent-mid); background: var(--accent-light);
+}
+.result-stage-label {
+  font-family: 'DM Mono', monospace; font-size: .52rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text3); text-align: center;
+  margin-top: .55rem; line-height: 1.4; max-width: 72px;
+}
+.result-stage-node.done .result-stage-label { color: var(--text2); }
+.result-stage-node.current .result-stage-label { color: var(--accent); font-weight: 500; }
+.result-stage-node.next .result-stage-label { color: var(--text2); }
+
+/* Detail cards for current + next level */
+.result-level-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin-top: 1.25rem;
+}
+.result-lcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.25rem;
+  transition: border-color .15s;
+}
+.result-lcard.is-current { border-color: var(--accent-mid); background: var(--accent-light); }
+.result-lcard-badge {
+  font-family: 'DM Mono', monospace; font-size: .52rem; letter-spacing: .1em;
+  text-transform: uppercase;
+  display: inline-block; padding: .18rem .5rem; border-radius: 3px;
+  margin-bottom: .65rem;
+}
+.result-lcard.is-current .result-lcard-badge {
+  color: var(--accent); background: var(--accent-mid); border: none;
+}
+.result-lcard:not(.is-current) .result-lcard-badge {
+  color: var(--text3); background: var(--bg2); border: none;
+}
+.result-lcard-name {
+  font-family: 'DM Serif Display', serif; font-size: 1rem;
+  letter-spacing: -.01em; color: var(--text); margin-bottom: .4rem;
+}
+.result-lcard-desc { font-size: .78rem; color: var(--text2); line-height: 1.6; margin-bottom: .85rem; }
+.result-lcard-resources { display: flex; flex-direction: column; gap: .35rem; }
+.result-lcard-res {
+  display: flex; align-items: center; gap: .55rem;
+  font-size: .76rem; color: var(--text2); text-decoration: none;
+  padding: .4rem .55rem; border: 1px solid var(--border); border-radius: 5px;
+  background: var(--bg); transition: border-color .15s, color .15s;
+}
+.result-lcard-res:hover { border-color: var(--accent-mid); color: var(--accent); }
+.result-lcard-res-type {
+  font-family: 'DM Mono', monospace; font-size: .52rem; letter-spacing: .08em;
+  color: var(--text3); border: 1px solid var(--border); padding: .08rem .3rem;
+  border-radius: 2px; flex-shrink: 0;
+}
+
+/* ── FULL JOURNEY (collapsible) ── */
+.result-journey-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .85rem 1.1rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  cursor: pointer; font-size: .84rem; color: var(--text2);
+  transition: background .15s, border-color .15s;
+  animation: dashCardIn .5s cubic-bezier(.22,1,.36,1) .3s both;
+}
+.result-journey-toggle:hover { background: var(--bg2); border-color: var(--accent-mid); }
+.result-journey-toggle-label {
+  font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text2);
+}
+.result-journey-chevron { transition: transform .3s; color: var(--text3); }
+.result-journey-toggle.open .result-journey-chevron { transform: rotate(180deg); }
+.result-journey-body { display: none; padding-top: .75rem; }
+.result-journey-body.open { display: block; }
+
+/* Journey list (full, collapsed by default) */
+.journey-stage{display:grid;grid-template-columns:24px 1fr;gap:1.25rem;padding:1.25rem 0;border-bottom:1px solid var(--border);opacity:0;transform:translateY(12px);transition:all .4s ease}
+.journey-stage.visible{opacity:1;transform:translateY(0)}
+.journey-stage:last-child{border-bottom:none}
+.journey-stage.is-current{background:var(--accent-light);padding:1.25rem 1rem;margin:0 -1rem;border:1px solid var(--accent-mid);border-radius:8px}
+.stage-dot{width:20px;height:20px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);margin-top:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem}
+.stage-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.stage-dot.current{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-mid)}
+.stage-name{font-weight:500;color:var(--text);margin-bottom:.3rem;font-size:.95rem}
+.stage-name.cl{color:var(--accent)}
+.stage-desc{font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:.75rem}
+
+@media(max-width:640px){
+  .result-hero-row{grid-template-columns:1fr}
+  .result-level-cards{grid-template-columns:1fr}
+  .result-wrap{padding:1.5rem 1rem 5rem}
+  .result-stat-cluster{gap:.85rem}
+}
+</style>
+
 <div class="screen" id="s-result">
   <div class="retake-banner" id="retake-banner">
     <span class="retake-text">Viewing saved results — <strong id="retake-email"></strong></span>
     <button class="retake-btn" onclick="startFresh()">Retake Diagnostic →</button>
   </div>
-  <div class="result-hero">
-    <div class="result-hero-left">
-      <div class="r-eyebrow">Your Diagnostic Result</div>
-      <div class="r-level" id="r-level"></div>
-      <div class="r-score" id="r-score"></div>
-      <div class="r-desc" id="r-desc"></div>
-      <div class="r-action-row">
-        <button class="r-cta" onclick="openModal('register')" id="r-register-btn">Create Account →</button>
-        <button class="r-ghost" onclick="openModal('login')">Log In</button>
-        <button class="r-ghost" id="r-dashboard-btn" style="display:none" onclick="showDashboard()">Go to Dashboard →</button>
-      </div>
-    </div>
-    <div class="schedule-widget">
-      <div class="sw-title" onclick="toggleSchedule()"><span>Plan Your Schedule</span><span id="sw-arrow">▾</span></div>
-      <div class="sw-body" id="sw-body">
-        <div class="sw-field"><label>Start Date</label><input type="date" id="sw-start" oninput="calcSchedule()"/></div>
-        <div class="sw-field"><label>Study Days</label>
-          <div class="days-grid">
-            <button class="day-btn" data-d="0" onclick="toggleDay(this)">Su</button>
-            <button class="day-btn sel" data-d="1" onclick="toggleDay(this)">Mo</button>
-            <button class="day-btn sel" data-d="2" onclick="toggleDay(this)">Tu</button>
-            <button class="day-btn sel" data-d="3" onclick="toggleDay(this)">We</button>
-            <button class="day-btn sel" data-d="4" onclick="toggleDay(this)">Th</button>
-            <button class="day-btn" data-d="5" onclick="toggleDay(this)">Fr</button>
-            <button class="day-btn" data-d="6" onclick="toggleDay(this)">Sa</button>
+
+  <div class="result-wrap">
+
+    <!-- ── ROW 1: Hero + Daily goal ── -->
+    <div class="result-hero-row">
+
+      <!-- Left: Your result -->
+      <div class="result-hero-card">
+        <div class="result-eyebrow">Diagnostic complete</div>
+        <div class="result-level-name" id="r-level">Early Algebra</div>
+        <div class="result-score-line" id="r-score">— / 15 correct</div>
+        <div class="result-desc" id="r-desc">Variables, equations, slope, systems, intro to quadratics.</div>
+        <div class="result-actions">
+          <button class="result-btn-primary" onclick="openModal('register')" id="r-register-btn">Create Account →</button>
+          <button class="result-btn-ghost" onclick="openModal('login')">Log In</button>
+          <button class="result-btn-primary" id="r-dashboard-btn" style="display:none" onclick="showDashboard()">Start Training →</button>
+        </div>
+        <div class="result-stat-cluster">
+          <div class="result-stat">
+            <div class="result-stat-val" id="r-accuracy-val">—</div>
+            <div class="result-stat-lbl">accuracy</div>
+          </div>
+          <div class="result-stat-div"></div>
+          <div class="result-stat">
+            <div class="result-stat-val" id="r-level-val">—</div>
+            <div class="result-stat-lbl">of 7 levels</div>
+          </div>
+          <div class="result-stat-div"></div>
+          <div class="result-stat">
+            <div class="result-stat-val">∞</div>
+            <div class="result-stat-lbl">practice qs</div>
           </div>
         </div>
-        <div class="sw-field"><label>Hours per Session</label>
-          <select id="sw-hours" onchange="calcSchedule()">
-            <option value="0.5">30 minutes</option>
-            <option value="1" selected>1 hour</option>
-            <option value="1.5">1.5 hours</option>
-            <option value="2">2 hours</option>
-            <option value="3">3 hours</option>
-          </select>
+      </div>
+
+      <!-- Right: Daily goal framing -->
+      <div class="result-goal-card">
+        <div class="result-goal-eyebrow">Your training plan</div>
+        <div class="result-goal-headline" id="r-goal-headline">
+          One quiz a day.<br/><em>That's the whole plan.</em>
         </div>
-        <div class="sw-result" id="sw-result" style="display:none">
-          <div class="sw-result-item"><span>Hours / Week</span><span id="sw-hrs-week">—</span></div>
-          <div class="sw-result-item"><span>Next Level</span><span id="sw-next">—</span></div>
-          <div class="sw-result-item"><span>Calculus Ready</span><span id="sw-calc">—</span></div>
-          <div class="sw-result-item"><span>Full Mastery</span><span id="sw-mit">—</span></div>
+        <div class="result-goal-body" id="r-goal-body">
+          5 questions. 3–5 minutes. Every single day builds something the occasional all-nighter can't.
+        </div>
+        <div class="result-milestones" id="r-milestones">
+          <!-- populated by JS -->
         </div>
       </div>
+
     </div>
-  </div>
-  <div class="projection-box" id="proj-box"></div>
-  <div class="journey-section"><p class="section-label">Your Full Path — Resources & Timeline</p><div id="journey-track"></div></div>
+
+    <!-- ── ROW 2: Path track ── -->
+    <div class="result-path-section">
+      <div class="result-path-header">
+        <div class="result-path-title">Your Learning Path</div>
+        <div class="result-path-sub" id="r-path-sub">Level 1 of 7</div>
+      </div>
+
+      <!-- Horizontal track -->
+      <div class="result-stage-track" id="r-stage-track">
+        <!-- populated by JS -->
+      </div>
+
+      <!-- Detail cards for current + next -->
+      <div class="result-level-cards" id="r-level-cards">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ── ROW 3: Full path (collapsible) ── -->
+    <div>
+      <div class="result-journey-toggle" id="r-journey-toggle" onclick="toggleResultJourney()">
+        <span class="result-journey-toggle-label">All 7 levels — resources & details</span>
+        <span class="result-journey-chevron">▾</span>
+      </div>
+      <div class="result-journey-body" id="r-journey-body">
+        <div id="journey-track"></div>
+      </div>
+    </div>
+
+  </div><!-- /result-wrap -->
 </div>
 
 <!-- ══════════════════════════════════
@@ -3078,7 +3414,7 @@ function showDiagResultOverlay(rd){
 
   const score_pct = Math.round((rd.score / rd.total) * 100);
   const scoreColor = score_pct >= 70 ? 'var(--accent)' : score_pct >= 40 ? 'var(--gold)' : 'var(--text2)';
-  const hrs = HOURS_TO_NEXT[rd.level] || 0;
+  const sessions = LEVEL_SESSIONS[rd.level] || 0;
 
   ov.innerHTML = `
     <div style="font-size:3.5rem;margin-bottom:1.2rem;animation:iconPop .6s cubic-bezier(.34,1.56,.64,1) .2s both;opacity:0">🎯</div>
@@ -3088,7 +3424,7 @@ function showDiagResultOverlay(rd){
     </h1>
     <p style="font-size:1rem;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:2rem;animation:obIn .4s ease .42s both;opacity:0">
       ${rd.score}/${rd.total} correct · ${stage.desc}
-      ${hrs>0 ? `<br/><strong style="color:var(--text)">~${Math.round(hrs/5)} weeks</strong> to the next level at 1hr/day.` : ''}
+      ${sessions>0 ? `<br/>Your first milestone: <strong style="color:var(--text)">~${sessions} daily quizzes</strong> to the next level.` : '<br/>You\'re at the highest level. Train for depth.'}
     </p>
     <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;animation:obIn .4s ease .48s both;opacity:0">
       <div style="text-align:center">
@@ -3129,69 +3465,235 @@ function showDiagResultOverlay(rd){
 
 function saveResult(data){ try{localStorage.setItem('apexmath_result',JSON.stringify(data));}catch(e){} }
 
-function renderResult(data,showRetake){
+// ── RESULT PAGE MILESTONES ─────────────────────────────────────────────────────
+// Sessions-based framing instead of weeks
+const LEVEL_SESSIONS = [30, 60, 80, 60, 50, 70, 0]; // daily quizzes to reach next level
+const LEVEL_ACTIONS = [
+  'Master fractions, percentages, and order of operations',
+  'Solve linear equations, graph lines, and factor polynomials',
+  'Work with logs, complex numbers, and sequences',
+  'Prove geometric theorems and master coordinate geometry',
+  'Use trig identities, limits, and conic sections confidently',
+  'Differentiate and integrate fluently',
+  'You\'ve reached the highest level. Deepen mastery with competition math.'
+];
+const LEVEL_NEXT_UNLOCK = [
+  '🔓 Early Algebra unlocks', '🔓 Advanced Algebra unlocks',
+  '🔓 Geometry unlocks', '🔓 Pre-Calculus unlocks',
+  '🔓 Calculus I unlocks', '🔓 Calculus II unlocks', null
+];
+
+function renderResult(data, showRetake){
   showScreen('s-result');
-  const stage=STAGES[data.level];
-  document.getElementById('r-level').textContent=stage.name;
-  document.getElementById('r-score').textContent=`${data.score}/${data.total} correct · Diagnostic complete`;
-  document.getElementById('r-desc').textContent=stage.desc;
-  const rb=document.getElementById('retake-banner');
-  if(showRetake&&data.email){rb.classList.add('show');document.getElementById('retake-email').textContent=data.email;}
+  const stage = STAGES[data.level];
+  const next = STAGES[data.level + 1];
+  const scorePct = Math.round((data.score / data.total) * 100);
+
+  // Hero card
+  document.getElementById('r-level').textContent = stage.name;
+  document.getElementById('r-score').textContent = `${data.score}/${data.total} correct · Diagnostic complete`;
+  document.getElementById('r-desc').textContent = stage.desc;
+  document.getElementById('r-accuracy-val').textContent = scorePct + '%';
+  document.getElementById('r-level-val').textContent = data.level + 1;
+
+  // Auth buttons
+  const rb = document.getElementById('retake-banner');
+  if(showRetake && data.email){ rb.classList.add('show'); document.getElementById('retake-email').textContent = data.email; }
   else rb.classList.remove('show');
-  if(currentUser){document.getElementById('r-register-btn').style.display='none';document.getElementById('r-dashboard-btn').style.display='inline-block';}
-  else{document.getElementById('r-register-btn').style.display='inline-block';document.getElementById('r-dashboard-btn').style.display='none';}
-  renderJourney(data.level,document.getElementById('journey-track'));
-  const hrs=(HOURS_TO_NEXT[data.level]||0);
-  document.getElementById('proj-box').textContent=hrs>0?`At 1 hour/day, 5 days/week, you could reach the next level in approximately ${Math.round(hrs/5)} weeks. Consistent, focused practice compounds fast.`:`You've reached the highest level tracked. Focus on deepening mastery and tackling competition math.`;
+
+  if(currentUser){
+    document.getElementById('r-register-btn').style.display = 'none';
+    document.querySelector('#s-result .result-btn-ghost')?.setAttribute('style','display:none');
+    document.getElementById('r-dashboard-btn').style.display = 'inline-block';
+  } else {
+    document.getElementById('r-register-btn').style.display = 'inline-block';
+    document.getElementById('r-dashboard-btn').style.display = 'none';
+  }
+
+  // Daily goal card — milestone framing (sessions, not weeks)
+  const sessions = LEVEL_SESSIONS[data.level] || 0;
+  const action = LEVEL_ACTIONS[data.level] || '';
+  const unlock = LEVEL_NEXT_UNLOCK[data.level];
+
+  document.getElementById('r-goal-headline').innerHTML =
+    data.level >= 5
+      ? `One quiz a day.<br/><em>You're in the deep end.</em>`
+      : `One quiz a day.<br/><em>That's the whole plan.</em>`;
+
+  document.getElementById('r-goal-body').textContent =
+    data.level >= 6
+      ? 'You\'ve reached Calculus II. The journey from here is depth, not breadth. Pick the topics you want to own.'
+      : '5 questions. 3–5 minutes. Every single day builds something hours of cramming can\'t. Consistency is the only real strategy.';
+
+  const milestones = document.getElementById('r-milestones');
+  milestones.innerHTML = '';
+
+  const ms = [
+    {
+      icon: '🎯',
+      text: `<strong>Today's focus:</strong> ${action}`,
+      badge: 'Start now'
+    },
+    sessions > 0 ? {
+      icon: '📈',
+      text: unlock
+        ? `After <strong>${sessions} daily quizzes</strong>, ${unlock.replace('🔓 ','')}.`
+        : `You're training at the highest level.`,
+      badge: `~${sessions} quizzes`
+    } : null,
+    {
+      icon: '🔥',
+      text: `<strong>Streak system:</strong> 3+ correct out of 5 keeps your streak. Miss a day? Streak resets — but your level doesn't.`,
+      badge: 'Daily'
+    },
+  ].filter(Boolean);
+
+  ms.forEach((m, i) => {
+    const el = document.createElement('div');
+    el.className = 'result-milestone';
+    el.style.animationDelay = (i * 80 + 200) + 'ms';
+    el.innerHTML = `
+      <div class="result-milestone-icon">${m.icon}</div>
+      <div class="result-milestone-text">${m.text}</div>
+      <div class="result-milestone-badge">${m.badge}</div>
+    `;
+    milestones.appendChild(el);
+  });
+
+  // Stage track
+  renderResultStageTrack(data.level);
+
+  // Level detail cards
+  renderResultLevelCards(data.level);
+
+  // Path sub label
+  document.getElementById('r-path-sub').textContent =
+    `Level ${data.level + 1} of ${STAGES.length}${data.level < STAGES.length - 1 ? ' · ' + (STAGES.length - 1 - data.level) + ' to go' : ' · Complete!'}`;
+
+  // Collapsed full journey
+  renderJourney(data.level, document.getElementById('journey-track'));
+
+  // Legacy proj-box stub (still in DOM from old code)
+  const pb = document.getElementById('proj-box');
+  if(pb) pb.style.display = 'none';
 }
 
-function startFresh(){qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;showScreen('s-diagnostic');loadQuestion();}
+function renderResultStageTrack(level){
+  const track = document.getElementById('r-stage-track');
+  if(!track) return;
+  track.innerHTML = '';
+  const shortNames = ['Arithmetic','Algebra','Adv. Algebra','Geometry','Pre-Calc','Calc I','Calc II'];
+  STAGES.forEach((s, i) => {
+    const isDone = i < level;
+    const isCurrent = i === level;
+    const isNext = i === level + 1;
+    const node = document.createElement('div');
+    node.className = 'result-stage-node' + (isDone?' done':isCurrent?' current':isNext?' next':'');
+    node.title = s.name;
+    node.innerHTML = `
+      <div class="result-stage-pip">${isDone ? '✓' : isCurrent ? '●' : ''}</div>
+      <div class="result-stage-label">${shortNames[i]}</div>
+    `;
+    node.onclick = () => {
+      // Scroll to the full journey and expand it
+      const toggle = document.getElementById('r-journey-toggle');
+      const body = document.getElementById('r-journey-body');
+      if(body && !body.classList.contains('open')){
+        body.classList.add('open');
+        toggle?.classList.add('open');
+      }
+      const stages = document.querySelectorAll('.journey-stage');
+      if(stages[i]) stages[i].scrollIntoView({behavior:'smooth', block:'center'});
+    };
+    track.appendChild(node);
+    // Stagger pip animation
+    setTimeout(()=>{ node.querySelector('.result-stage-pip').style.transform='scale(1)'; }, i*60+300);
+  });
+}
 
-function renderJourney(level,track){
-  track.innerHTML='';
-  STAGES.forEach((s,i)=>{
-    const isCurrent=i===level,isNext=i===level+1,isDone=i<level;
-    const dotIcon=isDone?'✓':'';
-    const dotClass=isDone?'done':isCurrent?'current':'';
+function renderResultLevelCards(level){
+  const wrap = document.getElementById('r-level-cards');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const typeIcons = {'video':'▶','course':'📖','book':'📚','tool':'🛠','notes':'📝'};
+  const toShow = [
+    { idx: level, label: 'You are here', isCurrent: true },
+    level < STAGES.length - 1 ? { idx: level + 1, label: 'Up next', isCurrent: false } : null
+  ].filter(Boolean);
+
+  toShow.forEach(({idx, label, isCurrent}) => {
+    const s = STAGES[idx];
+    const card = document.createElement('div');
+    card.className = 'result-lcard' + (isCurrent ? ' is-current' : '');
+    const sessions = LEVEL_SESSIONS[idx];
+    const progressMsg = isCurrent
+      ? 'Start your daily quiz to begin'
+      : sessions > 0 ? `Unlocks after ~${sessions} daily quizzes` : 'Final level';
+    card.innerHTML = `
+      <div class="result-lcard-badge">${label}</div>
+      <div class="result-lcard-name">${s.name}</div>
+      <div class="result-lcard-desc">${s.desc}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--accent);margin-bottom:.75rem">${progressMsg}</div>
+      <div class="result-lcard-resources">
+        ${s.resources.map(r=>`
+          <a class="result-lcard-res" href="${r.url}" target="_blank" rel="noopener">
+            <span class="result-lcard-res-type">${r.type}</span>
+            <span style="flex:1">${r.name}</span>
+            <span style="color:var(--accent);font-size:.7rem">↗</span>
+          </a>
+        `).join('')}
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+function toggleResultJourney(){
+  const toggle = document.getElementById('r-journey-toggle');
+  const body = document.getElementById('r-journey-body');
+  if(!toggle || !body) return;
+  const isOpen = body.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
+}
+
+function startFresh(){
+  qCount=0;correct=0;wrong=0;currentLevel=1;userLevel=1;diagLevelHistory={};
+  showScreen('s-diagnostic');loadQuestion();
+}
+
+function renderJourney(level, track){
+  if(!track) return;
+  track.innerHTML = '';
+  STAGES.forEach((s,i) => {
+    const isCurrent=i===level, isNext=i===level+1, isDone=i<level;
+    const sessions = LEVEL_SESSIONS[i];
     const el=document.createElement('div');
     el.className='journey-stage'+(isCurrent?' is-current':'')+(isNext?' is-next':'');
-    el.innerHTML=`<div class="stage-dot ${dotClass}">${dotIcon}</div>
+    const progressLabel = isDone
+      ? '<span style="color:var(--accent)">✓ Completed</span>'
+      : isCurrent
+        ? '<span style="color:var(--accent)">← You are here</span>'
+        : sessions > 0
+          ? `~${sessions} daily quizzes to unlock`
+          : 'Final level';
+    el.innerHTML=`<div class="stage-dot ${isDone?'done':isCurrent?'current':''}">${isDone?'✓':''}</div>
       <div class="stage-content">
-        <div class="stage-header">
-          <div class="stage-name${isCurrent?' cl':''}">${s.name}${isCurrent?' — You Are Here':''}</div>
-          <div class="stage-tags">
-            ${isCurrent?'<span class="tag ct">Current Level</span>':''}${isNext?'<span class="tag nt">Up Next</span>':''}
-            <span class="tag tt">${isDone?'Completed':`~${Math.round(HOURS_TO_NEXT[i]/5)} weeks at 1hr/day`}</span>
-          </div>
+        <div class="stage-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem">
+          <div class="stage-name${isCurrent?' cl':''}">${s.name}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.08em;color:var(--text3)">${progressLabel}</div>
         </div>
-        ${isNext?'<div class="next-callout">⟶ <strong>Up next.</strong> This is where you\'re headed after your current level.</div>':''}
         <div class="stage-desc">${s.desc}</div>
         <div class="resources">${s.resources.map(r=>`<div class="resource-row"><span class="res-type ${r.type}">${r.type}</span><span class="res-name">${r.name}</span><a class="res-link" href="${r.url}" target="_blank" rel="noopener">Visit →</a></div>`).join('')}</div>
       </div>`;
     track.appendChild(el);
-    setTimeout(()=>el.classList.add('visible'),i*80);
+    setTimeout(()=>el.classList.add('visible'), i*80);
   });
 }
 
-// schedule widget
-function toggleSchedule(){const b=document.getElementById('sw-body');b.classList.toggle('open');if(b.classList.contains('open')&&document.getElementById('sw-start').value)calcSchedule();}
-function toggleDay(btn){btn.classList.toggle('sel');calcSchedule();}
-function calcSchedule(){
-  const startVal=document.getElementById('sw-start').value;if(!startVal)return;
-  const days=[...document.querySelectorAll('.day-btn.sel')].length;
-  const hrs=parseFloat(document.getElementById('sw-hours').value);
-  const hrsPerWeek=days*hrs;
-  const hoursLeft=HOURS_TO_NEXT[userLevel]||0;
-  const weeksToNext=hrsPerWeek>0?Math.ceil(hoursLeft/hrsPerWeek):99;
-  const totalHours=HOURS_TO_NEXT.reduce((a,b)=>a+b,0);
-  const weeksToCalc=hrsPerWeek>0?Math.ceil(totalHours/hrsPerWeek):999;
-  const addWeeks=(date,w)=>{const d=new Date(date);d.setDate(d.getDate()+w*7);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});};
-  document.getElementById('sw-hrs-week').textContent=hrsPerWeek.toFixed(1)+' hrs';
-  document.getElementById('sw-next').textContent=addWeeks(startVal,weeksToNext);
-  document.getElementById('sw-calc').textContent=addWeeks(startVal,weeksToNext+Math.ceil(60/hrsPerWeek));
-  document.getElementById('sw-mit').textContent=addWeeks(startVal,weeksToCalc);
-  document.getElementById('sw-result').style.display='block';
-}
+// Keep legacy stubs
+function toggleSchedule(){}
+function calcSchedule(){}
+function toggleDay(){}
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 // ── MODAL SYSTEM ─────────────────────────────────────────────────────────────
@@ -3424,6 +3926,8 @@ function renderWeekStrip(days){ renderWeekHeatmap(days); }
 function renderAsideWeek(days){ renderWeekHeatmap(days); }
 // ws-card-sub legacy stub
 function _wsCardSubCompat(n){ const el=document.getElementById('ws-card-sub'); if(el)el.textContent=n>0?`${n} topics tracked`:'No weak spots yet'; }
+
+function renderBadges2(streak,totalQ,perfect){
   const earned=new Set(JSON.parse(localStorage.getItem('apexmath_badges')||'[]'));
   if(totalQ>=1)earned.add('first_quiz');
   if(streak>=3)earned.add('streak_3');
@@ -3574,7 +4078,7 @@ function renderPathModal(){
     let tags='';
     if(isCurrent) tags+=`<span class="ps-tag here">You are here</span>`;
     if(i===userLevel+1) tags+=`<span class="ps-tag" style="color:var(--gold,#92700a);border-color:rgba(146,112,10,.25)">Up next</span>`;
-    tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+Math.round(HOURS_TO_NEXT[i]/5)+' weeks'}</span>`;
+    tags+=`<span class="ps-tag">${isDone?'Done':isCurrent?'Current':'~'+LEVEL_SESSIONS[i]+' quizzes'}</span>`;
     body.innerHTML=`<div class="ps-name${isCurrent?' current-level':''}">${s.name}</div><div style="margin-bottom:.3rem">${tags}</div><div class="ps-desc">${s.desc}</div>`;
     el.appendChild(dot); el.appendChild(body);
     wrap.appendChild(el);
@@ -4088,91 +4592,7 @@ function getWeakSpots(){try{return JSON.parse(localStorage.getItem('apexmath_wea
 function trackWrongAnswer(topic){const ws=getWeakSpots();ws[topic]=(ws[topic]||0)+1;localStorage.setItem('apexmath_weakspots',JSON.stringify(ws));}
 function renderWeakSpots(){ renderWeakSpots2(); }
 
-// ── TIMER ─────────────────────────────────────────────────────────────────────
-function timerStart(){
-  if(timerRunning)return;
-  timerRunning=true; timerStartTime=Date.now()-timerElapsed;
-  timerInterval=setInterval(timerTick,1000);
-  document.getElementById('timer-start-btn').disabled=true;
-  document.getElementById('timer-stop-btn').disabled=false;
-  document.getElementById('timer-status').textContent='running…';
-  document.getElementById('timer-display').classList.add('running');
-}
-function timerStop(){
-  if(!timerRunning)return;
-  timerRunning=false; clearInterval(timerInterval);
-  timerElapsed=Date.now()-timerStartTime;
-  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
-  sessions.push({date:new Date().toLocaleDateString(),dur:timerElapsed});
-  localStorage.setItem('apexmath_timer_sessions',JSON.stringify(sessions.slice(-50)));
-  timerElapsed=0;
-  document.getElementById('timer-start-btn').disabled=false;
-  document.getElementById('timer-stop-btn').disabled=true;
-  document.getElementById('timer-status').textContent='session saved';
-  document.getElementById('timer-display').classList.remove('running');
-  renderTimerTotal(); renderTimerLog();
-}
-function timerReset(){
-  timerRunning=false; clearInterval(timerInterval); timerElapsed=0;
-  document.getElementById('timer-display').textContent='00:00:00';
-  document.getElementById('timer-start-btn').disabled=false;
-  document.getElementById('timer-stop-btn').disabled=true;
-  document.getElementById('timer-status').textContent='ready to start';
-  document.getElementById('timer-display').classList.remove('running');
-}
-function timerTick(){
-  timerElapsed=Date.now()-timerStartTime;
-  const s=Math.floor(timerElapsed/1000),m=Math.floor(s/60),h=Math.floor(m/60);
-  document.getElementById('timer-display').textContent=`${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-}
-function renderTimerTotal(){
-  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
-  const weekMs=7*24*3600*1000;
-  const total=sessions.filter(s=>Date.now()-new Date(s.date).getTime()<weekMs).reduce((a,s)=>a+s.dur,0);
-  const totalMin=Math.floor(total/60000),h=Math.floor(totalMin/60),m=totalMin%60;
-  const txt=`${h}h ${m}m`;
-  const el=document.getElementById('timer-total');if(el)el.textContent=txt;
-  const dic=document.getElementById('dic-study-time');if(dic)dic.textContent=txt;
-}
-function renderTimerLog(){
-  const sessions=JSON.parse(localStorage.getItem('apexmath_timer_sessions')||'[]');
-  const log=document.getElementById('timer-log');if(!log)return;
-  if(!sessions.length){log.innerHTML='<div style="font-size:.84rem;color:var(--text3);padding:1rem 0">No sessions yet.</div>';return;}
-  log.innerHTML=sessions.slice(-10).reverse().map(s=>{
-    const m=Math.floor(s.dur/60000),secs=Math.floor((s.dur%60000)/1000);
-    return`<div class="timer-log-row"><span class="timer-log-date">${s.date}</span><span class="timer-log-dur">${m}m ${secs}s</span></div>`;
-  }).join('');
-}
-
-// ── NOTES ─────────────────────────────────────────────────────────────────────
-function loadNote(level){const a=document.getElementById('notes-area');if(a)a.value=localStorage.getItem('apexmath_note_'+level)||'';document.getElementById('notes-count').textContent=(a?.value.length||0)+' chars';}
-function autoSaveNote(){
-  const level=document.getElementById('notes-level-select').value;
-  const v=document.getElementById('notes-area').value;
-  localStorage.setItem('apexmath_note_'+level,v);
-  document.getElementById('notes-count').textContent=v.length+' chars';
-  const savedEl=document.getElementById('notes-saved');savedEl.classList.add('show');
-  setTimeout(()=>savedEl.classList.remove('show'),2000);
-}
-function switchNotesLevel(){const level=document.getElementById('notes-level-select').value;loadNote(level);}
-
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
-async function changePassword(){
-  const cur=document.getElementById('sp-cur-pw').value,nw=document.getElementById('sp-new-pw').value;
-  if(!cur||!nw){document.getElementById('sp-pw-msg').textContent='Please fill both fields.';return;}
-  try{
-    const res=await fetch('/auth/change-password',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({currentPassword:cur,newPassword:nw})});
-    const data=await res.json();
-    document.getElementById('sp-pw-msg').textContent=res.ok?'Password updated!':data.error||'Error.';
-  }catch(e){document.getElementById('sp-pw-msg').textContent='Error.';}
-}
-async function updateLevel(){
-  const level=parseInt(document.getElementById('settings-level-select').value);
-  try{
-    const res=await fetch('/auth/update-level',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`},body:JSON.stringify({level,levelName:STAGES[level].name})});
-    if(res.ok){userLevel=level;showDashboard();}
-  }catch(e){}
-}
 function confirmRetake(){if(confirm('Retake the diagnostic? Your current level will be updated.'))startFresh();}
 async function confirmResetStreak(){
   if(!confirm('Reset your streak to 0?'))return;
