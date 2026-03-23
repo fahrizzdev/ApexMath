@@ -315,7 +315,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .dash-inner{
   padding:1.5rem 1.75rem 5rem;
   display:grid;
-  grid-template-columns:1fr 300px;
+  grid-template-columns:1fr 280px;
   grid-template-rows:auto;
   gap:1.25rem;
 }
@@ -341,29 +341,37 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 
 /* QUIZ HERO — the star of the show */
 .db-quiz{
-  background:linear-gradient(135deg,#08150a 0%,#0d2010 45%,#112614 100%);
-  border:1px solid rgba(45,90,39,.35);
-  border-radius:16px;
-  padding:2rem 2rem 1.75rem;
+  background:
+    linear-gradient(135deg,#06120a 0%,#0b1e0d 40%,#0f2412 100%);
+  border:1px solid rgba(45,90,39,.4);
+  border-radius:20px;
+  padding:2.5rem 2.5rem 2.25rem;
   position:relative;overflow:hidden;
   cursor:pointer;
-  transition:border-color .25s, box-shadow .25s, transform .2s;
-  display:flex;gap:1.5rem;align-items:center;
+  transition:border-color .3s, box-shadow .3s, transform .2s;
+  display:flex;gap:2rem;align-items:stretch;
+  min-height:280px;
 }
-/* animated noise texture overlay */
+/* dot grid pattern */
 .db-quiz::before{
   content:'';
   position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  background-size:200px 200px;
-  opacity:.4;pointer-events:none;border-radius:16px;
+  background-image:radial-gradient(rgba(45,90,39,.35) 1px, transparent 1px);
+  background-size:24px 24px;
+  opacity:.5;pointer-events:none;border-radius:20px;
 }
-/* radial glow */
+/* dual radial glows */
 .db-quiz::after{
   content:'';position:absolute;
-  top:-40%;right:-10%;
-  width:60%;padding-bottom:60%;
-  background:radial-gradient(circle,rgba(45,90,39,.28) 0%,transparent 65%);
+  top:-30%;right:-5%;
+  width:55%;padding-bottom:55%;
+  background:radial-gradient(circle,rgba(45,90,39,.32) 0%,transparent 60%);
+  pointer-events:none;
+}
+.db-quiz-glow2{
+  position:absolute;bottom:-40%;left:10%;
+  width:45%;padding-bottom:45%;
+  background:radial-gradient(circle,rgba(20,80,30,.2) 0%,transparent 65%);
   pointer-events:none;
 }
 .db-quiz:hover{
@@ -371,19 +379,21 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   box-shadow:0 16px 48px rgba(45,90,39,.2),0 4px 16px rgba(0,0,0,.2);
   transform:translateY(-2px);
 }
-.db-quiz-content{flex:1;min-width:0;position:relative;z-index:1}
+.db-quiz-content{flex:1;min-width:0;position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;}
 .db-quiz-eyebrow{
-  font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.2em;
-  text-transform:uppercase;color:rgba(168,197,160,.45);margin-bottom:.7rem;
+  font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(168,197,160,.4);margin-bottom:.85rem;
 }
+.db-quiz-top{}
+.db-quiz-bottom{display:flex;flex-direction:column;gap:.75rem}
 .db-quiz-title{
   font-family:'DM Serif Display',serif;
-  font-size:clamp(1.7rem,3.5vw,2.6rem);
-  letter-spacing:-.04em;color:#fff;line-height:1;margin-bottom:.5rem;
+  font-size:clamp(2rem,4vw,3.2rem);
+  letter-spacing:-.04em;color:#fff;line-height:.95;margin-bottom:.65rem;
 }
 .db-quiz-sub{
-  font-size:.78rem;color:rgba(255,255,255,.3);line-height:1.65;
-  margin-bottom:1.5rem;max-width:380px;
+  font-size:.82rem;color:rgba(255,255,255,.32);line-height:1.7;
+  margin-bottom:2rem;max-width:400px;
 }
 .db-quiz-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
 .db-quiz-btn{
@@ -409,9 +419,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 }
 .db-quiz-streak-badge strong{color:rgba(168,197,160,.9)}
 .db-quiz-emoji{
-  font-size:5rem;flex-shrink:0;
+  font-size:7rem;flex-shrink:0;
   position:relative;z-index:1;
-  filter:drop-shadow(0 8px 24px rgba(45,90,39,.5));
+  align-self:center;
+  filter:drop-shadow(0 12px 32px rgba(45,90,39,.6)) drop-shadow(0 0 60px rgba(45,90,39,.25));
   animation:dbEmojiFloat 5s ease-in-out infinite;
   user-select:none;
 }
@@ -421,36 +432,37 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   66%{transform:translateY(-4px) rotate(-1deg)}
 }
 
-/* TOOLS ROW — 4 compact cards */
+/* TOOLS ROW */
 .db-tools{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;
 }
 .db-tool{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:1.1rem;
+  border-radius:14px;padding:.95rem 1rem;
   cursor:pointer;
   transition:border-color .2s,box-shadow .2s,transform .2s,background .2s;
-  display:flex;flex-direction:column;gap:.6rem;
+  display:flex;align-items:center;gap:.85rem;
   position:relative;overflow:hidden;
 }
 .db-tool::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent),rgba(100,200,80,.6));
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .3s cubic-bezier(.22,1,.36,1);
+  content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;
+  background:var(--accent);border-radius:0 2px 2px 0;
+  transform:scaleY(0);transform-origin:center;
+  transition:transform .25s cubic-bezier(.22,1,.36,1);
 }
-.db-tool:hover::after{transform:scaleX(1)}
+.db-tool:hover::after{transform:scaleY(1)}
 .db-tool:hover{
   border-color:var(--accent-mid);background:var(--accent-light);
-  box-shadow:0 6px 20px rgba(0,0,0,.06);
-  transform:translateY(-3px);
+  box-shadow:0 4px 16px rgba(0,0,0,.06);
+  transform:translateY(-2px);
 }
-.db-tool-icon{font-size:1.35rem;line-height:1}
+.db-tool-icon{font-size:1.5rem;line-height:1;flex-shrink:0}
+.db-tool-body{display:flex;flex-direction:column;gap:.18rem;min-width:0}
 .db-tool-name{
-  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--text);
 }
-.db-tool-hint{font-size:.72rem;color:var(--text3);line-height:1.4;flex:1}
+.db-tool-hint{font-size:.7rem;color:var(--text3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* WEAK SPOTS PANEL */
 .db-ws{
@@ -519,7 +531,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .db-streak-top{display:flex;align-items:flex-end;gap:.75rem;margin-bottom:.5rem}
 .db-streak-number{
   font-family:'DM Serif Display',serif;
-  font-size:4.5rem;letter-spacing:-.06em;color:#b85a00;line-height:.9;
+  font-size:5.5rem;letter-spacing:-.06em;color:#b85a00;line-height:.85;
 }
 [data-theme="ink"] .db-streak-number{color:#d4822a}
 .db-streak-right{display:flex;flex-direction:column;gap:.15rem;padding-bottom:.3rem}
@@ -700,7 +712,6 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .dcard,.dcard-quiz,.dcard-streak,.dcard-level,.dcard-tool,
 .dcard-stat,.dcard-weakspots,.dash-today-grid,
 .dash-train-grid,.dash-stats-row,.dash-section,
-.ws-inline-list,.ws-inline-state,
 .dash-section-title,.dash-section-sub{display:none!important}
 
 /* MODAL OVERLAY for sub-screens inside dashboard */
@@ -2317,15 +2328,20 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 
       <!-- QUIZ HERO -->
       <div class="db-quiz" id="quiz-card-wrap" onclick="document.getElementById('quiz-start-btn').click()">
+        <div class="db-quiz-glow2"></div>
         <div class="db-quiz-content">
-          <div class="db-quiz-eyebrow" id="quiz-eyebrow">Daily Quiz</div>
-          <div class="db-quiz-title" id="quiz-card-title">Today's Quiz</div>
-          <div class="db-quiz-sub" id="quiz-card-sub">5 questions · get 3+ right to keep your streak. Every wrong answer shows you exactly why.</div>
-          <div class="db-quiz-actions">
-            <button class="db-quiz-btn" id="quiz-start-btn" onclick="event.stopPropagation();startDailyQuiz()">
-              <span id="quiz-btn-label">Start</span> →
-            </button>
-            <div class="db-quiz-streak-badge" id="quiz-streak-inline"></div>
+          <div class="db-quiz-top">
+            <div class="db-quiz-eyebrow" id="quiz-eyebrow">Daily Quiz</div>
+            <div class="db-quiz-title" id="quiz-card-title">Today's Quiz</div>
+            <div class="db-quiz-sub" id="quiz-card-sub">5 questions · get 3+ right to keep your streak. Every wrong answer shows you exactly why.</div>
+          </div>
+          <div class="db-quiz-bottom">
+            <div class="db-quiz-actions">
+              <button class="db-quiz-btn" id="quiz-start-btn" onclick="event.stopPropagation();startDailyQuiz()">
+                <span id="quiz-btn-label">Start</span> →
+              </button>
+              <div class="db-quiz-streak-badge" id="quiz-streak-inline"></div>
+            </div>
           </div>
         </div>
         <div class="db-quiz-emoji" id="quiz-emoji" aria-hidden="true">🎯</div>
@@ -2335,23 +2351,19 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
       <div class="db-tools">
         <div class="db-tool" onclick="openDashModal('modal-practice')">
           <div class="db-tool-icon">⚡</div>
-          <div class="db-tool-name">Practice</div>
-          <div class="db-tool-hint">Any level. Unlimited reps.</div>
+          <div class="db-tool-body"><div class="db-tool-name">Practice</div><div class="db-tool-hint">Any level. Unlimited reps.</div></div>
         </div>
         <div class="db-tool" onclick="openDashModal('modal-flashcards')">
           <div class="db-tool-icon">🃏</div>
-          <div class="db-tool-name">Flashcards</div>
-          <div class="db-tool-hint">Flip. Rate. Lock it in.</div>
+          <div class="db-tool-body"><div class="db-tool-name">Flashcards</div><div class="db-tool-hint">Flip. Rate. Lock it in.</div></div>
         </div>
         <div class="db-tool" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
           <div class="db-tool-icon">📚</div>
-          <div class="db-tool-name">Lessons</div>
-          <div class="db-tool-hint">Step-by-step walkthroughs.</div>
+          <div class="db-tool-body"><div class="db-tool-name">Lessons</div><div class="db-tool-hint">Step-by-step.</div></div>
         </div>
         <div class="db-tool" onclick="openDashModal('modal-formulas')">
           <div class="db-tool-icon">📋</div>
-          <div class="db-tool-name">Formulas</div>
-          <div class="db-tool-hint">Searchable by level.</div>
+          <div class="db-tool-body"><div class="db-tool-name">Formulas</div><div class="db-tool-hint">Searchable by level.</div></div>
         </div>
       </div>
 
@@ -3910,6 +3922,8 @@ function renderInlineWeakSpots(weakTopics){
   }
   if(state) state.style.display='none';
   list.style.display='flex';
+  list.style.flexDirection='column';
+  list.style.gap='.6rem';
   const top5 = weakTopics.slice(0,5);
   const max = Math.max(...top5.map(t=>t.wrong||t.wrong_count||0),1);
   top5.forEach((t,i)=>{
@@ -3919,27 +3933,17 @@ function renderInlineWeakSpots(weakTopics){
     const color = pct>60?'var(--red)':'var(--accent)';
     const lesson = t.lesson;
     const el = document.createElement('div');
-    el.className='ws-inline-item';
-    el.style.animationDelay = (i*60+350)+'ms';
+    el.className='db-ws-row';
     el.innerHTML=`
-      <div class="ws-inline-bar-wrap">
-        <div class="ws-inline-label">
-          <span class="ws-inline-topic">${topic}</span>
-          <div style="display:flex;align-items:center;gap:.4rem">
-            ${lesson?`<a class="ws-inline-lesson" href="lessons.html?level=${lesson.level}&topic=${encodeURIComponent(topic)}">Study →</a>`:''}
-            <span class="ws-inline-count">missed ${wrong}×</span>
-          </div>
-        </div>
-        <div class="ws-inline-track">
-          <div class="ws-inline-fill" style="width:0%;background:${color}" data-pct="${pct}"></div>
-        </div>
+      <div class="db-ws-name" title="${topic}">${topic}</div>
+      <div class="db-ws-track">
+        <div class="db-ws-fill" style="width:0%;background:${color}"></div>
       </div>
+      <div class="db-ws-miss">${wrong}×</div>
+      ${lesson?`<a class="db-ws-btn" href="lessons.html?level=${lesson.level}&topic=${encodeURIComponent(topic)}" onclick="event.stopPropagation()">Study →</a>`:''}
     `;
     list.appendChild(el);
-    // Animate bars in
-    setTimeout(()=>{
-      el.querySelector('.ws-inline-fill').style.width=pct+'%';
-    }, i*60+500);
+    setTimeout(()=>{ el.querySelector('.db-ws-fill').style.width=pct+'%'; }, i*70+400);
   });
 }
 
