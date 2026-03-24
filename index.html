@@ -158,7 +158,13 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .land-foot-text{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp { ... }
 
+/* ADD THIS BELOW */
+#onboard-transition { ... }
+.ot-bg { ... }
+...
+@keyframes zoomFly { ... }
 /* ──────────────────────────────────────
    DIAGNOSTIC
 ────────────────────────────────────── */
@@ -1106,7 +1112,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 </style>
 </head>
 <body>
-
+<div id="onboard-transition">
+  <div class="ot-bg"></div>
+  <div class="ot-text">Preparing your learning environment…</div>
+</div>
 <!-- NAV -->
 <nav>
   <a class="logo" onclick="handleLogoClick()">Sc<em>alar</em></a>
@@ -1630,6 +1639,61 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   <!-- Background atmosphere -->
   <div class="ob-grid"></div>
   <div class="ob-symbols" id="ob-symbols"></div>
+<div class="ob-cinematic" id="ob-cinematic">
+  <div class="ob-cine-stars"></div>
+  <div class="ob-cine-grid"></div>
+  <div class="ob-cine-vignette"></div>
+
+  <div class="ob-cine-copy">
+    <div class="ob-cine-kicker">Account created</div>
+    <div class="ob-cine-title">Dropping you into<br/><em>your learning map.</em></div>
+    <div class="ob-cine-sub" id="ob-cine-sub">
+      Placement first. Then the path opens up around you.
+    </div>
+  </div>
+
+  <div class="ob-cine-map">
+    <div class="ob-cine-route"><div class="ob-cine-route-fill"></div></div>
+
+    <div class="ob-cine-node" style="left:14%;top:55%">
+      <div class="ob-cine-node-dot"></div>
+      <div class="ob-cine-node-label">Account</div>
+    </div>
+
+    <div class="ob-cine-node" style="left:37%;top:42%">
+      <div class="ob-cine-node-dot"></div>
+      <div class="ob-cine-node-label">Map</div>
+    </div>
+
+    <div class="ob-cine-node" style="left:61%;top:61%">
+      <div class="ob-cine-node-dot"></div>
+      <div class="ob-cine-node-label">Training Loop</div>
+    </div>
+
+    <div class="ob-cine-node is-goal" style="left:84%;top:47%">
+      <div class="ob-cine-node-dot"></div>
+      <div class="ob-cine-node-label">Diagnostic</div>
+    </div>
+
+    <div class="ob-cine-beam" style="left:84%;top:47%"></div>
+  </div>
+
+  <div class="ob-cine-card">
+    <div class="ob-cine-card-top">
+      <div class="ob-cine-card-kicker">Spawn point</div>
+      <div class="ob-cine-card-step">Step 1 unlocked</div>
+    </div>
+    <div class="ob-cine-card-title" id="ob-cine-card-title">
+      Your first drop is the diagnostic.
+    </div>
+    <div class="ob-cine-card-body">
+      We place you fast, then the rest of Scalar adapts around your exact level,
+      weak spots, and momentum.
+    </div>
+  </div>
+
+  <button class="ob-cine-skip" onclick="obSkipIntro()">Skip cinematic →</button>
+</div>
 
   <!-- Steps -->
   <div class="ob-stage">
@@ -3119,12 +3183,60 @@ function startDashCanvas(){
 let obCurrentStep = 1;
 const OB_TOTAL = 4;
 let obUserName = '';
+let obIntroTimers = [];
+let obIntroFinished = false;
+
 
 function obInit() {
-  // Spawn floating math symbols
+  obCurrentStep = 1;
+  obIntroFinished = false;
+  obClearIntroTimers();
+
+  const onboarding = document.getElementById('s-onboarding');
+  const cinematic = document.getElementById('ob-cinematic');
+
+  if (onboarding) onboarding.classList.add('intro-active');
+  if (cinematic) {
+    cinematic.classList.remove('active');
+    void cinematic.offsetWidth;
+    cinematic.classList.add('active');
+  }
+
+  document.querySelectorAll('.ob-step').forEach((step, idx) => {
+    step.classList.toggle('active', idx === 0);
+    step.classList.remove('leaving');
+  });
+
+  const skip = document.getElementById('ob-skip-btn');
+  if (skip) skip.style.display = '';
+
+  const nd = document.getElementById('ob-name-display');
+  if (nd) nd.textContent = "let's get you set up.";
+
+  const nameInput = document.getElementById('ob-name-input');
+  if (nameInput) nameInput.value = '';
+
+  const fallbackName = currentUser?.email?.split('@')[0] || 'you';
+  const cineSub = document.getElementById('ob-cine-sub');
+  const cineTitle = document.getElementById('ob-cine-card-title');
+
+  if (cineSub) {
+    cineSub.textContent =
+      `${fallbackName}, your route starts with a fast placement pass, then Scalar shapes the map around you.`;
+  }
+
+  if (cineTitle) {
+    cineTitle.textContent = `${fallbackName}'s first drop is the diagnostic.`;
+  }
+
+  obUpdateDots(1);
+  obUpdateBtn(1);
+
   const syms = ['∫','∑','∂','π','∞','∇','∆','α','β','λ','θ','σ','lim','f(x)','d/dx','x²','sin','cos','→','∈','∀','∃'];
   const container = document.getElementById('ob-symbols');
   if (!container) return;
+  container.innerHTML = '';
+
   for (let i = 0; i < 28; i++) {
     const el = document.createElement('div');
     el.className = 'ob-sym';
@@ -3138,6 +3250,13 @@ function obInit() {
     container.appendChild(el);
   }
 
+  const handle = setTimeout(obFinishIntro, 3500);
+  obIntroTimers.push(handle);
+
+  document.addEventListener('katex-ready', () => {});
+}
+
+
   // Focus name input
   setTimeout(() => {
     const inp = document.getElementById('ob-name-input');
@@ -3146,6 +3265,76 @@ function obInit() {
 
   // Ring animation on step 4
   document.addEventListener('katex-ready', () => {});
+}
+function obClearIntroTimers() {
+  obIntroTimers.forEach(t => clearTimeout(t));
+  obIntroTimers = [];
+}
+
+function obFinishIntro() {
+  if (obIntroFinished) return;
+  obIntroFinished = true;
+  obClearIntroTimers();
+
+  const onboarding = document.getElementById('s-onboarding');
+  const cinematic = document.getElementById('ob-cinematic');
+
+  if (cinematic) {
+    cinematic.style.transition = 'opacity .45s ease';
+    cinematic.style.opacity = '0';
+  }
+
+  const handle = setTimeout(() => {
+    if (cinematic) {
+      cinematic.classList.remove('active');
+      cinematic.style.opacity = '';
+      cinematic.style.transition = '';
+    }
+    if (onboarding) onboarding.classList.remove('intro-active');
+    const inp = document.getElementById('ob-name-input');
+    if (inp) inp.focus();
+  }, 420);
+
+  obIntroTimers.push(handle);
+}
+
+function obSkipIntro() {
+  obFinishIntro();
+}
+function obClearIntroTimers() {
+  obIntroTimers.forEach(t => clearTimeout(t));
+  obIntroTimers = [];
+}
+
+function obFinishIntro() {
+  if (obIntroFinished) return;
+  obIntroFinished = true;
+  obClearIntroTimers();
+
+  const onboarding = document.getElementById('s-onboarding');
+  const cinematic = document.getElementById('ob-cinematic');
+
+  if (cinematic) {
+    cinematic.style.transition = 'opacity .45s ease';
+    cinematic.style.opacity = '0';
+  }
+
+  const handle = setTimeout(() => {
+    if (cinematic) {
+      cinematic.classList.remove('active');
+      cinematic.style.opacity = '';
+      cinematic.style.transition = '';
+    }
+    if (onboarding) onboarding.classList.remove('intro-active');
+    const inp = document.getElementById('ob-name-input');
+    if (inp) inp.focus();
+  }, 420);
+
+  obIntroTimers.push(handle);
+}
+
+function obSkipIntro() {
+  obFinishIntro();
 }
 
 function obUpdateDots(step) {
