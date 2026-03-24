@@ -2345,7 +2345,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
           <div class="dcard-cta">Open →</div>
         </div>
 
-        <div class="dcard dcard-tool" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.open('lessons.html'+(t?'?theme='+t:''),'_blank')})()">
+        <div class="dcard dcard-tool" onclick="(function(){const t=localStorage.getItem('apexmath_theme')||'';window.location.href='lessons.html'+(t?'?theme='+t:'')})()">
           <div class="dcard-tool-icon">📚</div>
           <div class="dcard-tool-name">Lessons</div>
           <div class="dcard-tool-desc">Step-by-step walkthroughs for every topic.</div>
