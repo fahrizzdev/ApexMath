@@ -1262,7 +1262,8 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 ══════════════════════════════════ -->
 
 <style>
-/* ── ONBOARDING SCREEN ─────────────────────────────────────────────────────── */
+/* ── ONBOARDING SCREEN ───────────────────────────────── */
+
 #s-onboarding {
   min-height: 100vh;
   background: var(--bg);
@@ -1273,7 +1274,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 }
 #s-onboarding.active { display: flex; }
 
-/* Animated background grid */
+/* Grid */
 .ob-grid {
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image:
@@ -1285,248 +1286,158 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 }
 @keyframes gridPan { to { background-position: 48px 48px; } }
 
-/* Floating math symbols */
+/* Symbols */
 .ob-symbols {
   position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
 }
-.ob-sym {
-  position: absolute;
-  font-family: 'DM Mono', monospace;
-  color: var(--accent);
-  opacity: 0;
-  font-size: 1rem;
-  animation: symFloat linear infinite;
-  animation-fill-mode: both;
-}
-@keyframes symFloat {
-  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
-  10%  { opacity: .12; }
-  90%  { opacity: .08; }
-  100% { opacity: 0; transform: translateY(-120vh) rotate(20deg); }
-}
 
-/* Step container */
+/* Step */
 .ob-stage {
   position: relative; z-index: 10;
   flex: 1; display: flex; align-items: center; justify-content: center;
   padding: 2rem;
 }
 
-/* Individual step */
 .ob-step {
   display: none; flex-direction: column; align-items: center; text-align: center;
   max-width: 780px; width: 100%;
   animation: obIn .55s cubic-bezier(.22,1,.36,1) both;
 }
 .ob-step.active { display: flex; }
+
 @keyframes obIn {
   from { opacity: 0; transform: translateY(28px) scale(.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes obOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(-22px) scale(.97); }
-}
-.ob-step.leaving { animation: obOut .3s cubic-bezier(.4,0,1,1) both; }
 
-/* Step icon */
-.ob-icon {
-  width: 88px; height: 88px; border-radius: 24px;
-  background: var(--accent-light); border: 2px solid var(--accent-mid);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.4rem; margin-bottom: 2rem;
-  animation: iconPop .6s cubic-bezier(.34,1.56,.64,1) .1s both;
-  position: relative;
-}
-@keyframes iconPop {
-  from { transform: scale(.6) rotate(-10deg); opacity: 0; }
-  to   { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-.ob-icon::after {
-  content: '';
-  position: absolute; inset: -8px;
-  border-radius: 28px;
-  border: 1px solid var(--accent-mid);
-  opacity: .5;
-  animation: iconRing 2s ease-in-out infinite;
-}
-@keyframes iconRing {
-  0%, 100% { transform: scale(1); opacity: .5; }
-  50% { transform: scale(1.06); opacity: .15; }
-}
+/* ── CINEMATIC INTRO ───────────────────────────────── */
 
-/* Step number pill */
-.ob-step-pill {
-  font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .16em;
-  text-transform: uppercase; color: var(--accent);
-  border: 1px solid var(--accent-mid); background: var(--accent-light);
-  padding: .28rem .75rem; border-radius: 999px; margin-bottom: 1.25rem;
-  animation: obIn .4s ease .05s both;
-}
-
-/* Step headline */
-.ob-h {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  letter-spacing: -.04em; line-height: 1.1;
-  color: var(--text); margin-bottom: .75rem;
-  animation: obIn .4s ease .1s both;
-}
-.ob-h em { color: var(--accent); font-style: normal; }
-
-/* Subheading */
-.ob-sub {
-  font-size: 1.05rem; color: var(--text2); line-height: 1.7;
-  max-width: 540px; margin: 0 auto 2.5rem;
-  animation: obIn .4s ease .18s both;
-}
-
-/* Feature cards grid */
-/* Keep all your original .ob-feat-grid, .ob-feat-card, .ob-flow, .ob-diag-preview, .ob-accuracy-ring, .ob-bottom, .ob-btn, .ob-name-input, and media queries exactly as before */
-
-/* ── CINEMATIC TRANSITION ───────────────────────────────── */
 .ob-cinematic {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.08), rgba(0,0,0,0.95));
+  background: radial-gradient(circle at center, rgba(255,255,255,0.12), rgba(0,0,0,0.96));
   opacity: 0;
   pointer-events: none;
   z-index: 999;
-  transition: opacity .6s ease;
+  transition: opacity .5s ease;
 }
 .ob-cinematic.active { opacity: 1; }
 
-#s-onboarding.cinematic-zoom {
-  animation: obZoomIn .9s cubic-bezier(.22,1,.36,1) forwards;
-}
-@keyframes obZoomIn {
-  0%   { transform: scale(1); filter: blur(0px); }
-  40%  { transform: scale(1.04); filter: blur(2px); }
-  100% { transform: scale(1.12); filter: blur(6px); opacity: 0; }
-}
-#s-onboarding.cinematic-zoom .ob-grid {
-  animation-duration: 6s !important;
-}
-.ob-cinematic::after {
+/* motion streak */
+.ob-cinematic::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,.15), transparent);
-  transform: translateX(-100%);
-  animation: cinematicSweep .8s ease forwards;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.25) 50%, transparent 80%);
+  transform: translateX(-120%);
+  opacity: 0;
 }
-@keyframes cinematicSweep {
-  to { transform: translateX(100%); }
+.ob-cinematic.active::before {
+  animation: cinematicStreak .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+@keyframes cinematicStreak {
+  0% { transform: translateX(-120%); opacity: 0; }
+  30% { opacity: .8; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+/* camera zoom */
+#s-onboarding.cinematic-zoom {
+  animation: obCinematicFull 1s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+@keyframes obCinematicFull {
+  0%   { transform: scale(1) translateY(0); filter: blur(0px); }
+  30%  { transform: scale(1.05) translateY(-10px); filter: blur(2px); }
+  60%  { transform: scale(1.12) translateY(-20px); filter: blur(4px); }
+  100% { transform: scale(1.25) translateY(-40px); filter: blur(8px); opacity: 0; }
+}
+
+/* flash */
+.ob-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  z-index: 998;
+  pointer-events: none;
+}
+.ob-flash.active {
+  animation: flashPop .4s ease forwards;
+}
+@keyframes flashPop {
+  0% { opacity: 0; }
+  40% { opacity: .35; }
+  100% { opacity: 0; }
 }
 </style>
 
 <div class="screen" id="s-onboarding">
 
-  <!-- Cinematic overlay -->
-
+  <!-- CINEMATIC ELEMENTS -->
   <div class="ob-cinematic" id="ob-cinematic"></div>
+  <div class="ob-flash" id="ob-flash"></div>
 
-  <!-- Background atmosphere -->
-
+  <!-- BACKGROUND -->
   <div class="ob-grid"></div>
   <div class="ob-symbols" id="ob-symbols"></div>
 
-  <!-- STEP 1: Welcome -->
-
-  <div class="ob-step ob-step--welcome active" id="ob-step-1">
-    <div class="ob-icon">🎓</div>
-    <div class="ob-step-pill">Step 1 of 4 — Welcome</div>
-    <h1 class="ob-h">Welcome to <em>Scalar</em>,<br/><span id="ob-name-display">let's get you set up.</span></h1>
-    <p class="ob-sub">The adaptive math platform that meets you exactly where you are — and gets you where you want to go.</p>
-    <div class="ob-name-wrap">
-      <input class="ob-name-input" id="ob-name-input" placeholder="What should we call you?" maxlength="32" onkeydown="if(event.key==='Enter')obNext()" />
-    </div>
+  <!-- STEP 1 -->
+  <div class="ob-step active" id="ob-step-1">
+    <h1 class="ob-h">Welcome to <em>Scalar</em></h1>
+    <input id="ob-name-input" placeholder="Your name" onkeydown="if(event.key==='Enter')obNext()" />
   </div>
 
-  <!-- STEP 2: What's here -->
-
+  <!-- STEP 2 -->
   <div class="ob-step" id="ob-step-2">
-    <div class="ob-icon">🗺️</div>
-    <div class="ob-step-pill">Step 2 of 4 — What's inside</div>
-    <h1 class="ob-h">Everything you need.<br/><em>Nothing you don't.</em></h1>
-    <p class="ob-sub">Six tools, one goal: take you from wherever you are to wherever you want to be in math.</p>
-    <div class="ob-feat-grid">
-      <div class="ob-feat-card highlight">
-        <span class="ob-feat-card-icon">🎯</span>
-        <div class="ob-feat-card-name">Adaptive Diagnostic</div>
-        <div class="ob-feat-card-desc">10 questions that pinpoint your exact level across 7 difficulty tiers. You do this first — it calibrates everything.</div>
-      </div>
-      <div class="ob-feat-card">
-        <span class="ob-feat-card-icon">🔥</span>
-        <div class="ob-feat-card-name">Daily Quiz</div>
-        <div class="ob-feat-card-desc">5 questions every day, biased toward your weak spots. Build streaks. Build habits. Miss a day, start again.</div>
-      </div>
-      <div class="ob-feat-card">
-        <span class="ob-feat-card-icon">⚡</span>
-        <div class="ob-feat-card-name">Practice Mode</div>
-        <div class="ob-feat-card-desc">Unlimited questions by topic and level. Drill exactly what you're weak on until it clicks.</div>
-      </div>
-      <div class="ob-feat-card">
-        <span class="ob-feat-card-icon">📍</span>
-        <div class="ob-feat-card-name">Weak Spot Tracker</div>
-        <div class="ob-feat-card-desc">Every wrong answer logs the topic. See your patterns across sessions. Know exactly what to study.</div>
-      </div>
-      <div class="ob-feat-card">
-        <span class="ob-feat-card-icon">💡</span>
-        <div class="ob-feat-card-name">Worked Solutions</div>
-        <div class="ob-feat-card-desc">Every question — right or wrong — shows a full step-by-step explanation. You always leave knowing why.</div>
-      </div>
-      <div class="ob-feat-card">
-        <span class="ob-feat-card-icon">🃏</span>
-        <div class="ob-feat-card-name">Flashcards + Formulas</div>
-        <div class="ob-feat-card-desc">Flip through concept cards. Search every formula you need. Your reference sheet is always one tap away.</div>
-      </div>
-    </div>
+    <h1 class="ob-h">Everything you need</h1>
   </div>
-
-  <!-- STEP 3: How it works -->
-
-  <!-- (Keep the original STEP 3 content here, exactly as in your original paste) -->
-
-  <!-- STEP 4: Diagnostic preview -->
-
-  <!-- (Keep the original STEP 4 content here, exactly as in your original paste) -->
-
-  <!-- Bottom navigation -->
-
-  <!-- (Keep your original .ob-bottom navigation block as before) -->
 
 </div>
 
 <script>
-// ── CINEMATIC TRANSITION LOGIC ─────────────────────────────
+let currentStep = 1;
+
+function goToStep(step) {
+  document.querySelector(`#ob-step-${currentStep}`).classList.remove('active');
+  currentStep = step;
+  document.querySelector(`#ob-step-${currentStep}`).classList.add('active');
+}
+
+/* ── CINEMATIC TRANSITION ───────────────── */
+
 function cinematicTransition(callback) {
   const screen = document.getElementById('s-onboarding');
   const overlay = document.getElementById('ob-cinematic');
+  const flash = document.getElementById('ob-flash');
 
-  screen.classList.add('cinematic-zoom');
   overlay.classList.add('active');
 
   setTimeout(() => {
+    flash.classList.add('active');
+    screen.classList.add('cinematic-zoom');
+  }, 120);
+
+  setTimeout(() => {
     callback();
+  }, 600);
+
+  setTimeout(() => {
     screen.classList.remove('cinematic-zoom');
     overlay.classList.remove('active');
-  }, 750);
+    flash.classList.remove('active');
+  }, 1100);
 }
 
-// Patch obNext() safely to include cinematic on Step 1 -> Step 2
-const _oldObNext = window.obNext;
-window.obNext = function () {
-  if (typeof currentStep !== 'undefined' && currentStep === 1) {
-    cinematicTransition(() => {
-      if (typeof goToStep === 'function') goToStep(2);
-    });
-    return;
+function obNext() {
+  if (currentStep === 1) {
+    cinematicTransition(() => goToStep(2));
+  } else {
+    goToStep(currentStep + 1);
   }
-  if (_oldObNext) _oldObNext();
-};
+}
 </script>
-
 <!-- ══════════════════════════════════
      DIAGNOSTIC
 ══════════════════════════════════ -->
