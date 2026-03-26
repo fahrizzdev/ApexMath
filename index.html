@@ -3448,7 +3448,7 @@ function showDiagResultOverlay(rd){
     " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       Start Training →
     </button>
-    <button onclick="renderResult(${JSON.stringify(rd).replace(/"/g,'&quot;')},false);document.getElementById('diag-result-overlay').remove()" style="
+  <button id="ob-view-path-btn" style="
       margin-top:.75rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;
       text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;
       animation:obIn .4s ease .58s both;opacity:0
@@ -3458,6 +3458,11 @@ function showDiagResultOverlay(rd){
   `;
 
   document.body.appendChild(ov);
+  const pathBtn = document.getElementById('ob-view-path-btn');
+  if (pathBtn) pathBtn.addEventListener('click', () => {
+    renderResult(rd, false);
+    document.getElementById('diag-result-overlay')?.remove();
+  });
 }
 
 function saveResult(data){ try{localStorage.setItem('apexmath_result',JSON.stringify(data));}catch(e){} }
