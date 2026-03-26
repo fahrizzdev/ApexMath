@@ -2974,7 +2974,29 @@ function updateModalUI(){
 async function submitAuth(){
   const email=document.getElementById('auth-email').value.trim();
 
- 
+  const password=document.getElementById('auth-password').value;
+  const errEl=document.getElementById('auth-err');
+  if(!email||!password){errEl.textContent='Please fill in both fields.';errEl.classList.add('show');return;}
+  try{
+    const res=await fetch(authMode==='register'?'/auth/register':'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const data=await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Something went wrong.';errEl.classList.add('show');return;}
+    setToken(data.token);
+    if (data.userId) currentUserId = data.userId;
+    currentUser = data;
+    updateNavForUser(currentUser);
+closeModal();
+    if (authMode === 'register') {
+      try { localStorage.removeItem('scalar_ob_done_' + (data.userId || 'anon')); } catch(e) {}
+      showScreen('s-onboarding');
+      obInit();
+      obUpdateDots(1);
+      obUpdateBtn(1);
+    } else {
+      showDashboard();
+    }
+  }catch(e){errEl.textContent='Connection error. Try again.';errEl.classList.add('show');}
+}
 function signOut(){ setToken(null); currentUser=null; updateNavForUser(null); showScreen('s-landing'); }
 function updateNavForUser(user){
   document.getElementById('nav-auth-area').style.display=user?'none':'flex';
@@ -3101,7 +3123,9 @@ let obUserName = '';
 function obInit() {
   obCurrentStep = 1;
   // Spawn floating math symbols
-  const container = document.getElementById('ob-symbols');
+  // Spawn floating math symbols
+  const syms = ['∫','∑','∂','π','∞','∇','∆','α','β','λ','θ','σ','lim','f(x)','d/dx','x²','sin','cos','→','∈','∀','∃'];
+const container = document.getElementById('ob-symbols');
   if (!container) return;
   container.innerHTML = '';
   for (let i = 0; i < 28; i++) {
