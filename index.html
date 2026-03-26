@@ -2530,7 +2530,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
           <div class="timer-status2" id="timer-status2">ready to start</div>
         </div>
         <div class="timer-btns2">
-          <button class="quiz-card-btn" style="padding:.65rem 1.2rem;font-size:.6rem" id="timer-btn-start2" onclick="timerStart2()">Start</button>
+          <button class="setting-btn2" style="padding:.65rem 1.2rem;font-size:.6rem" id="timer-btn-start2" onclick="timerStart2()">Start</button>
           <button class="setting-btn2" id="timer-btn-stop2" onclick="timerStop2()" disabled>Stop</button>
           <button class="setting-btn2" onclick="timerReset2()">Discard</button>
         </div>
@@ -2973,6 +2973,7 @@ function updateModalUI(){
 }
 async function submitAuth(){
   const email=document.getElementById('auth-email').value.trim();
+
   const password=document.getElementById('auth-password').value;
   const errEl=document.getElementById('auth-err');
   if(!email||!password){errEl.textContent='Please fill in both fields.';errEl.classList.add('show');return;}
@@ -2984,30 +2985,7 @@ async function submitAuth(){
     if (data.userId) currentUserId = data.userId;
     currentUser = data;
     updateNavForUser(currentUser);
-    closeModal();
-    if (authMode === 'register') {
-      try { localStorage.removeItem('scalar_ob_done_' + (data.userId || 'anon')); } catch(e) {}
-      showScreen('s-onboarding');
-      obInit();
-      obUpdateDots(1);
-      obUpdateBtn(1);
-    } else {
-      showDashboard();
-    }
-  }catch(e){errEl.textContent='Connection error. Try again.';errEl.classList.add('show');}
-}
-  const password=document.getElementById('auth-password').value;
-  const errEl=document.getElementById('auth-err');
-  if(!email||!password){errEl.textContent='Please fill in both fields.';errEl.classList.add('show');return;}
-  try{
-    const res=await fetch(authMode==='register'?'/auth/register':'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-    const data=await res.json();
-    if(!res.ok){errEl.textContent=data.error||'Something went wrong.';errEl.classList.add('show');return;}
-    setToken(data.token);
-    if (data.userId) currentUserId = data.userId;
-    currentUser = data;
-    updateNavForUser(currentUser);
-  closemodal();
+closeModal();
     if (authMode === 'register') {
       try { localStorage.removeItem('scalar_ob_done_' + (data.userId || 'anon')); } catch(e) {}
       showScreen('s-onboarding');
@@ -3147,8 +3125,9 @@ function obInit() {
   // Spawn floating math symbols
   // Spawn floating math symbols
   const syms = ['∫','∑','∂','π','∞','∇','∆','α','β','λ','θ','σ','lim','f(x)','d/dx','x²','sin','cos','→','∈','∀','∃'];
-  const container = document.getElementById('ob-symbols');
+const container = document.getElementById('ob-symbols');
   if (!container) return;
+  container.innerHTML = '';
   for (let i = 0; i < 28; i++) {
     const el = document.createElement('div');
     el.className = 'ob-sym';
@@ -3849,7 +3828,7 @@ async function showDashboard(){
     const studyH = Math.floor(studyMs/3600000);
     const studyM = Math.floor((studyMs%3600000)/60000);
     document.getElementById('stat-hours').textContent = studyH > 0 ? `${studyH}h ${studyM}m` : `${studyM}m`;
-    document.getElementById('timer-card-total').textContent = (studyH>0?studyH+'h ':'')+studyM+'m this week →';
+    const tcEl = document.getElementById('timer-card-total'); if(tcEl) tcEl.textContent = (studyH>0?studyH+'h ':'')+studyM+'m this week →';
 
     // ── INLINE WEAK SPOTS ──
     renderInlineWeakSpots(data.weakTopics||[]);
@@ -3878,7 +3857,7 @@ async function showDashboard(){
       asRes.innerHTML=resources.map(r=>`<a class="dash-aside-res-link" href="${r.url}" target="_blank" rel="noopener"><span class="dash-aside-res-icon">${typeIcons[r.type]||'🔗'}</span>${r.name}</a>`).join('');
     }
 
-    setTimeout(startDashCanvas,200);
+   
 
   }catch(e){console.error('Dashboard error',e);}
 }
