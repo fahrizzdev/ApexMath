@@ -1249,15 +1249,15 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 <!-- ══════════════════════════════════
      ONBOARDING
 ══════════════════════════════════ -->
-<style>
 /* ── ONBOARDING SCREEN ─────────────────────────────────────────────────────── */
 #s-onboarding {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   background: var(--bg);
   display: none;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
 }
 #s-onboarding.active { display: flex; }
 
@@ -1296,8 +1296,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* Step container */
 .ob-stage {
   position: relative; z-index: 10;
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  padding: 2rem;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem 2rem;
+  overflow: hidden;
 }
 
 /* Individual step */
@@ -1319,10 +1321,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 
 /* Step icon */
 .ob-icon {
-  width: 88px; height: 88px; border-radius: 24px;
+  width: 64px; height: 64px; border-radius: 18px;
   background: var(--accent-light); border: 2px solid var(--accent-mid);
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.4rem; margin-bottom: 2rem;
+  font-size: 1.8rem; margin-bottom: 1rem;
   animation: iconPop .6s cubic-bezier(.34,1.56,.64,1) .1s both;
   position: relative;
 }
@@ -1333,7 +1335,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ob-icon::after {
   content: '';
   position: absolute; inset: -8px;
-  border-radius: 28px;
+  border-radius: 22px;
   border: 1px solid var(--accent-mid);
   opacity: .5;
   animation: iconRing 2s ease-in-out infinite;
@@ -1348,36 +1350,36 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .16em;
   text-transform: uppercase; color: var(--accent);
   border: 1px solid var(--accent-mid); background: var(--accent-light);
-  padding: .28rem .75rem; border-radius: 999px; margin-bottom: 1.25rem;
+  padding: .22rem .75rem; border-radius: 999px; margin-bottom: .75rem;
   animation: obIn .4s ease .05s both;
 }
 
 /* Step headline */
 .ob-h {
   font-family: 'DM Serif Display', serif;
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
   letter-spacing: -.04em; line-height: 1.1;
-  color: var(--text); margin-bottom: .75rem;
+  color: var(--text); margin-bottom: .5rem;
   animation: obIn .4s ease .1s both;
 }
 .ob-h em { color: var(--accent); font-style: normal; }
 
 /* Subheading */
 .ob-sub {
-  font-size: 1.05rem; color: var(--text2); line-height: 1.7;
-  max-width: 540px; margin: 0 auto 2.5rem;
+  font-size: .95rem; color: var(--text2); line-height: 1.6;
+  max-width: 540px; margin: 0 auto 1.5rem;
   animation: obIn .4s ease .18s both;
 }
 
 /* Feature cards grid (step 2) */
 .ob-feat-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: .75rem; width: 100%; margin-bottom: 2.5rem;
+  gap: .6rem; width: 100%; margin-bottom: 1.5rem;
   animation: obIn .4s ease .15s both;
 }
 .ob-feat-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.1rem 1rem; text-align: left;
+  border-radius: 10px; padding: .85rem .9rem; text-align: left;
   transition: border-color .2s, transform .2s, box-shadow .2s;
   cursor: default;
   opacity: 0;
@@ -1396,15 +1398,15 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   box-shadow: 0 6px 20px rgba(0,0,0,.06);
 }
 .ob-feat-card-icon {
-  font-size: 1.4rem; margin-bottom: .55rem; display: block;
+  font-size: 1.1rem; margin-bottom: .35rem; display: block;
 }
 .ob-feat-card-name {
-  font-family: 'DM Mono', monospace; font-size: .68rem; letter-spacing: .08em;
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .08em;
   text-transform: uppercase; color: var(--text); font-weight: 500;
-  margin-bottom: .3rem;
+  margin-bottom: .2rem;
 }
 .ob-feat-card-desc {
-  font-size: .8rem; color: var(--text2); line-height: 1.55;
+  font-size: .75rem; color: var(--text2); line-height: 1.5;
 }
 .ob-feat-card.highlight {
   border-color: var(--accent-mid); background: var(--accent-light);
@@ -1414,12 +1416,12 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* Flow diagram (step 3) */
 .ob-flow {
   display: flex; align-items: stretch; gap: 0;
-  width: 100%; margin-bottom: 2.5rem;
+  width: 100%; margin-bottom: 1.5rem;
   animation: obIn .4s ease .15s both;
 }
 .ob-flow-step {
   flex: 1; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.4rem 1.1rem; position: relative;
+  border-radius: 10px; padding: 1rem .9rem; position: relative;
   transition: transform .2s, box-shadow .2s;
 }
 .ob-flow-step:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.07); }
@@ -1428,14 +1430,14 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   color: var(--text3); font-size: 1.2rem; flex-shrink: 0;
 }
 .ob-flow-num {
-  font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent);
-  letter-spacing: -.04em; line-height: 1; margin-bottom: .4rem;
+  font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--accent);
+  letter-spacing: -.04em; line-height: 1; margin-bottom: .3rem;
 }
 .ob-flow-title {
-  font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--text); margin-bottom: .4rem;
+  font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text); margin-bottom: .3rem;
 }
-.ob-flow-body { font-size: .78rem; color: var(--text2); line-height: 1.55; }
+.ob-flow-body { font-size: .74rem; color: var(--text2); line-height: 1.5; }
 .ob-flow-step.active-step {
   border-color: var(--accent); background: var(--accent-light);
 }
@@ -1444,19 +1446,19 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* Diagnostic preview (step 4) */
 .ob-diag-preview {
   width: 100%; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden;
-  margin-bottom: 2.5rem;
+  border-radius: 12px; overflow: hidden;
+  margin-bottom: 1.25rem;
   animation: obIn .4s ease .15s both;
   box-shadow: 0 8px 32px rgba(0,0,0,.07);
 }
 .ob-diag-topbar {
   background: var(--bg2); border-bottom: 1px solid var(--border);
-  padding: .75rem 1.25rem;
+  padding: .55rem 1.1rem;
   display: flex; align-items: center; justify-content: space-between;
 }
 .ob-diag-dots { display: flex; gap: .4rem; }
 .ob-diag-dot {
-  width: 9px; height: 9px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
   background: var(--border);
 }
 .ob-diag-dot:nth-child(1) { background: #ff5f57; }
@@ -1466,10 +1468,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em;
   text-transform: uppercase; color: var(--text3);
 }
-.ob-diag-body { padding: 1.75rem 1.75rem 1.25rem; text-align: left; }
+.ob-diag-body { padding: 1rem 1.25rem .9rem; text-align: left; }
 .ob-diag-prog {
-  height: 4px; background: var(--bg2); border-radius: 2px;
-  margin-bottom: 1.5rem; overflow: hidden;
+  height: 3px; background: var(--bg2); border-radius: 2px;
+  margin-bottom: .9rem; overflow: hidden;
 }
 .ob-diag-prog-fill {
   height: 100%; width: 40%; background: var(--accent); border-radius: 2px;
@@ -1479,40 +1481,40 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   0%, 100% { width: 40%; } 50% { width: 45%; }
 }
 .ob-diag-q {
-  font-family: 'DM Serif Display', serif; font-size: 1.15rem;
-  color: var(--text); margin-bottom: 1.25rem; line-height: 1.4;
+  font-family: 'DM Serif Display', serif; font-size: 1rem;
+  color: var(--text); margin-bottom: .85rem; line-height: 1.4;
 }
-.ob-diag-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.ob-diag-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
 .ob-diag-opt {
-  display: flex; align-items: center; gap: .65rem;
-  border: 1px solid var(--border); border-radius: 8px;
-  padding: .65rem .85rem; background: var(--bg);
-  font-size: .84rem; color: var(--text2); cursor: default;
+  display: flex; align-items: center; gap: .55rem;
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: .5rem .75rem; background: var(--bg);
+  font-size: .8rem; color: var(--text2); cursor: default;
   transition: border-color .15s;
 }
 .ob-diag-opt.correct-opt {
   border-color: var(--accent); background: var(--accent-light); color: var(--text);
 }
 .ob-diag-opt-letter {
-  font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .08em;
   color: var(--text3); flex-shrink: 0;
 }
 .ob-diag-opt.correct-opt .ob-diag-opt-letter { color: var(--accent); }
 .ob-diag-feedback {
-  margin-top: 1rem; padding: .85rem 1rem;
+  margin-top: .75rem; padding: .65rem .85rem;
   background: var(--accent-light); border: 1px solid var(--accent-mid);
-  border-radius: 8px; font-size: .82rem; color: var(--text2); line-height: 1.6;
+  border-radius: 7px; font-size: .78rem; color: var(--text2); line-height: 1.55;
 }
 .ob-diag-feedback strong { color: var(--accent); }
 
 /* Accuracy meter (step 4) */
 .ob-accuracy-ring {
-  display: flex; gap: 2rem; align-items: center; justify-content: center;
-  margin-bottom: 2.5rem;
+  display: flex; gap: 1.5rem; align-items: center; justify-content: center;
+  margin-bottom: 1.25rem;
   animation: obIn .4s ease .2s both;
 }
-.ob-ring-wrap { position: relative; width: 110px; height: 110px; }
-.ob-ring-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+.ob-ring-wrap { position: relative; width: 88px; height: 88px; }
+.ob-ring-svg { width: 88px; height: 88px; transform: rotate(-90deg); }
 .ob-ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
 .ob-ring-fill {
   fill: none; stroke: var(--accent); stroke-width: 8;
@@ -1525,25 +1527,25 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .ob-ring-pct {
-  font-family: 'DM Serif Display', serif; font-size: 1.5rem;
+  font-family: 'DM Serif Display', serif; font-size: 1.3rem;
   color: var(--text); letter-spacing: -.04em; line-height: 1;
 }
 .ob-ring-sub {
-  font-family: 'DM Mono', monospace; font-size: .5rem; letter-spacing: .1em;
+  font-family: 'DM Mono', monospace; font-size: .45rem; letter-spacing: .1em;
   text-transform: uppercase; color: var(--text3);
 }
 .ob-ring-info { text-align: left; }
 .ob-ring-info-title {
-  font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: .4rem;
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: .35rem;
 }
-.ob-ring-info-body { font-size: .84rem; color: var(--text2); line-height: 1.65; max-width: 260px; }
+.ob-ring-info-body { font-size: .8rem; color: var(--text2); line-height: 1.6; max-width: 260px; }
 
 /* Bottom nav */
 .ob-bottom {
   position: relative; z-index: 10;
-  padding: 1.5rem 2rem 2rem;
-  display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+  padding: 1rem 2rem 1.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: .85rem;
 }
 
 /* Dot progress */
@@ -1562,7 +1564,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* CTA row */
 .ob-cta-row { display: flex; align-items: center; gap: .85rem; }
 .ob-btn-primary {
-  padding: .85rem 2.2rem;
+  padding: .75rem 2rem;
   background: var(--accent); color: #fff; border: none;
   font-family: 'DM Mono', monospace; font-size: .68rem; letter-spacing: .14em;
   text-transform: uppercase; cursor: pointer; border-radius: 8px;
@@ -1589,13 +1591,13 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* Name input (step 1) */
 .ob-name-wrap {
   display: flex; flex-direction: column; align-items: center;
-  gap: .75rem; margin-bottom: 2rem; width: 100%; max-width: 340px;
+  gap: .75rem; margin-bottom: 1.5rem; width: 100%; max-width: 340px;
   animation: obIn .4s ease .2s both;
 }
 .ob-name-input {
-  width: 100%; padding: .85rem 1.1rem;
+  width: 100%; padding: .75rem 1rem;
   background: var(--surface); border: 1.5px solid var(--border);
-  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 1rem;
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .95rem;
   border-radius: 10px; outline: none;
   transition: border-color .2s;
   text-align: center;
@@ -1604,13 +1606,13 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 .ob-name-input::placeholder { color: var(--text3); }
 
 /* Step-specific layout tweaks */
-.ob-step--welcome .ob-h { font-size: clamp(2.4rem, 6vw, 4rem); }
+.ob-step--welcome .ob-h { font-size: clamp(2rem, 5vw, 3.2rem); }
 
 /* Animated checkmark */
 .ob-check {
-  width: 24px; height: 24px; flex-shrink: 0;
+  width: 20px; height: 20px; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%; background: var(--accent); color: #fff; font-size: .75rem;
+  border-radius: 50%; background: var(--accent); color: #fff; font-size: .7rem;
   animation: checkPop .4s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes checkPop { from { transform: scale(0); } to { transform: scale(1); } }
@@ -1618,186 +1620,12 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:1.1rem
 /* Mobile */
 @media(max-width:640px){
   .ob-feat-grid { grid-template-columns: 1fr 1fr; }
-  .ob-flow { flex-direction: column; gap: .5rem; }
-  .ob-flow-arrow { transform: rotate(90deg); align-self: center; padding: .2rem 0; }
+  .ob-flow { flex-direction: column; gap: .4rem; }
+  .ob-flow-arrow { transform: rotate(90deg); align-self: center; padding: .1rem 0; }
   .ob-diag-opts { grid-template-columns: 1fr; }
   .ob-accuracy-ring { flex-direction: column; }
-  .ob-h { font-size: clamp(1.8rem, 7vw, 2.6rem); }
+  .ob-h { font-size: clamp(1.6rem, 6vw, 2.2rem); }
 }
-</style>
-
-<div class="screen" id="s-onboarding">
-  <!-- Background atmosphere -->
-  <div class="ob-grid"></div>
-  <div class="ob-symbols" id="ob-symbols"></div>
-
-  <!-- Steps -->
-  <div class="ob-stage">
-
-    <!-- STEP 1: Welcome -->
-    <div class="ob-step ob-step--welcome active" id="ob-step-1">
-      <div class="ob-icon">🎓</div>
-      <div class="ob-step-pill">Step 1 of 4 — Welcome</div>
-      <h1 class="ob-h">Welcome to <em>Scalar</em>,<br/><span id="ob-name-display">let's get you set up.</span></h1>
-      <p class="ob-sub">The adaptive math platform that meets you exactly where you are — and gets you where you want to go.</p>
-      <div class="ob-name-wrap">
-        <input class="ob-name-input" id="ob-name-input" placeholder="What should we call you?" maxlength="32" onkeydown="if(event.key==='Enter')obNext()" />
-      </div>
-    </div>
-
-    <!-- STEP 2: What's here -->
-    <div class="ob-step" id="ob-step-2">
-      <div class="ob-icon">🗺️</div>
-      <div class="ob-step-pill">Step 2 of 4 — What's inside</div>
-      <h1 class="ob-h">Everything you need.<br/><em>Nothing you don't.</em></h1>
-      <p class="ob-sub">Six tools, one goal: take you from wherever you are to wherever you want to be in math.</p>
-      <div class="ob-feat-grid">
-        <div class="ob-feat-card highlight">
-          <span class="ob-feat-card-icon">🎯</span>
-          <div class="ob-feat-card-name">Adaptive Diagnostic</div>
-          <div class="ob-feat-card-desc">10 questions that pinpoint your exact level across 7 difficulty tiers. You do this first — it calibrates everything.</div>
-        </div>
-        <div class="ob-feat-card">
-          <span class="ob-feat-card-icon">🔥</span>
-          <div class="ob-feat-card-name">Daily Quiz</div>
-          <div class="ob-feat-card-desc">5 questions every day, biased toward your weak spots. Build streaks. Build habits. Miss a day, start again.</div>
-        </div>
-        <div class="ob-feat-card">
-          <span class="ob-feat-card-icon">⚡</span>
-          <div class="ob-feat-card-name">Practice Mode</div>
-          <div class="ob-feat-card-desc">Unlimited questions by topic and level. Drill exactly what you're weak on until it clicks.</div>
-        </div>
-        <div class="ob-feat-card">
-          <span class="ob-feat-card-icon">📍</span>
-          <div class="ob-feat-card-name">Weak Spot Tracker</div>
-          <div class="ob-feat-card-desc">Every wrong answer logs the topic. See your patterns across sessions. Know exactly what to study.</div>
-        </div>
-        <div class="ob-feat-card">
-          <span class="ob-feat-card-icon">💡</span>
-          <div class="ob-feat-card-name">Worked Solutions</div>
-          <div class="ob-feat-card-desc">Every question — right or wrong — shows a full step-by-step explanation. You always leave knowing why.</div>
-        </div>
-        <div class="ob-feat-card">
-          <span class="ob-feat-card-icon">🃏</span>
-          <div class="ob-feat-card-name">Flashcards + Formulas</div>
-          <div class="ob-feat-card-desc">Flip through concept cards. Search every formula you need. Your reference sheet is always one tap away.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3: How it works -->
-    <div class="ob-step" id="ob-step-3">
-      <div class="ob-icon">⚡</div>
-      <div class="ob-step-pill">Step 3 of 4 — The loop</div>
-      <h1 class="ob-h">The learning loop<br/>that <em>actually works.</em></h1>
-      <p class="ob-sub">Most platforms just test you. Scalar runs a deliberate practice loop — so every session compounds.</p>
-      <div class="ob-flow">
-        <div class="ob-flow-step active-step">
-          <div class="ob-flow-num">01</div>
-          <div class="ob-flow-title">Diagnose</div>
-          <div class="ob-flow-body">Find your exact starting point across 7 levels in one 10-question session.</div>
-        </div>
-        <div class="ob-flow-arrow">→</div>
-        <div class="ob-flow-step">
-          <div class="ob-flow-num">02</div>
-          <div class="ob-flow-title">Train daily</div>
-          <div class="ob-flow-body">5 questions a day, targeted at your weakest topics. Miss less. Learn more.</div>
-        </div>
-        <div class="ob-flow-arrow">→</div>
-        <div class="ob-flow-step">
-          <div class="ob-flow-num">03</div>
-          <div class="ob-flow-title">Get feedback</div>
-          <div class="ob-flow-body">Wrong answers show a "Learn this" lesson link. Right away, not buried in a menu.</div>
-        </div>
-        <div class="ob-flow-arrow">→</div>
-        <div class="ob-flow-step">
-          <div class="ob-flow-num">04</div>
-          <div class="ob-flow-title">Level up</div>
-          <div class="ob-flow-body">As your weak spots shrink, your daily quiz adapts. Progress compounds automatically.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 4: Diagnostic preview -->
-    <div class="ob-step" id="ob-step-4">
-      <div class="ob-icon">🎯</div>
-      <div class="ob-step-pill">Step 4 of 4 — You're ready</div>
-      <h1 class="ob-h">First up:<br/>your <em>diagnostic.</em></h1>
-      <p class="ob-sub">10 adaptive questions. ~5 minutes. The result calibrates everything — your daily quiz, your weak spots, your learning path.</p>
-
-      <div class="ob-diag-preview">
-        <div class="ob-diag-topbar">
-          <div class="ob-diag-dots">
-            <div class="ob-diag-dot"></div>
-            <div class="ob-diag-dot"></div>
-            <div class="ob-diag-dot"></div>
-          </div>
-          <div class="ob-diag-label">Scalar — Diagnostic</div>
-          <div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--text3)">Question 4 of 15</div>
-        </div>
-        <div class="ob-diag-body">
-          <div class="ob-diag-prog"><div class="ob-diag-prog-fill"></div></div>
-          <div class="ob-diag-q">Solve for x: &nbsp; 2x + 5 = 13</div>
-          <div class="ob-diag-opts">
-            <div class="ob-diag-opt">
-              <span class="ob-diag-opt-letter">A</span> x = 3
-            </div>
-            <div class="ob-diag-opt correct-opt">
-              <span class="ob-diag-opt-letter">B</span> x = 4 &nbsp; <span class="ob-check">✓</span>
-            </div>
-            <div class="ob-diag-opt">
-              <span class="ob-diag-opt-letter">C</span> x = 9
-            </div>
-            <div class="ob-diag-opt">
-              <span class="ob-diag-opt-letter">D</span> x = 18
-            </div>
-          </div>
-          <div class="ob-diag-feedback">
-            <strong>✓ Correct.</strong> Subtract 5 from both sides: 2x = 8. Divide by 2: x = 4.
-            The level adjusts automatically as you go — harder if you're getting it, easier if you're not.
-          </div>
-        </div>
-      </div>
-
-      <div class="ob-accuracy-ring" id="ob-rings">
-        <div class="ob-ring-wrap">
-          <svg class="ob-ring-svg" viewBox="0 0 100 100">
-            <circle class="ob-ring-bg" cx="50" cy="50" r="45"/>
-            <circle class="ob-ring-fill" id="ob-ring-1" cx="50" cy="50" r="45"/>
-          </svg>
-          <div class="ob-ring-label">
-            <div class="ob-ring-pct">7</div>
-            <div class="ob-ring-sub">levels</div>
-          </div>
-        </div>
-        <div class="ob-ring-info">
-          <div class="ob-ring-info-title">Adaptive across 7 tiers</div>
-          <div class="ob-ring-info-body">
-            The diagnostic covers Arithmetic through Calculus II. It adjusts in real time — so you'll never get stuck on questions that are way too easy or too hard. You'll finish with a precise starting point.
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /ob-stage -->
-
-  <!-- Bottom navigation -->
-  <div class="ob-bottom">
-    <div class="ob-dots">
-      <div class="ob-dot active" id="ob-d1"></div>
-      <div class="ob-dot" id="ob-d2"></div>
-      <div class="ob-dot" id="ob-d3"></div>
-      <div class="ob-dot" id="ob-d4"></div>
-    </div>
-    <div class="ob-cta-row">
-      <button class="ob-btn-skip" id="ob-skip-btn" onclick="obSkip()">Skip intro →</button>
-      <button class="ob-btn-primary" id="ob-next-btn" onclick="obNext()">
-        <span id="ob-next-label">Let's go →</span>
-      </button>
-    </div>
-  </div>
-</div>
-
 
 <!-- ══════════════════════════════════
      DIAGNOSTIC
