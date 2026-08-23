@@ -196,6 +196,9 @@ app.get('/waitlist/count', async (req, res) => {
 // ── Adaptive question (DB-backed session) ────────────────────────────────────
 app.post('/question', optionalAuthMiddleware, async (req, res) => {
   const { sessionId, currentLevel, correct, wrong } = req.body;
+  if (typeof sessionId !== 'string' || !sessionId.trim() || sessionId.length > 128) {
+    return res.status(400).json({ error: 'Session ID must be a non-empty string up to 128 characters' });
+  }
   const normalizedLevel = currentLevel == null ? undefined : Number(currentLevel);
   if (normalizedLevel !== undefined &&
       (!Number.isInteger(normalizedLevel) || normalizedLevel < 0 || normalizedLevel > 6)) {
