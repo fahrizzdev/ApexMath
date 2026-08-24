@@ -178,9 +178,12 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 // ── Waitlist ──────────────────────────────────────────────────────────────────
 app.post('/waitlist', async (req, res) => {
   const { email } = req.body;
-  if (!email || !email.includes('@')) return res.status(400).json({ error: 'Invalid email' });
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    return res.status(400).json({ error: 'Invalid email' });
+  }
   try {
-    await pool.query('INSERT INTO waitlist (email) VALUES ($1) ON CONFLICT (email) DO NOTHING', [email]);
+    await pool.query('INSERT INTO waitlist (email) VALUES ($1) ON CONFLICT (email) DO NOTHING', [normalizedEmail]);
     const result = await pool.query('SELECT COUNT(*) FROM waitlist');
     res.json({ success: true, count: parseInt(result.rows[0].count) });
   } catch { res.status(500).json({ error: 'Server error' }); }
