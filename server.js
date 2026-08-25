@@ -537,6 +537,14 @@ app.post('/daily/complete', authMiddleware, async (req, res) => {
   }
   // topicResults: [{ topic, correct: bool }]
   try {
+    const existingQuiz = await pool.query(
+      'SELECT 1 FROM daily_quiz_results WHERE user_id=$1 AND quiz_date=CURRENT_DATE LIMIT 1',
+      [req.userId]
+    );
+    if (existingQuiz.rows.length > 0) {
+      return res.status(409).json({ error: 'Daily quiz already completed' });
+    }
+
     const result = await pool.query('SELECT streak, last_quiz_date FROM users WHERE id=$1', [req.userId]);
     const u = result.rows[0];
     const today = new Date().toISOString().split('T')[0];
